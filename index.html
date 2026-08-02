@@ -112,7 +112,7 @@
   /* ---------- HERO ---------- */
   .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:110px;padding-bottom:90px}
   .hero-inner{position:relative;z-index:2;will-change:transform,opacity}
-  #hero3d{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:.92}
+  #hero3d{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.92}
   .hero .kick{margin-bottom:24px;overflow:hidden}
   .hero h1{font-family:var(--font-display);font-weight:700;text-transform:uppercase;font-size:clamp(2.6rem,10.5vw,8.6rem);line-height:.92;letter-spacing:-.012em;text-wrap:balance;max-width:100%}
   .hero h1 .line{display:block;overflow:hidden}
@@ -186,15 +186,17 @@
   .pillar p{margin-top:10px;color:var(--ink-dim);font-size:.94rem;transform:translateZ(16px)}
 
   /* ---------- antes/depois ---------- */
-  .ba-stage{position:relative;border-radius:26px;overflow:hidden;border:1px solid var(--line-strong);aspect-ratio:16/9;background:#0a0406}
-  @media(max-width:640px){.ba-stage{aspect-ratio:4/5}}
+  .ba-stage{position:relative;border-radius:26px;overflow:hidden;border:1px solid var(--line-strong);aspect-ratio:4/5;max-width:440px;margin-inline:auto;background:#0a0406}
+  .ba-stage + .ba-stage{margin-top:clamp(24px,5vw,44px)}
   .ba-layer{position:absolute;inset:0;display:grid;place-items:center}
+  .ba-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+  .ba-before .ba-img{filter:grayscale(.35) contrast(.96) brightness(.94)}
   .figure{position:relative;width:min(38%,240px);aspect-ratio:3/5;border-radius:120px 120px 40px 40px}
   .ba-before{background:linear-gradient(180deg,#161014,#0b080b)}
   .ba-before .figure{background:radial-gradient(60% 40% at 50% 22%,#3a3338,#241d22 60%,#161116);opacity:.9}
-  .ba-after{clip-path:inset(0 100% 0 0);background:radial-gradient(90% 90% at 50% 40%,rgba(255,35,51,.16),transparent 60%),linear-gradient(180deg,#1c0a0c,#0d0708)}
+  .ba-after{clip-path:inset(0 0 0 100%);background:radial-gradient(90% 90% at 50% 40%,rgba(255,35,51,.16),transparent 60%),linear-gradient(180deg,#1c0a0c,#0d0708)}
   .ba-after .figure{background:radial-gradient(58% 42% at 50% 20%,#ffd9cf,#ff3344 45%,#7a0c14 90%);box-shadow:0 0 120px -20px rgba(255,35,51,.8),0 0 40px rgba(255,122,90,.3)}
-  .ba-handle{position:absolute;top:0;bottom:0;width:2px;background:linear-gradient(var(--red-hot),var(--crimson));box-shadow:0 0 20px var(--red);left:0}
+  .ba-handle{position:absolute;top:0;bottom:0;width:2px;background:linear-gradient(var(--red-hot),var(--crimson));box-shadow:0 0 20px var(--red);left:0;z-index:3}
   .ba-handle::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:var(--glass);border:1px solid var(--red-soft);backdrop-filter:blur(6px)}
   .ba-tag{position:absolute;top:20px;font-family:var(--font-mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;padding:8px 15px;border-radius:999px;background:rgba(0,0,0,.5);border:1px solid var(--line);cursor:pointer;user-select:none;-webkit-appearance:none;appearance:none;transition:background .25s,color .25s,border-color .25s,box-shadow .25s;z-index:3}
   .ba-tag.b{left:20px;color:var(--ink-dim)}
@@ -261,13 +263,76 @@
   .dockcta .t b{color:var(--ink)}
   @media(max-width:520px){.dockcta .t{display:none}.dockcta{padding:8px}}
 
+  /* ---------- parede viva (vídeos) ---------- */
+  #videos{overflow:hidden}
+  .vfilters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:clamp(20px,3vw,30px)}
+  .vchip{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;min-height:40px;transition:color .25s,border-color .25s,background .25s,box-shadow .25s;-webkit-appearance:none;appearance:none}
+  .vchip:hover{color:var(--ink);border-color:var(--line-strong)}
+  .vchip.active{color:#fff;background:linear-gradient(180deg,var(--red-soft),var(--red));border-color:var(--red);box-shadow:0 8px 26px -10px rgba(255,35,51,.7)}
+  .vchip:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+
+  .vstage{position:relative;height:clamp(430px,66vh,560px);perspective:1600px;perspective-origin:50% 45%;touch-action:pan-y;user-select:none;overflow:hidden;cursor:grab}
+  .vstage.grabbing{cursor:grabbing}
+  .vstage.grabbing .vcard{transition:none;cursor:grabbing}
+  .vtrack{position:absolute;inset:0;transform-style:preserve-3d}
+  .vcard{position:absolute;inset:0;margin:auto;height:min(90%,470px);width:auto;aspect-ratio:9/19.5;cursor:pointer;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.16,1,.3,1),opacity .5s;will-change:transform,opacity}
+  .vcard[hidden]{display:none}
+  .phone{position:relative;width:100%;height:100%;border-radius:26px;overflow:hidden;border:1px solid var(--line-strong);background:#0a0406;box-shadow:0 40px 80px -40px rgba(0,0,0,.9),inset 0 0 0 2px rgba(0,0,0,.5)}
+  .phone::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:38%;height:5px;border-radius:999px;background:rgba(0,0,0,.55);z-index:4}
+  .cover{position:absolute;inset:0;background-size:220% 220%;animation:vsheen 9s ease-in-out infinite}
+  .cover::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 55% at 50% 20%,rgba(255,255,255,.14),transparent 60%),linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55));mix-blend-mode:screen}
+  @keyframes vsheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .c-skincare{background-image:linear-gradient(150deg,#ff8f6b,#ff3344 55%,#7a0c14)}
+  .c-skincare2{background-image:linear-gradient(150deg,#ffb27a,#ff5a63 55%,#8a1020)}
+  .c-cabelo{background-image:linear-gradient(150deg,#5a1220,#b00d1c 55%,#2a0810)}
+  .c-corpo{background-image:linear-gradient(150deg,#ff5a63,#b00d1c 55%,#3a0a10)}
+  .c-corpo2{background-image:linear-gradient(150deg,#ff7a5a,#c2101c 55%,#4a0c12)}
+  .c-estilo{background-image:linear-gradient(150deg,#ffd9cf,#ff5a63 50%,#7a0c14)}
+  .c-estilo2{background-image:linear-gradient(150deg,#ffb199,#ff2333 55%,#5a0a12)}
+  .c-mente{background-image:linear-gradient(150deg,#ff9a7a,#b00d1c 55%,#1c0608)}
+  .vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(10,4,6,.42);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(4px);z-index:3;transition:transform .35s,opacity .35s}
+  .vplay svg{width:22px;height:22px;fill:#fff;margin-left:2px}
+  .vlabel{position:absolute;top:20px;left:14px;z-index:3;font-family:var(--font-mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:5px 10px;backdrop-filter:blur(4px)}
+  .vtime{position:absolute;bottom:14px;right:12px;z-index:3;font-family:var(--font-mono);font-size:.62rem;color:#fff;background:rgba(0,0,0,.5);border-radius:6px;padding:3px 7px}
+  .vprog{position:absolute;left:0;bottom:0;height:3px;width:0;z-index:3;background:linear-gradient(90deg,var(--red-hot),var(--red));box-shadow:0 0 10px var(--red)}
+  .vcard.is-active{cursor:default}
+  .vcard.is-active .phone{border-color:rgba(255,90,99,.55);box-shadow:0 50px 100px -40px rgba(255,35,51,.55),0 0 0 1px rgba(255,90,99,.25)}
+  .vcard.is-active .vplay{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+  .vcard.is-active .vprog{animation:vplay 6s linear infinite}
+  @keyframes vplay{0%{width:0}100%{width:100%}}
+  .vcard:not(.is-active) .cover{animation-play-state:paused;filter:saturate(.7) brightness(.6)}
+  .vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:var(--glass);border:1px solid var(--line-strong);color:var(--ink);cursor:pointer;backdrop-filter:blur(10px);transition:transform .25s,border-color .25s,color .25s;-webkit-appearance:none;appearance:none}
+  .vnav svg{width:22px;height:22px}
+  .vnav:hover{border-color:var(--red);color:var(--red-soft)}
+  .vnav.prev{left:clamp(0px,3vw,26px)}
+  .vnav.next{right:clamp(0px,3vw,26px)}
+  .vnav:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+  @media(max-width:560px){.vnav{width:44px;height:44px}.vnav.prev{left:2px}.vnav.next{right:2px}}
+  .vcaption{margin-top:26px;text-align:center;font-family:var(--font-accent);font-style:italic;font-size:clamp(1.05rem,2.4vw,1.5rem);color:var(--ink);min-height:1.6em;transition:opacity .3s}
+  .vdots{display:flex;justify-content:center;gap:8px;margin-top:16px}
+  .vdots button{width:8px;height:8px;border-radius:50%;background:var(--line-strong);border:0;padding:0;cursor:pointer;transition:transform .3s,background .3s}
+  .vdots button.on{background:var(--red);transform:scale(1.35);box-shadow:0 0 0 4px rgba(255,35,51,.18)}
+
+  /* ---------- cursor de brasa ---------- */
+  .cur-ember{position:fixed;top:0;left:0;width:18px;height:18px;border-radius:50%;pointer-events:none;z-index:60;opacity:0;transition:opacity .4s;background:radial-gradient(circle,rgba(255,160,95,.9),rgba(255,40,52,.5) 45%,transparent 72%);mix-blend-mode:screen;filter:blur(.4px)}
+  .cur-ember.pulse{animation:curpulse .45s ease-out}
+  @keyframes curpulse{0%{box-shadow:0 0 0 0 rgba(255,70,60,.5)}100%{box-shadow:0 0 0 28px rgba(255,70,60,0)}}
+
+  /* ---------- números que "queimam" ---------- */
+  .stat .n.lit b{animation:numburn 1s ease-out}
+  @keyframes numburn{0%{filter:drop-shadow(0 0 2px rgba(255,70,60,.2))}40%{filter:drop-shadow(0 0 22px rgba(255,100,60,.95))}100%{filter:drop-shadow(0 0 9px rgba(255,60,60,.35))}}
+
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto}
     [data-reveal]{transition-duration:.001ms;opacity:1;transform:none}
+    .cur-ember{display:none}
+    .stat .n.lit b{animation:none}
     .scrollcue .bar{animation:none}
     .hero h1 .i{transform:none}
     .hero .sub,.hero-actions,.hero .pillrow{opacity:1;transform:none}
     .intro{display:none}
+    .cover{animation:none}
+    .vcard.is-active .vprog{animation:none;width:55%}
   }
 </style>
 
@@ -291,6 +356,7 @@
   <a href="#hero" data-rail="hero"><span class="lbl">Início</span><span class="dot"></span></a>
   <a href="#manifesto" data-rail="manifesto"><span class="lbl">O espelho</span><span class="dot"></span></a>
   <a href="#metodo" data-rail="metodo"><span class="lbl">O método</span><span class="dot"></span></a>
+  <a href="#videos" data-rail="videos"><span class="lbl">Provas</span><span class="dot"></span></a>
   <a href="#antesdepois" data-rail="antesdepois"><span class="lbl">Transformação</span><span class="dot"></span></a>
   <a href="#numeros" data-rail="numeros"><span class="lbl">Resultados</span><span class="dot"></span></a>
   <a href="#oferta" data-rail="oferta"><span class="lbl">A oferta</span><span class="dot"></span></a>
@@ -347,38 +413,39 @@
   <section class="wrap" id="metodo">
     <div class="shead" data-reveal>
       <span class="eyebrow">O método</span>
-      <h2>Cinco frentes, <em>uma</em> nova versão</h2>
+      <h2>5 áreas, <em>um</em> glow up de verdade</h2>
     </div>
+    <p class="lead" style="margin-top:-14px;margin-bottom:clamp(26px,5vw,50px)" data-reveal>As 5 áreas do seu glow up: <b style="color:var(--ink)">skincare, cabelo, corpo, estilo e mente</b>. Um passo de cada vez, sem enrolação.</p>
     <div class="method-grid" id="methodGrid">
       <article class="pillar" data-reveal>
         <span class="num">01</span>
         <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11Z" stroke="currentColor" stroke-width="1.6"/></svg></span>
         <h3>Skincare</h3>
-        <p>Rotina de pele por tipo e objetivo — o brilho que se vê de longe começa aqui.</p>
+        <p>Rotina de pele descomplicada. É aquele glow que todo mundo nota de longe.</p>
       </article>
       <article class="pillar d1" data-reveal>
         <span class="num">02</span>
         <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 14c0-6 4-10 8-10s8 4 8 10c0 3-2 6-8 6s-8-3-8-6Z" stroke="currentColor" stroke-width="1.6"/><path d="M9 20v-3M15 20v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
         <h3>Cabelo &amp; corte</h3>
-        <p>O corte e o cuidado certos para o seu rosto — o detalhe que muda tudo.</p>
+        <p>O corte certo pro seu rosto e como manter. É o detalhe que muda tudo — real.</p>
       </article>
       <article class="pillar d2" data-reveal>
         <span class="num">03</span>
         <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4v4M18 4v4M6 16v4M18 16v4M6 8h12M6 16h12M4 8h4M16 8h4M4 16h4M16 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
         <h3>Corpo &amp; treino</h3>
-        <p>Postura, composição e presença física com um plano que cabe na sua rotina.</p>
+        <p>Treino que cabe na sua rotina. Mais postura, mais presença, zero desculpa.</p>
       </article>
       <article class="pillar" data-reveal>
         <span class="num">04</span>
         <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6l2-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
         <h3>Estilo &amp; imagem</h3>
-        <p>Guarda-roupa, cores e proporção — vestir bem sem gastar demais.</p>
+        <p>Roupas e cores que são a sua cara. Estiloso sem gastar rios de dinheiro.</p>
       </article>
       <article class="pillar d1" data-reveal>
         <span class="num">05</span>
         <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4a5 5 0 0 1 5 5c0 2-1 3-2 4v3H9v-3c-1-1-2-2-2-4a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 20h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
         <h3>Mente &amp; confiança</h3>
-        <p>A cabeça que sustenta o glow up — hábitos, disciplina e autoestima.</p>
+        <p>A base do glow up: hábitos, foco e confiança pra segurar tudo.</p>
       </article>
       <article class="pillar d2" data-reveal style="display:grid;place-content:center;text-align:center;background:linear-gradient(150deg,rgba(255,35,51,.18),rgba(176,13,28,.08))">
         <div class="serif" style="font-size:1.6rem;color:var(--red-soft)">+ acompanhamento<br>e comunidade</div>
@@ -387,20 +454,83 @@
     </div>
   </section>
 
+  <!-- PAREDE VIVA — COLETÂNEA DE VÍDEOS -->
+  <section class="wrap" id="videos">
+    <div class="shead" data-reveal>
+      <span class="eyebrow">Provas reais</span>
+      <h2>Vê com os <em>próprios olhos</em></h2>
+    </div>
+    <p class="lead" style="margin-top:-14px;margin-bottom:clamp(24px,4vw,40px)" data-reveal>Transformações de gente de verdade — uma por área. Arrasta pro lado e escolhe o que quer ver.</p>
+
+    <div class="vfilters" data-reveal>
+      <button class="vchip active" data-area="all" type="button">Tudo</button>
+      <button class="vchip" data-area="skincare" type="button">Skincare</button>
+      <button class="vchip" data-area="cabelo" type="button">Cabelo</button>
+      <button class="vchip" data-area="corpo" type="button">Corpo</button>
+      <button class="vchip" data-area="estilo" type="button">Estilo</button>
+      <button class="vchip" data-area="mente" type="button">Mente</button>
+    </div>
+
+    <div class="vstage" id="vstage" data-reveal>
+      <div class="vtrack" id="vtrack">
+        <article class="vcard" data-area="skincare" data-tag="Skincare" data-caption="&quot;minha pele antes vs agora 😳&quot; — 14 dias de rotina" data-dur="0:32">
+          <div class="phone"><div class="cover c-skincare"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Skincare</span><span class="vtime">0:32</span><i class="vprog"></i></div>
+        </article>
+        <article class="vcard" data-area="cabelo" data-tag="Cabelo &amp; corte" data-caption="&quot;troquei o corte e virei outro 🔥&quot;" data-dur="0:21">
+          <div class="phone"><div class="cover c-cabelo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Cabelo</span><span class="vtime">0:21</span><i class="vprog"></i></div>
+        </article>
+        <article class="vcard" data-area="corpo" data-tag="Corpo &amp; treino" data-caption="&quot;90 dias de treino que cabe na rotina&quot;" data-dur="0:45">
+          <div class="phone"><div class="cover c-corpo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Corpo</span><span class="vtime">0:45</span><i class="vprog"></i></div>
+        </article>
+        <article class="vcard" data-area="estilo" data-tag="Estilo &amp; imagem" data-caption="&quot;montei looks com o que eu já tinha&quot;" data-dur="0:28">
+          <div class="phone"><div class="cover c-estilo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Estilo</span><span class="vtime">0:28</span><i class="vprog"></i></div>
+        </article>
+        <article class="vcard" data-area="mente" data-tag="Mente &amp; confiança" data-caption="&quot;parei de me esconder e mudou tudo&quot;" data-dur="0:39">
+          <div class="phone"><div class="cover c-mente"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Mente</span><span class="vtime">0:39</span><i class="vprog"></i></div>
+        </article>
+        <article class="vcard" data-area="skincare" data-tag="Skincare" data-caption="&quot;rotina de 5 min que salvou minha pele&quot;" data-dur="0:24">
+          <div class="phone"><div class="cover c-skincare2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Skincare</span><span class="vtime">0:24</span><i class="vprog"></i></div>
+        </article>
+        <article class="vcard" data-area="corpo" data-tag="Corpo &amp; treino" data-caption="&quot;postura muda tudo — antes/depois&quot;" data-dur="0:33">
+          <div class="phone"><div class="cover c-corpo2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Corpo</span><span class="vtime">0:33</span><i class="vprog"></i></div>
+        </article>
+        <article class="vcard" data-area="estilo" data-tag="Estilo &amp; imagem" data-caption="&quot;achei as cores certas pro meu tom&quot;" data-dur="0:19">
+          <div class="phone"><div class="cover c-estilo2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Estilo</span><span class="vtime">0:19</span><i class="vprog"></i></div>
+        </article>
+      </div>
+
+      <button class="vnav prev" id="vprev" type="button" aria-label="Vídeo anterior"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="vnav next" id="vnext" type="button" aria-label="Próximo vídeo"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+
+    <div class="vcaption" id="vcaption" aria-live="polite"></div>
+    <div class="vdots" id="vdots" aria-hidden="true"></div>
+    <p class="ba-note">Prévia conceitual — no site real entram os vídeos do TOLEDOX (TikTok / YouTube).</p>
+  </section>
+
   <!-- ANTES / DEPOIS -->
   <section class="wrap" id="antesdepois">
     <div class="shead" data-reveal>
       <span class="eyebrow">Transformação</span>
       <h2>Role e veja o <em>depois</em> aparecer</h2>
     </div>
-    <div class="ba-stage" id="baStage" data-reveal>
-      <div class="ba-layer ba-before"><div class="figure"></div></div>
-      <div class="ba-layer ba-after" id="baAfter"><div class="figure"></div></div>
-      <button type="button" id="baAntes" class="ba-tag b" aria-pressed="false">Antes</button>
-      <button type="button" id="baDepois" class="ba-tag a" aria-pressed="false">Depois</button>
-      <div class="ba-handle" id="baHandle"></div>
+    <div class="ba-stage" data-reveal data-antes="assets/par1-antes.jpg" data-depois="assets/par1-depois.jpg">
+      <div class="ba-layer ba-before"><div class="figure"></div><img class="ba-img ba-img-before" alt="Antes da transformação" /></div>
+      <div class="ba-layer ba-after"><div class="figure"></div><img class="ba-img ba-img-after" alt="Depois da transformação" /></div>
+      <button type="button" class="ba-tag b ba-antes" aria-pressed="false">Antes</button>
+      <button type="button" class="ba-tag a ba-depois" aria-pressed="false">Depois</button>
+      <div class="ba-handle"></div>
     </div>
-    <p class="ba-note">Clique em <b style="color:var(--ink)">Antes</b> ou <b style="color:var(--red-soft)">Depois</b> para revelar cada lado — ou role a página. (No site real, entram as fotos do TOLEDOX.)</p>
+
+    <div class="ba-stage" data-reveal data-antes="assets/par2-antes.jpg" data-depois="assets/par2-depois.jpg">
+      <div class="ba-layer ba-before"><div class="figure"></div><img class="ba-img ba-img-before" alt="Antes da transformação" /></div>
+      <div class="ba-layer ba-after"><div class="figure"></div><img class="ba-img ba-img-after" alt="Depois da transformação" /></div>
+      <button type="button" class="ba-tag b ba-antes" aria-pressed="false">Antes</button>
+      <button type="button" class="ba-tag a ba-depois" aria-pressed="false">Depois</button>
+      <div class="ba-handle"></div>
+    </div>
+
+    <p class="ba-note">Clique em <b style="color:var(--ink)">Antes</b> ou <b style="color:var(--red-soft)">Depois</b> para revelar cada lado — ou role a página.</p>
   </section>
 
   <!-- NÚMEROS -->
@@ -412,7 +542,7 @@
     <div class="stats">
       <div class="stat" data-reveal><div class="n"><b><span class="count" data-target="2000">0</span>+</b></div><div class="k">Alunos transformados</div></div>
       <div class="stat d1" data-reveal><div class="n"><b><span class="count" data-target="90">0</span></b></div><div class="k">Dias de plano</div></div>
-      <div class="stat d2" data-reveal><div class="n"><b><span class="count" data-target="5">0</span></b></div><div class="k">Frentes do método</div></div>
+      <div class="stat d2" data-reveal><div class="n"><b><span class="count" data-target="5">0</span></b></div><div class="k">Áreas do método</div></div>
       <div class="stat d3" data-reveal><div class="n"><b><span class="count" data-target="97">0</span>%</b></div><div class="k">Recomendam</div></div>
     </div>
   </section>
@@ -594,8 +724,8 @@
   var start=performance.now(), last=start;
   function frame(now){
     var dt=Math.min((now-last)/16.67,3); last=now;
+    progCur+=(progTarget-progCur)*0.06; mx+=(mtx-mx)*0.05; my+=(mty-my)*0.05;
     if(ok){
-      progCur+=(progTarget-progCur)*0.06; mx+=(mtx-mx)*0.05; my+=(mty-my)*0.05;
       gl.uniform2f(uRes,canvas.width,canvas.height);
       gl.uniform1f(uTime,reduce?0:(now-start)/1000);
       gl.uniform1f(uProg,progCur); gl.uniform2f(uMouse,mx,my);
@@ -635,11 +765,20 @@
     var vsrc=[
      "attribute vec3 aCenter; attribute vec2 aCorner; attribute float aSeed;",
      "uniform mat3 uRot; uniform vec2 uScale; uniform float uPointR; uniform float uAspect; uniform float uTime;",
+     "uniform float uDisp; uniform float uSquash; uniform float uSwirl;",
      "varying float vD; varying float vR; varying vec2 vC;",
      "void main(){",
-     " vec3 p=uRot*aCenter;",
+     " vec3 ac=aCenter;",
+     " vR=length(ac);",
+     " float ang=uSwirl*(ac.y*1.6);",
+     " float cs=cos(ang), sn=sin(ang);",
+     " vec3 sw=vec3(ac.x*cs-ac.z*sn, ac.y, ac.x*sn+ac.z*cs);",
+     " float tb=0.55+0.45*sin(aSeed*28.0+uTime*0.6);",
+     " vec3 pos=sw+normalize(ac+vec3(0.0001))*uDisp*tb;",
+     " pos.z*=(1.0-uSquash*0.82);",
+     " pos*=(1.0+uSquash*0.18);",
+     " vec3 p=uRot*pos;",
      " vD=p.z*0.5+0.5;",
-     " vR=length(aCenter);",
      " vC=aCorner;",
      " vec2 c=vec2(p.x*uScale.x, p.y*uScale.y);",
      " float tw=0.78+0.22*sin(uTime*2.0+aSeed*6.2831);",
@@ -685,7 +824,8 @@
     attr("aCenter",aCenter,3); attr("aCorner",aCorner,2); attr("aSeed",aSeed,1);
     var uRot=g.getUniformLocation(pr,"uRot"), uScale=g.getUniformLocation(pr,"uScale"),
         uPointR=g.getUniformLocation(pr,"uPointR"), uAspect=g.getUniformLocation(pr,"uAspect"),
-        uT=g.getUniformLocation(pr,"uTime"), uAlpha=g.getUniformLocation(pr,"uAlpha");
+        uT=g.getUniformLocation(pr,"uTime"), uAlpha=g.getUniformLocation(pr,"uAlpha"),
+        uDisp=g.getUniformLocation(pr,"uDisp"), uSquash=g.getUniformLocation(pr,"uSquash"), uSwirl=g.getUniformLocation(pr,"uSwirl");
     g.enable(g.BLEND); g.blendFunc(g.SRC_ALPHA,g.ONE); g.clearColor(0,0,0,0);
     var gdpr=Math.min(window.devicePixelRatio||1, isTouch?1.25:1.5), gscale=isTouch?0.7:0.85, R=0.95, sx=R, sy=R, aspect=1, pr_ndc=0.02;
     var basePx=isTouch?5.2:7.5;   // diâmetro da partícula em px de buffer
@@ -694,20 +834,30 @@
       if(w>=h){ sx=R*h/w; sy=R; } else { sx=R; sy=R*w/h; }
       pr_ndc=basePx/h; }
     gres(); window.addEventListener("resize",gres);
-    var vis=true;
-    new IntersectionObserver(function(es){ es.forEach(function(en){ vis=en.isIntersecting; }); },{threshold:0.02}).observe(document.getElementById("hero"));
+    /* pausa só quando a aba está oculta — a esfera persiste por todos os capítulos */
+    var awake=true;
+    document.addEventListener("visibilitychange",function(){ awake=!document.hidden; if(awake) requestAnimationFrame(gframe); });
+    function sstep(e0,e1,x){ var t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3.0-2.0*t); }
     function mrot(ry,rx){ var cy=Math.cos(ry),syr=Math.sin(ry),cx=Math.cos(rx),sxr=Math.sin(rx);
       return new Float32Array([ cy, sxr*syr, -cx*syr,  0.0, cx, sxr,  syr, -sxr*cy, cx*cy ]); }
     var gs=performance.now();
     function gframe(now){
-      if(vis){ g.clear(g.COLOR_BUFFER_BIT);
-        var tt=reduce?0.6:(now-gs)/1000;
-        var ry=tt*0.22+mx*0.7, rx=0.32+my*0.45+Math.sin(tt*0.25)*0.08;
-        g.uniformMatrix3fv(uRot,false,mrot(ry,rx));
-        g.uniform2f(uScale,sx,sy); g.uniform1f(uPointR,pr_ndc); g.uniform1f(uAspect,aspect);
-        g.uniform1f(uT,tt); g.uniform1f(uAlpha,isTouch?1.0:0.42);
-        g.drawArrays(g.TRIANGLES,0,V); }
-      requestAnimationFrame(gframe);
+      g.clear(g.COLOR_BUFFER_BIT);
+      var tt=reduce?0.6:(now-gs)/1000;
+      /* progCur (0..1) é o scroll global — dita a coreografia da esfera por capítulo */
+      var P=progCur;
+      var disp=0.62*sstep(0.05,0.40,P)*(1.0-sstep(0.58,0.95,P)); // dispersa no meio, reforma nas pontas
+      var squash=sstep(0.60,0.94,P);                              // achata num anel na oferta/faq
+      var swirl=0.12+P*1.5;
+      var mob=isTouch?0.35:0.7;
+      var ry=tt*0.20+mx*mob*(1.0-squash*0.6), rx=0.30+my*0.40+Math.sin(tt*0.25)*0.08;
+      g.uniformMatrix3fv(uRot,false,mrot(ry,rx));
+      g.uniform2f(uScale,sx,sy); g.uniform1f(uPointR,pr_ndc); g.uniform1f(uAspect,aspect);
+      g.uniform1f(uT,tt);
+      g.uniform1f(uDisp,disp); g.uniform1f(uSquash,squash); g.uniform1f(uSwirl,swirl);
+      g.uniform1f(uAlpha, isTouch?1.0:(0.40+0.22*P));
+      g.drawArrays(g.TRIANGLES,0,V);
+      if(awake) requestAnimationFrame(gframe);
     }
     requestAnimationFrame(gframe);
   })();
@@ -716,13 +866,34 @@
   var io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } }); },{threshold:0.15});
   document.querySelectorAll("[data-reveal]").forEach(function(el){ io.observe(el); });
 
+  /* ---------------- marquee reativo à velocidade do scroll ---------------- */
+  var marq=document.getElementById("marq");
+  if(marq && !reduce){
+    marq.style.animation="none";
+    var mpos=0, mboost=0, mls=window.scrollY;
+    window.addEventListener("scroll",function(){ var y=window.scrollY; mboost=Math.min(mboost+Math.abs(y-mls)*0.006,6); mls=y; },{passive:true});
+    (function mstep(){ var half=(marq.scrollWidth/2)||1, spd=half/(22*60);
+      mpos-=spd*(1+mboost); mboost*=0.9; if(mpos<=-half) mpos+=half;
+      marq.style.transform="translateX("+mpos+"px)"; requestAnimationFrame(mstep); })();
+  }
+
+  /* ---------------- cursor de brasa (desktop) ---------------- */
+  if(!isTouch && !reduce){
+    var cur=document.createElement("div"); cur.className="cur-ember"; cur.setAttribute("aria-hidden","true"); document.body.appendChild(cur);
+    var cxr=window.innerWidth/2, cyr=window.innerHeight/2, cxs=cxr, cys=cyr;
+    window.addEventListener("pointermove",function(e){ if(e.pointerType==="touch")return; cxr=e.clientX; cyr=e.clientY; cur.style.opacity="1"; },{passive:true});
+    window.addEventListener("pointerdown",function(){ cur.classList.add("pulse"); setTimeout(function(){ cur.classList.remove("pulse"); },450); });
+    (function cstep(){ cxs+=(cxr-cxs)*0.18; cys+=(cyr-cys)*0.18; cur.style.transform="translate("+(cxs-9)+"px,"+(cys-9)+"px)"; requestAnimationFrame(cstep); })();
+  }
+
   /* ---------------- count up ---------------- */
   var cio=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ countUp(en.target); cio.unobserve(en.target); } }); },{threshold:0.5});
   document.querySelectorAll(".count").forEach(function(el){ cio.observe(el); });
   function countUp(el){ var target=parseInt(el.getAttribute("data-target"),10)||0;
     if(reduce){ el.textContent=target.toLocaleString("pt-BR"); return; }
     var t0=null,dur=1600; function step(ts){ if(!t0)t0=ts; var p=Math.min((ts-t0)/dur,1); var e=1-Math.pow(1-p,3);
-      el.textContent=Math.round(target*e).toLocaleString("pt-BR"); if(p<1)requestAnimationFrame(step); } requestAnimationFrame(step); }
+      el.textContent=Math.round(target*e).toLocaleString("pt-BR");
+      if(p<1){ requestAnimationFrame(step); } else { var n=el.closest?el.closest(".n"):null; if(n){ n.classList.add("lit"); setTimeout(function(){ n.classList.remove("lit"); },1000); } } } requestAnimationFrame(step); }
 
   /* ---------------- 3D pillar tilt ---------------- */
   var grid=document.getElementById("methodGrid");
@@ -745,31 +916,134 @@
     });
   }
 
-  /* ---------------- antes/depois ---------------- */
-  var stage=document.getElementById("baStage"), after=document.getElementById("baAfter"), handle=document.getElementById("baHandle");
-  var baBtnB=document.getElementById("baAntes"), baBtnA=document.getElementById("baDepois");
-  var baManual=null, baCur=0, baRAF=false;
-  function baScrollVal(){ if(!stage) return 0; var r=stage.getBoundingClientRect(), vh=window.innerHeight;
-    var p=(vh-r.top)/(vh+r.height); return Math.min(Math.max((p-0.15)/0.7,0),1); }
-  function baApply(){ var pct=baCur*100; if(after) after.style.clipPath="inset(0 "+(100-pct)+"% 0 0)"; if(handle) handle.style.left=pct+"%"; }
-  function baTick(){ var goal=(baManual!==null)?baManual:baScrollVal();
-    baCur+=(goal-baCur)*(reduce?1:0.16); baApply();
-    if(!reduce && Math.abs(goal-baCur)>0.002){ requestAnimationFrame(baTick); } else { baCur=goal; baApply(); baRAF=false; } }
-  function baKick(){ if(!baRAF){ baRAF=true; requestAnimationFrame(baTick); } }
-  window.addEventListener("scroll",function(){ if(baManual===null) baKick(); },{passive:true});
-  window.addEventListener("resize",baKick);
-  function baSet(val){ baManual=val;
-    if(baBtnB){ baBtnB.classList.toggle("active",val===0); baBtnB.setAttribute("aria-pressed",String(val===0)); }
-    if(baBtnA){ baBtnA.classList.toggle("active",val===1); baBtnA.setAttribute("aria-pressed",String(val===1)); }
-    baKick(); }
-  if(baBtnB) baBtnB.addEventListener("click",function(){ baSet(0); });
-  if(baBtnA) baBtnA.addEventListener("click",function(){ baSet(1); });
-  baCur=baScrollVal(); baApply(); baKick();
+  /* ---------------- antes/depois (cada quadro é independente) ---------------- */
+  function initBA(stage){
+    var after=stage.querySelector(".ba-after"), handle=stage.querySelector(".ba-handle");
+    var btnB=stage.querySelector(".ba-antes"), btnA=stage.querySelector(".ba-depois");
+    var imgB=stage.querySelector(".ba-img-before"), imgA=stage.querySelector(".ba-img-after");
+    var manual=null, cur=0, raf=false;
+    /* carrega as fotos reais; se o arquivo não existir, cai no fallback (gradiente) */
+    [imgB,imgA].forEach(function(im){ if(im) im.addEventListener("error",function(){ im.style.display="none"; }); });
+    if(imgB) imgB.src=stage.getAttribute("data-antes");
+    if(imgA) imgA.src=stage.getAttribute("data-depois");
+
+    function scrollVal(){ var r=stage.getBoundingClientRect(), vh=window.innerHeight;
+      var p=(vh-r.top)/(vh+r.height); return Math.min(Math.max((p-0.15)/0.7,0),1); }
+    function apply(){ var pct=cur*100; if(after) after.style.clipPath="inset(0 0 0 "+(100-pct)+"%)"; if(handle) handle.style.left=(100-pct)+"%"; }
+    function tick(){ var goal=(manual!==null)?manual:scrollVal();
+      cur+=(goal-cur)*(reduce?1:0.16); apply();
+      if(!reduce && Math.abs(goal-cur)>0.002){ requestAnimationFrame(tick); } else { cur=goal; apply(); raf=false; } }
+    function kick(){ if(!raf){ raf=true; requestAnimationFrame(tick); } }
+    function set(val){ manual=val;
+      if(btnB){ btnB.classList.toggle("active",val===0); btnB.setAttribute("aria-pressed",String(val===0)); }
+      if(btnA){ btnA.classList.toggle("active",val===1); btnA.setAttribute("aria-pressed",String(val===1)); }
+      kick(); }
+    if(btnB) btnB.addEventListener("click",function(){ set(0); });
+    if(btnA) btnA.addEventListener("click",function(){ set(1); });
+    window.addEventListener("scroll",function(){ if(manual===null) kick(); },{passive:true});
+    window.addEventListener("resize",kick);
+    cur=scrollVal(); apply(); kick();
+  }
+  document.querySelectorAll(".ba-stage").forEach(initBA);
+
+  /* ---------------- parede viva (coverflow de vídeos) ---------------- */
+  (function(){
+    var track=document.getElementById("vtrack"); if(!track) return;
+    var stage=document.getElementById("vstage");
+    var cards=Array.prototype.slice.call(track.querySelectorAll(".vcard"));
+    var caption=document.getElementById("vcaption");
+    var dotsWrap=document.getElementById("vdots");
+    var prevBtn=document.getElementById("vprev"), nextBtn=document.getElementById("vnext");
+    var chips=Array.prototype.slice.call(document.querySelectorAll(".vchip"));
+    var visible=cards.slice(), idx=0;
+
+    function buildDots(){ dotsWrap.innerHTML="";
+      visible.forEach(function(_,i){ var b=document.createElement("button"); b.type="button";
+        b.setAttribute("aria-label","Ir ao vídeo "+(i+1));
+        b.addEventListener("click",function(){ go(i); }); dotsWrap.appendChild(b); }); }
+
+    function stepPx(){ return Math.min(window.innerWidth*0.30,258); }
+    /* posiciona os cards para um centro fracionário (permite arrasto contínuo) */
+    function place(center){
+      var spread=stepPx();
+      cards.forEach(function(c){ c.hidden=(visible.indexOf(c)===-1); });
+      visible.forEach(function(c,i){
+        var off=i-center, abs=Math.abs(off);
+        var ry=Math.max(-58,Math.min(58,-off*38));
+        var sc=Math.max(0.6,1-abs*0.14);
+        var op=abs>2.4?0:Math.max(0.18,1-abs*0.34);
+        c.style.transform="translate3d("+(off*spread)+"px,0,"+(-abs*180)+"px) rotateY("+ry+"deg) scale("+sc+")";
+        c.style.opacity=op; c.style.zIndex=String(100-Math.round(abs));
+        c.style.pointerEvents=abs>2.4?"none":"auto";
+        c.classList.toggle("is-active",Math.abs(off)<0.5);
+      });
+    }
+    function layout(){
+      place(idx);
+      var act=visible[idx];
+      if(act && caption){ caption.style.opacity=0;
+        setTimeout(function(){ caption.textContent=(act.getAttribute("data-caption")||"").replace(/&quot;/g,'"'); caption.style.opacity=1; },150); }
+      Array.prototype.forEach.call(dotsWrap.children,function(d,i){ d.classList.toggle("on",i===idx); });
+    }
+
+    function go(i){ idx=Math.max(0,Math.min(visible.length-1,i)); layout(); }
+    function wrap(d){ if(!visible.length)return; idx=(idx+d+visible.length)%visible.length; layout(); }
+    function next(){ wrap(1); } function prev(){ wrap(-1); }
+
+    nextBtn.addEventListener("click",next); prevBtn.addEventListener("click",prev);
+    cards.forEach(function(c){ c.addEventListener("click",function(){ if(suppressClick) return; var i=visible.indexOf(c); if(i>-1 && i!==idx) go(i); }); });
+
+    chips.forEach(function(ch){ ch.addEventListener("click",function(){
+      chips.forEach(function(x){ x.classList.remove("active"); }); ch.classList.add("active");
+      var area=ch.getAttribute("data-area");
+      visible=(area==="all")?cards.slice():cards.filter(function(c){ return c.getAttribute("data-area")===area; });
+      idx=0; buildDots(); layout();
+    }); });
+
+    var down=false,dragging=false,startX=0,moved=0,pid=null,suppressClick=false;
+    function clampCenter(v){ return Math.max(-0.4,Math.min(visible.length-0.6,v)); }
+    stage.addEventListener("pointerdown",function(e){
+      if(e.target.closest(".vnav")) return;             /* não sequestra o clique das setas */
+      down=true; dragging=false; startX=e.clientX; moved=0; pid=e.pointerId;
+    });
+    stage.addEventListener("pointermove",function(e){
+      if(!down) return; moved=e.clientX-startX;
+      if(!dragging && Math.abs(moved)>6){ dragging=true; stage.classList.add("grabbing"); try{stage.setPointerCapture(pid);}catch(_){} }
+      if(dragging){ place(clampCenter(idx - moved/stepPx())); }   /* segue o ponteiro em tempo real */
+    });
+    function endDrag(){ if(!down) return; down=false;
+      if(dragging){ stage.classList.remove("grabbing");
+        idx=Math.max(0,Math.min(visible.length-1,Math.round(idx - moved/stepPx())));
+        layout();
+        suppressClick=true; setTimeout(function(){ suppressClick=false; },80); }
+      dragging=false; }
+    stage.addEventListener("pointerup",endDrag); stage.addEventListener("pointercancel",endDrag);
+
+    stage.setAttribute("tabindex","0");
+    stage.addEventListener("keydown",function(e){ if(e.key==="ArrowRight"){next();e.preventDefault();} else if(e.key==="ArrowLeft"){prev();e.preventDefault();} });
+
+    /* scrollytelling: leve inclinação do anel enquanto a seção cruza a viewport */
+    if(!reduce){ window.addEventListener("scroll",function(){
+      var r=stage.getBoundingClientRect(), vh=window.innerHeight;
+      var p=Math.max(0,Math.min(1,(vh-r.top)/(vh+r.height)));
+      track.style.transform="rotateX("+((0.5-p)*5)+"deg)";
+    },{passive:true}); }
+
+    /* autoplay suave — pausa no hover, no arrasto e fora da tela */
+    var inView=false,hover=false;
+    new IntersectionObserver(function(es){ es.forEach(function(en){ inView=en.isIntersecting; }); },{threshold:0.35}).observe(stage);
+    stage.addEventListener("pointerenter",function(){ hover=true; });
+    stage.addEventListener("pointerleave",function(){ hover=false; endDrag(); });
+    if(!reduce){ setInterval(function(){ if(inView && !hover && !dragging) next(); },6000); }
+
+    window.addEventListener("resize",layout);
+    buildDots(); layout();
+  })();
 
   /* ---------------- rail + topbar + dock ---------------- */
   var rio=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ var id=en.target.id;
     document.querySelectorAll(".rail a").forEach(function(a){ a.classList.toggle("active",a.getAttribute("data-rail")===id); }); } }); },{threshold:0.5});
-  ["hero","manifesto","metodo","antesdepois","numeros","oferta","faq"].forEach(function(id){ var s=document.getElementById(id); if(s)rio.observe(s); });
+  ["hero","manifesto","metodo","videos","antesdepois","numeros","oferta","faq"].forEach(function(id){ var s=document.getElementById(id); if(s)rio.observe(s); });
 
   var topbar=document.getElementById("topbar"), dock=document.getElementById("dock"), footer=document.querySelector("footer"), progressBar=document.getElementById("progress");
   window.addEventListener("scroll",function(){
