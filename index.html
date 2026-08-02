@@ -308,6 +308,10 @@
   .vnav.next{right:clamp(0px,3vw,26px)}
   .vnav:focus-visible{outline:2px solid var(--red);outline-offset:3px}
   @media(max-width:560px){.vnav{width:44px;height:44px}.vnav.prev{left:2px}.vnav.next{right:2px}}
+  .vhint{display:none;justify-content:center;align-items:center;gap:10px;margin-top:14px;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
+  .vhint svg{width:30px;height:22px;color:var(--red-soft);animation:vswipe 1.9s ease-in-out infinite}
+  @keyframes vswipe{0%,100%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+  @media(max-width:720px){ .vnav{display:none} .vhint{display:flex} }
   .vcaption{margin-top:26px;text-align:center;font-family:var(--font-accent);font-style:italic;font-size:clamp(1.05rem,2.4vw,1.5rem);color:var(--ink);min-height:1.6em;transition:opacity .3s}
   .vdots{display:flex;justify-content:center;gap:8px;margin-top:16px}
   .vdots button{width:8px;height:8px;border-radius:50%;background:var(--line-strong);border:0;padding:0;cursor:pointer;transition:transform .3s,background .3s}
@@ -333,6 +337,7 @@
     .intro{display:none}
     .cover{animation:none}
     .vcard.is-active .vprog{animation:none;width:55%}
+    .vhint svg{animation:none}
   }
 </style>
 
@@ -504,6 +509,10 @@
     </div>
 
     <div class="vcaption" id="vcaption" aria-live="polite"></div>
+    <div class="vhint" aria-hidden="true">
+      <svg viewBox="0 0 32 24" fill="none"><path d="M20 6l-4-4-4 4M12 18l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".35"/><path d="M3 12h9M20 12h9M9 9l-3 3 3 3M23 9l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Arraste para navegar</span>
+    </div>
     <div class="vdots" id="vdots" aria-hidden="true"></div>
     <p class="ba-note">Prévia conceitual — no site real entram os vídeos do TOLEDOX (TikTok / YouTube).</p>
   </section>
