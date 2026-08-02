@@ -196,8 +196,11 @@
   .ba-before .figure{background:radial-gradient(60% 40% at 50% 22%,#3a3338,#241d22 60%,#161116);opacity:.9}
   .ba-after{clip-path:inset(0 0 0 100%);background:radial-gradient(90% 90% at 50% 40%,rgba(255,35,51,.16),transparent 60%),linear-gradient(180deg,#1c0a0c,#0d0708)}
   .ba-after .figure{background:radial-gradient(58% 42% at 50% 20%,#ffd9cf,#ff3344 45%,#7a0c14 90%);box-shadow:0 0 120px -20px rgba(255,35,51,.8),0 0 40px rgba(255,122,90,.3)}
-  .ba-handle{position:absolute;top:0;bottom:0;width:2px;background:linear-gradient(var(--red-hot),var(--crimson));box-shadow:0 0 20px var(--red);left:0;z-index:3}
-  .ba-handle::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:var(--glass);border:1px solid var(--red-soft);backdrop-filter:blur(6px)}
+  .ba-handle{position:absolute;top:0;bottom:0;width:2px;background:linear-gradient(var(--red-hot),var(--crimson));box-shadow:0 0 20px var(--red);left:0;z-index:4;cursor:ew-resize;touch-action:none}
+  .ba-handle::before{content:"";position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:44px}
+  .ba-handle::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:var(--glass);border:1px solid var(--red-soft);backdrop-filter:blur(6px);box-shadow:0 4px 18px -4px rgba(255,35,51,.6);transition:transform .2s,box-shadow .2s}
+  .ba-handle:hover::after,.ba-handle.grab::after{transform:translate(-50%,-50%) scale(1.12);box-shadow:0 6px 26px -4px rgba(255,35,51,.85)}
+  .ba-grip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;color:var(--red-soft);z-index:1;pointer-events:none}
   .ba-tag{position:absolute;top:20px;font-family:var(--font-mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;padding:8px 15px;border-radius:999px;background:rgba(0,0,0,.5);border:1px solid var(--line);cursor:pointer;user-select:none;-webkit-appearance:none;appearance:none;transition:background .25s,color .25s,border-color .25s,box-shadow .25s;z-index:3}
   .ba-tag.b{left:20px;color:var(--ink-dim)}
   .ba-tag.a{right:20px;color:var(--red-soft);border-color:rgba(255,35,51,.4)}
@@ -527,7 +530,7 @@
       <div class="ba-layer ba-after"><div class="figure"></div><img class="ba-img ba-img-after" alt="Depois da transformação" /></div>
       <button type="button" class="ba-tag b ba-antes" aria-pressed="false">Antes</button>
       <button type="button" class="ba-tag a ba-depois" aria-pressed="false">Depois</button>
-      <div class="ba-handle"></div>
+      <div class="ba-handle"><svg class="ba-grip" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.5 8l-4 4 4 4M14.5 8l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
     <div class="ba-stage" data-reveal data-antes="assets/par2-antes.jpg" data-depois="assets/par2-depois.jpg">
@@ -535,7 +538,7 @@
       <div class="ba-layer ba-after"><div class="figure"></div><img class="ba-img ba-img-after" alt="Depois da transformação" /></div>
       <button type="button" class="ba-tag b ba-antes" aria-pressed="false">Antes</button>
       <button type="button" class="ba-tag a ba-depois" aria-pressed="false">Depois</button>
-      <div class="ba-handle"></div>
+      <div class="ba-handle"><svg class="ba-grip" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.5 8l-4 4 4 4M14.5 8l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
     <p class="ba-note">Clique em <b style="color:var(--ink)">Antes</b> ou <b style="color:var(--red-soft)">Depois</b> para revelar cada lado — ou role a página.</p>
@@ -947,6 +950,22 @@
       kick(); }
     if(btnB) btnB.addEventListener("click",function(){ set(0); });
     if(btnA) btnA.addEventListener("click",function(){ set(1); });
+
+    /* arrastar a bolinha central para revelar (sem scroll nem botão) */
+    function fracFromX(cx){ var r=stage.getBoundingClientRect(); return r.width?Math.min(Math.max((cx-r.left)/r.width,0),1):0; }
+    function syncBtns(){ var a0=cur<=0.02,a1=cur>=0.98;
+      if(btnB){ btnB.classList.toggle("active",a0); btnB.setAttribute("aria-pressed",String(a0)); }
+      if(btnA){ btnA.classList.toggle("active",a1); btnA.setAttribute("aria-pressed",String(a1)); } }
+    if(handle){
+      var hDrag=false;
+      handle.addEventListener("pointerdown",function(e){ hDrag=true; handle.classList.add("grab");
+        try{handle.setPointerCapture(e.pointerId);}catch(_){}
+        cur=1-fracFromX(e.clientX); manual=cur; apply(); syncBtns(); e.preventDefault(); });
+      handle.addEventListener("pointermove",function(e){ if(!hDrag)return; cur=1-fracFromX(e.clientX); manual=cur; apply(); syncBtns(); });
+      function hEnd(){ if(hDrag){ hDrag=false; handle.classList.remove("grab"); } }
+      handle.addEventListener("pointerup",hEnd); handle.addEventListener("pointercancel",hEnd);
+    }
+
     window.addEventListener("scroll",function(){ if(manual===null) kick(); },{passive:true});
     window.addEventListener("resize",kick);
     cur=scrollVal(); apply(); kick();
