@@ -336,6 +336,8 @@
     .pc-glowring,.pc-sweep::before,.promo-seal,.ribbon .live-dot,.sc-bar i::after,.cd-clock b.tick{animation:none}
     .offer-stage.in .offer-embers{opacity:0}
   }
+  /* mobile/tablet: selo pra dentro (não sangra pro fora da tela) */
+  @media(max-width:860px){ .promo-seal{top:-24px;left:18px;width:76px;height:76px} }
 
   /* ---------- faq ---------- */
   .faq{max-width:820px}
@@ -1344,12 +1346,14 @@
     if(e.target && e.target.closest && e.target.closest("button,.vchip,.ba-tag,.rail a,[data-goto]")) Sound.tick(); },true);
 
   var topbar=document.getElementById("topbar"), dock=document.getElementById("dock"), footer=document.querySelector("footer"), progressBar=document.getElementById("progress");
+  var offerSec=document.getElementById("oferta"), finalSec=document.getElementById("final");
+  function ctaInView(el){ if(!el)return false; var r=el.getBoundingClientRect(); return r.top<window.innerHeight*0.72 && r.bottom>window.innerHeight*0.32; }
   window.addEventListener("scroll",function(){
     topbar.classList.toggle("solid",window.scrollY>40);
     progressBar.style.width=(scrollProg()*100)+"%";
     var pastHero=window.scrollY>window.innerHeight*0.85;
     var footTop=footer.getBoundingClientRect().top;
-    dock.classList.toggle("show",pastHero && footTop>window.innerHeight);
+    dock.classList.toggle("show",pastHero && footTop>window.innerHeight && !ctaInView(offerSec) && !ctaInView(finalSec));
   },{passive:true});
 
   /* ---------------- FAQ com abertura animada ---------------- */
