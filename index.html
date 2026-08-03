@@ -197,7 +197,7 @@
   .ba-stage{position:relative;border-radius:26px;overflow:hidden;border:1px solid var(--line-strong);aspect-ratio:4/5;max-width:440px;margin-inline:auto;background:#0a0406}
   .ba-stage + .ba-stage{margin-top:clamp(24px,5vw,44px)}
   .ba-layer{position:absolute;inset:0;display:grid;place-items:center}
-  .ba-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+  .ba-img{position:absolute;inset:0;background-repeat:no-repeat;background-position:50% 25%;background-size:cover}
   .ba-before .ba-img{filter:grayscale(.35) contrast(.96) brightness(.94)}
   .figure{position:relative;width:min(38%,240px);aspect-ratio:3/5;border-radius:120px 120px 40px 40px}
   .ba-before{background:linear-gradient(180deg,#161014,#0b080b)}
@@ -437,49 +437,13 @@
       <h2>5 áreas, <em>um</em> glow up de verdade</h2>
     </div>
     <p class="lead" style="margin-top:-14px;margin-bottom:clamp(26px,5vw,50px)" data-reveal>As 5 áreas do seu glow up: <b style="color:var(--ink)">skincare, cabelo, corpo, estilo e mente</b>. Um passo de cada vez, sem enrolação.</p>
-    <div class="method-grid" id="methodGrid">
-      <article class="pillar" data-reveal>
-        <span class="num">01</span>
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11Z" stroke="currentColor" stroke-width="1.6"/></svg></span>
-        <h3>Skincare</h3>
-        <p>Rotina de pele descomplicada. É aquele glow que todo mundo nota de longe.</p>
-      </article>
-      <article class="pillar d1" data-reveal>
-        <span class="num">02</span>
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 14c0-6 4-10 8-10s8 4 8 10c0 3-2 6-8 6s-8-3-8-6Z" stroke="currentColor" stroke-width="1.6"/><path d="M9 20v-3M15 20v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
-        <h3>Cabelo &amp; corte</h3>
-        <p>O corte certo pro seu rosto e como manter. É o detalhe que muda tudo — real.</p>
-      </article>
-      <article class="pillar d2" data-reveal>
-        <span class="num">03</span>
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4v4M18 4v4M6 16v4M18 16v4M6 8h12M6 16h12M4 8h4M16 8h4M4 16h4M16 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
-        <h3>Corpo &amp; treino</h3>
-        <p>Treino que cabe na sua rotina. Mais postura, mais presença, zero desculpa.</p>
-      </article>
-      <article class="pillar" data-reveal>
-        <span class="num">04</span>
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6l2-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
-        <h3>Estilo &amp; imagem</h3>
-        <p>Roupas e cores que são a sua cara. Estiloso sem gastar rios de dinheiro.</p>
-      </article>
-      <article class="pillar d1" data-reveal>
-        <span class="num">05</span>
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4a5 5 0 0 1 5 5c0 2-1 3-2 4v3H9v-3c-1-1-2-2-2-4a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 20h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
-        <h3>Mente &amp; confiança</h3>
-        <p>A base do glow up: hábitos, foco e confiança pra segurar tudo.</p>
-      </article>
-      <article class="pillar d2" data-reveal style="display:grid;place-content:center;text-align:center;background:linear-gradient(150deg,rgba(255,35,51,.18),rgba(176,13,28,.08))">
-        <div class="serif" style="font-size:1.6rem;color:var(--red-soft)">+ acompanhamento<br>e comunidade</div>
-        <p style="margin-top:10px;color:var(--ink-dim);transform:none">Você nunca faz sozinho.</p>
-      </article>
-    </div>
   </section>
 
   <!-- PAREDE VIVA — COLETÂNEA DE VÍDEOS -->
   <section class="wrap" id="videos">
     <div class="shead" data-reveal>
       <span class="eyebrow">Provas reais</span>
-      <h2>Vê com os <em>próprios olhos</em></h2>
+      <h2>Veja com os <em>próprios olhos</em></h2>
     </div>
     <p class="lead" style="margin-top:-14px;margin-bottom:clamp(24px,4vw,40px)" data-reveal>Transformações de gente de verdade — uma por área. Arrasta pro lado e escolhe o que quer ver.</p>
 
@@ -540,16 +504,16 @@
       <h2>Role e veja o <em>depois</em> aparecer</h2>
     </div>
     <div class="ba-stage" data-reveal data-antes="assets/par1-antes.jpg" data-depois="assets/par1-depois.jpg">
-      <div class="ba-layer ba-before"><div class="figure"></div><img class="ba-img ba-img-before" alt="Antes da transformação" decoding="async" /></div>
-      <div class="ba-layer ba-after"><div class="figure"></div><img class="ba-img ba-img-after" alt="Depois da transformação" decoding="async" /></div>
+      <div class="ba-layer ba-before"><div class="figure"></div><div class="ba-img ba-img-before" role="img" aria-label="Antes da transformação" style="background-position:50% 7%;background-size:192%"></div></div>
+      <div class="ba-layer ba-after"><div class="figure"></div><div class="ba-img ba-img-after" role="img" aria-label="Depois da transformação" style="background-position:50% 30%;background-size:100%"></div></div>
       <button type="button" class="ba-tag b ba-antes" aria-pressed="false">Antes</button>
       <button type="button" class="ba-tag a ba-depois" aria-pressed="false">Depois</button>
       <div class="ba-handle"><svg class="ba-grip" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.5 8l-4 4 4 4M14.5 8l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
     <div class="ba-stage" data-reveal data-antes="assets/par2-antes.jpg" data-depois="assets/par2-depois.jpg">
-      <div class="ba-layer ba-before"><div class="figure"></div><img class="ba-img ba-img-before" alt="Antes da transformação" decoding="async" /></div>
-      <div class="ba-layer ba-after"><div class="figure"></div><img class="ba-img ba-img-after" alt="Depois da transformação" decoding="async" /></div>
+      <div class="ba-layer ba-before"><div class="figure"></div><div class="ba-img ba-img-before" role="img" aria-label="Antes da transformação" style="background-position:50% 49%;background-size:110%"></div></div>
+      <div class="ba-layer ba-after"><div class="figure"></div><div class="ba-img ba-img-after" role="img" aria-label="Depois da transformação" style="background-position:50% 30%;background-size:100%"></div></div>
       <button type="button" class="ba-tag b ba-antes" aria-pressed="false">Antes</button>
       <button type="button" class="ba-tag a ba-depois" aria-pressed="false">Depois</button>
       <div class="ba-handle"><svg class="ba-grip" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.5 8l-4 4 4 4M14.5 8l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -838,7 +802,7 @@
      "varying float vD; varying float vR; varying vec2 vC;",
      "void main(){",
      " vec3 ac=aCenter;",
-     " float az=atan(ac.z, ac.x);",              // agrupa a longitude em 5 constelações
+     " float az=atan(ac.z, ac.x+0.0001);",       // agrupa a longitude em 5 constelações (guarda contra (0,0))
      " float sect=1.2566371;",                   // 2π/5
      " float naz=mix(az, floor(az/sect+0.5)*sect, uCluster*0.85);",
      " float hor=length(vec2(ac.x, ac.z));",
@@ -873,32 +837,29 @@
      " float a=soft*(0.14+0.66*vD)*(0.55+0.6*shell)*uAlpha;",
      " gl_FragColor=vec4(col,a);",
      "}"].join("\n");
-    function sh(t,s){ var o=g.createShader(t); g.shaderSource(o,s); g.compileShader(o); return g.getShaderParameter(o,g.COMPILE_STATUS)?o:null; }
+    function sh(t,s){ var o=g.createShader(t); g.shaderSource(o,s); g.compileShader(o);
+      if(!g.getShaderParameter(o,g.COMPILE_STATUS)){ try{ console.warn("hero3d shader falhou:", g.getShaderInfoLog(o)); }catch(_){} return null; } return o; }
     var v=sh(g.VERTEX_SHADER,vsrc), f=sh(g.FRAGMENT_SHADER,fsrc);
     if(!v||!f){ c.style.display="none"; return; }
     var pr=g.createProgram(); g.attachShader(pr,v); g.attachShader(pr,f); g.linkProgram(pr);
-    if(!g.getProgramParameter(pr,g.LINK_STATUS)){ c.style.display="none"; return; }
+    if(!g.getProgramParameter(pr,g.LINK_STATUS)){ try{ console.warn("hero3d link falhou:", g.getProgramInfoLog(pr)); }catch(_){} c.style.display="none"; return; }
     g.useProgram(pr);
     // cada partícula = 2 triângulos (6 vértices)
-    var N=isTouch?2600:10000;
+    var N=isTouch?2600:17000;
     var corners=[-1,-1, 1,-1, -1,1,  -1,1, 1,-1, 1,1];
     var V=N*6;
     var aCenter=new Float32Array(V*3), aCorner=new Float32Array(V*2), aSeed=new Float32Array(V), aPrism=new Float32Array(V*3);
-    // prisma triangular: triângulo equilátero no plano XY, extrudado ao longo de Z
-    var PR=0.98, PD=0.62;
-    var TAx=0, TAy=PR, TBx=-PR*0.8660254, TBy=-PR*0.5, TCx=PR*0.8660254, TCy=-PR*0.5;
+    // bipirâmide triangular: triângulo equilátero (equador no plano XZ) + 2 ápices em ±Y
+    var BR=0.86, BH=1.12;
+    var be0=[BR,0,0], be1=[-BR*0.5,0,BR*0.8660254], be2=[-BR*0.5,0,-BR*0.8660254];
+    var bAp=[0,BH,0], bBp=[0,-BH,0];
+    var BF=[ [be0,be1,bAp],[be1,be2,bAp],[be2,be0,bAp], [be1,be0,bBp],[be2,be1,bBp],[be0,be2,bBp] ]; // 6 faces triangulares
     function prismPoint(){
-      var x,y,z;
-      if(Math.random()<0.26){                       // tampas triangulares (frente/trás)
-        var u=Math.random(), vv=Math.random(); if(u+vv>1){ u=1-u; vv=1-vv; }
-        x=TAx+(TBx-TAx)*u+(TCx-TAx)*vv; y=TAy+(TBy-TAy)*u+(TCy-TAy)*vv;
-        z=(Math.random()<0.5?-PD:PD);
-      } else {                                       // 3 faces retangulares laterais
-        var e=Math.floor(Math.random()*3), x0,y0,x1,y1;
-        if(e===0){ x0=TAx;y0=TAy;x1=TBx;y1=TBy; } else if(e===1){ x0=TBx;y0=TBy;x1=TCx;y1=TCy; } else { x0=TCx;y0=TCy;x1=TAx;y1=TAy; }
-        var t=Math.random(); x=x0+(x1-x0)*t; y=y0+(y1-y0)*t; z=-PD+Math.random()*2*PD;
-      }
-      return [x,y,z];
+      var f=BF[(Math.random()*6)|0], P0=f[0],P1=f[1],P2=f[2];
+      var u=Math.random(), v=Math.random(); if(u+v>1){ u=1-u; v=1-v; }
+      return [ P0[0]+(P1[0]-P0[0])*u+(P2[0]-P0[0])*v,
+               P0[1]+(P1[1]-P0[1])*u+(P2[1]-P0[1])*v,
+               P0[2]+(P1[2]-P0[2])*u+(P2[2]-P0[2])*v ];
     }
     for(var i=0;i<N;i++){
       var y=1-(i/(N-1))*2, rad=Math.sqrt(Math.max(0.0,1-y*y)), th=i*2.399963, rr=0.62+0.38*Math.random();
@@ -918,8 +879,8 @@
         uT=g.getUniformLocation(pr,"uTime"), uAlpha=g.getUniformLocation(pr,"uAlpha"),
         uDisp=g.getUniformLocation(pr,"uDisp"), uPrism=g.getUniformLocation(pr,"uPrism"), uSwirl=g.getUniformLocation(pr,"uSwirl"), uCluster=g.getUniformLocation(pr,"uCluster");
     g.enable(g.BLEND); g.blendFunc(g.SRC_ALPHA,g.ONE); g.clearColor(0,0,0,0);
-    var gdpr=Math.min(window.devicePixelRatio||1, isTouch?1.25:1.5), gscale=isTouch?0.7:0.85, R=0.95, sx=R, sy=R, aspect=1, pr_ndc=0.02;
-    var basePx=isTouch?5.2:7.5;   // diâmetro da partícula em px de buffer
+    var gdpr=Math.min(window.devicePixelRatio||1, isTouch?1.25:2), gscale=isTouch?0.7:1.0, R=0.95, sx=R, sy=R, aspect=1, pr_ndc=0.02;
+    var basePx=isTouch?5.2:(10*gdpr);   // diâmetro da partícula em px de buffer (escala com o DPI → nitidez constante)
     function gres(){ var w=Math.max(1,Math.floor(c.clientWidth*gdpr*gscale)), h=Math.max(1,Math.floor(c.clientHeight*gdpr*gscale));
       c.width=w; c.height=h; g.viewport(0,0,w,h); aspect=w/h;
       if(w>=h){ sx=R*h/w; sy=R; } else { sx=R; sy=R*w/h; }
@@ -938,15 +899,15 @@
       /* progCur (0..1) é o scroll global — dita a coreografia da esfera por capítulo */
       var P=progCur;
       var disp=0.62*sstep(0.05,0.40,P)*(1.0-sstep(0.58,0.95,P)); // dispersa no meio, reforma nas pontas
-      var prism=sstep(0.60,0.95,P);                               // condensa num prisma no fim da página
-      var swirl=(0.12+P*1.5)*(1.0-prism);                         // solta o giro ao formar o prisma (facetas limpas)
+      var prism=sstep(0.60,0.95,P);                               // condensa numa bipirâmide triangular no fim da página
+      var swirl=(0.12+P*1.5)*(1.0-prism);                         // solta o giro ao formar a bipirâmide (facetas limpas)
       var mob=isTouch?0.35:0.7;
       var ry=tt*0.20+mx*mob*(1.0-prism*0.5), rx=0.30+my*0.40+Math.sin(tt*0.25)*0.08;
       g.uniformMatrix3fv(uRot,false,mrot(ry,rx));
       g.uniform2f(uScale,sx,sy); g.uniform1f(uPointR,pr_ndc); g.uniform1f(uAspect,aspect);
       g.uniform1f(uT,tt);
       g.uniform1f(uDisp,disp); g.uniform1f(uPrism,prism); g.uniform1f(uSwirl,swirl); g.uniform1f(uCluster,metCur*(1.0-prism));
-      g.uniform1f(uAlpha, isTouch?1.0:(0.40+0.22*P));
+      g.uniform1f(uAlpha, isTouch?1.0:(0.82+0.18*P));
       g.drawArrays(g.TRIANGLES,0,V);
       if(awake) requestAnimationFrame(gframe);
     }
@@ -1031,10 +992,9 @@
     var btnB=stage.querySelector(".ba-antes"), btnA=stage.querySelector(".ba-depois");
     var imgB=stage.querySelector(".ba-img-before"), imgA=stage.querySelector(".ba-img-after");
     var manual=null, cur=0, raf=false;
-    /* carrega as fotos reais; se o arquivo não existir, cai no fallback (gradiente) */
-    [imgB,imgA].forEach(function(im){ if(im) im.addEventListener("error",function(){ im.style.display="none"; }); });
-    if(imgB) imgB.src=stage.getAttribute("data-antes");
-    if(imgA) imgA.src=stage.getAttribute("data-depois");
+    /* carrega as fotos reais como background (controle independente de zoom/posição) */
+    if(imgB) imgB.style.backgroundImage="url('"+stage.getAttribute("data-antes")+"')";
+    if(imgA) imgA.style.backgroundImage="url('"+stage.getAttribute("data-depois")+"')";
 
     function scrollVal(){ var r=stage.getBoundingClientRect(), vh=window.innerHeight;
       var p=(vh-r.top)/(vh+r.height); return Math.min(Math.max((p-0.15)/0.7,0),1); }
@@ -1070,6 +1030,7 @@
     cur=scrollVal(); apply(); kick();
   }
   document.querySelectorAll(".ba-stage").forEach(initBA);
+
 
   /* ---------------- parede viva (coverflow de vídeos) ---------------- */
   (function(){
@@ -1206,26 +1167,6 @@
   document.querySelectorAll("[data-goto]").forEach(function(b){ b.addEventListener("click",function(){
     var t=document.querySelector(b.getAttribute("data-goto")); if(t)t.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"}); }); });
 
-  /* ---------------- smooth scroll com inércia (desktop / ponteiro fino) ---------------- */
-  if(!isTouch && !reduce && window.matchMedia && window.matchMedia("(pointer:fine)").matches){
-    var ssTarget=window.scrollY, ssCur=window.scrollY, ssRAF=false, ssLast=window.scrollY;
-    function ssMax(){ return Math.max(0, document.documentElement.scrollHeight - window.innerHeight); }
-    function ssLoop(){
-      if(Math.abs(window.scrollY-ssLast)>2){ ssCur=ssTarget=window.scrollY; }   /* scroll externo → ressincroniza */
-      ssCur+=(ssTarget-ssCur)*0.16;
-      if(Math.abs(ssTarget-ssCur)<0.4){ ssCur=ssTarget; ssRAF=false; }
-      window.scrollTo(0,ssCur); ssLast=Math.round(ssCur);
-      if(ssRAF) requestAnimationFrame(ssLoop);
-    }
-    function ssKick(){ if(!ssRAF){ ssRAF=true; requestAnimationFrame(ssLoop); } }
-    window.addEventListener("wheel",function(e){
-      if(e.ctrlKey) return;                         /* pinch-zoom */
-      e.preventDefault();
-      var d=e.deltaY; if(e.deltaMode===1) d*=16; else if(e.deltaMode===2) d*=window.innerHeight;
-      ssTarget=Math.max(0,Math.min(ssMax(), ssTarget+d)); ssKick();
-    },{passive:false});
-    window.addEventListener("scroll",function(){ if(!ssRAF){ ssTarget=ssCur=window.scrollY; ssLast=Math.round(window.scrollY); } },{passive:true});
-  }
 })();
 </script>
 
