@@ -441,7 +441,7 @@
     background:linear-gradient(180deg,rgba(176,13,28,0) 40%,rgba(120,8,16,.55));opacity:var(--fog,0);transition:opacity .5s}
   /* vídeo vivo no card ativo (deixe cair um <video class="vfeed"> dentro de .phone) */
   .vfeed{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .5s}
-  .vcard.is-active .vfeed{opacity:1}
+  .vcard.has-video.is-active .vfeed{opacity:1}   /* só revela quando o vídeo realmente toca (senão fica o gradiente) */
   .cover{position:absolute;inset:0;background-size:220% 220%;animation:vsheen 9s ease-in-out infinite}
   .cover::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 55% at 50% 20%,rgba(255,255,255,.14),transparent 60%),linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55));mix-blend-mode:screen}
   @keyframes vsheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
@@ -456,12 +456,13 @@
   .vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(10,4,6,.42);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(4px);z-index:3;transition:transform .35s,opacity .35s}
   .vplay svg{width:22px;height:22px;fill:#fff;margin-left:2px}
   .vlabel{position:absolute;top:20px;left:14px;z-index:3;font-family:var(--font-mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:5px 10px;backdrop-filter:blur(4px)}
-  .vtime{position:absolute;bottom:14px;right:12px;z-index:3;font-family:var(--font-mono);font-size:.62rem;color:#fff;background:rgba(0,0,0,.5);border-radius:6px;padding:3px 7px}
+  .vtime{position:absolute;bottom:14px;left:12px;z-index:3;font-family:var(--font-mono);font-size:.62rem;color:#fff;background:rgba(0,0,0,.5);border-radius:6px;padding:3px 7px}
   .vprog{position:absolute;left:0;bottom:0;height:3px;width:0;z-index:3;background:linear-gradient(90deg,var(--red-hot),var(--red));box-shadow:0 0 10px var(--red)}
   .vcard.is-active{cursor:default}
   .vcard.is-active .phone{border-color:rgba(255,90,99,.55);box-shadow:0 50px 100px -40px rgba(255,35,51,.55),0 0 0 1px rgba(255,90,99,.25)}
   .vcard.is-active .vplay{opacity:0;transform:translate(-50%,-50%) scale(.6)}
   .vcard.is-active .vprog{animation:vplay 6s linear infinite}
+  .vcard.has-video .vprog{animation:none}   /* com vídeo real, a barra segue o tempo do vídeo (JS), não a animação fake */
   @keyframes vplay{0%{width:0}100%{width:100%}}
   .vcard:not(.is-active) .cover{animation-play-state:paused;filter:saturate(.7) brightness(.6)}
   .vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:var(--glass);border:1px solid var(--line-strong);color:var(--ink);cursor:pointer;backdrop-filter:blur(10px);transition:transform .25s,border-color .25s,color .25s;-webkit-appearance:none;appearance:none}
@@ -470,6 +471,18 @@
   .vnav.prev{left:clamp(0px,3vw,26px)}
   .vnav.next{right:clamp(0px,3vw,26px)}
   .vnav:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+  /* controles dentro do vídeo (mute + tela cheia) — padrão tipo player */
+  .vc{position:absolute;z-index:4;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(10,4,6,.5);border:1px solid rgba(255,255,255,.3);color:#fff;cursor:pointer;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s,transform .2s,background .2s;-webkit-appearance:none;appearance:none}
+  .vcard.has-video.is-active .vc{opacity:1;pointer-events:auto}   /* controles só quando há vídeo real tocando */
+  .vc:hover{background:rgba(255,35,51,.6);transform:scale(1.08)}
+  .vc:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+  .vc svg{width:18px;height:18px}
+  .vc-sound{right:10px;bottom:12px}
+  .vc-full{right:10px;top:12px}
+  .vc-sound .wave{opacity:0;transition:opacity .25s}
+  .vstage.snd-on .vc-sound .wave{opacity:1}
+  .vc-sound .slash{opacity:1;transition:opacity .25s}
+  .vstage.snd-on .vc-sound .slash{opacity:0}
   @media(max-width:560px){.vnav{width:44px;height:44px}.vnav.prev{left:2px}.vnav.next{right:2px}}
   .vhint{display:none;justify-content:center;align-items:center;gap:10px;margin-top:14px;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
   .vhint svg{width:30px;height:22px;color:var(--red-soft);animation:vswipe 1.9s ease-in-out infinite}
@@ -619,28 +632,28 @@
 
     <div class="vstage" id="vstage" data-reveal>
       <div class="vtrack" id="vtrack">
-        <article class="vcard" data-area="skincare" data-tag="Skincare" data-caption="&quot;minha pele antes vs agora 😳&quot; — 14 dias de rotina" data-dur="0:32">
+        <article class="vcard" data-area="skincare" data-tag="Skincare" data-caption="&quot;minha pele antes vs agora 😳&quot; — 14 dias de rotina" data-video="assets/skincare-1.mp4" data-dur="0:32">
           <div class="phone"><div class="cover c-skincare"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Skincare</span><span class="vtime">0:32</span><i class="vprog"></i></div>
         </article>
-        <article class="vcard" data-area="cabelo" data-tag="Cabelo &amp; corte" data-caption="&quot;troquei o corte e virei outro 🔥&quot;" data-dur="0:21">
+        <article class="vcard" data-area="cabelo" data-tag="Cabelo &amp; corte" data-caption="&quot;troquei o corte e virei outro 🔥&quot;" data-video="assets/cabelo-1.mp4" data-dur="0:21">
           <div class="phone"><div class="cover c-cabelo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Cabelo</span><span class="vtime">0:21</span><i class="vprog"></i></div>
         </article>
-        <article class="vcard" data-area="corpo" data-tag="Corpo &amp; treino" data-caption="&quot;90 dias de treino que cabe na rotina&quot;" data-dur="0:45">
+        <article class="vcard" data-area="corpo" data-tag="Corpo &amp; treino" data-caption="&quot;90 dias de treino que cabe na rotina&quot;" data-video="assets/corpo-1.mp4" data-dur="0:45">
           <div class="phone"><div class="cover c-corpo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Corpo</span><span class="vtime">0:45</span><i class="vprog"></i></div>
         </article>
-        <article class="vcard" data-area="estilo" data-tag="Estilo &amp; imagem" data-caption="&quot;montei looks com o que eu já tinha&quot;" data-dur="0:28">
+        <article class="vcard" data-area="estilo" data-tag="Estilo &amp; imagem" data-caption="&quot;montei looks com o que eu já tinha&quot;" data-video="assets/estilo-1.mp4" data-dur="0:28">
           <div class="phone"><div class="cover c-estilo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Estilo</span><span class="vtime">0:28</span><i class="vprog"></i></div>
         </article>
-        <article class="vcard" data-area="mente" data-tag="Mente &amp; confiança" data-caption="&quot;parei de me esconder e mudou tudo&quot;" data-dur="0:39">
+        <article class="vcard" data-area="mente" data-tag="Mente &amp; confiança" data-caption="&quot;parei de me esconder e mudou tudo&quot;" data-video="assets/mente-1.mp4" data-dur="0:39">
           <div class="phone"><div class="cover c-mente"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Mente</span><span class="vtime">0:39</span><i class="vprog"></i></div>
         </article>
-        <article class="vcard" data-area="skincare" data-tag="Skincare" data-caption="&quot;rotina de 5 min que salvou minha pele&quot;" data-dur="0:24">
+        <article class="vcard" data-area="skincare" data-tag="Skincare" data-caption="&quot;rotina de 5 min que salvou minha pele&quot;" data-video="assets/skincare-2.mp4" data-dur="0:24">
           <div class="phone"><div class="cover c-skincare2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Skincare</span><span class="vtime">0:24</span><i class="vprog"></i></div>
         </article>
-        <article class="vcard" data-area="corpo" data-tag="Corpo &amp; treino" data-caption="&quot;postura muda tudo — antes/depois&quot;" data-dur="0:33">
+        <article class="vcard" data-area="corpo" data-tag="Corpo &amp; treino" data-caption="&quot;postura muda tudo — antes/depois&quot;" data-video="assets/corpo-2.mp4" data-dur="0:33">
           <div class="phone"><div class="cover c-corpo2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Corpo</span><span class="vtime">0:33</span><i class="vprog"></i></div>
         </article>
-        <article class="vcard" data-area="estilo" data-tag="Estilo &amp; imagem" data-caption="&quot;achei as cores certas pro meu tom&quot;" data-dur="0:19">
+        <article class="vcard" data-area="estilo" data-tag="Estilo &amp; imagem" data-caption="&quot;achei as cores certas pro meu tom&quot;" data-video="assets/estilo-2.mp4" data-dur="0:19">
           <div class="phone"><div class="cover c-estilo2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Estilo</span><span class="vtime">0:19</span><i class="vprog"></i></div>
         </article>
       </div>
@@ -702,7 +715,7 @@
     <div class="offer">
       <div data-reveal>
         <span class="eyebrow">A oferta</span>
-        <h2 style="font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;font-size:clamp(2rem,5vw,3.4rem);line-height:1;margin:18px 0 22px">Comece hoje sua<br>versão <span class="serif" style="text-transform:none;color:var(--red-soft)">incendiária</span></h2>
+        <h2 style="font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;font-size:clamp(2rem,5vw,3.4rem);line-height:1;margin:18px 0 22px">Comece hoje a<br><span class="serif" style="text-transform:none;color:var(--red-soft)">moggar</span></h2>
         <p class="lead">Acesso completo ao método, atualizações e comunidade. Um investimento único — resultado que fica pra vida.</p>
         <div class="guarantee">
           <span class="seal"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -1420,6 +1433,44 @@
     var chips=Array.prototype.slice.call(document.querySelectorAll(".vchip"));
     var visible=cards.slice(), idx=0;
 
+    /* cria o <video> do card sob demanda (lazy) com fallback gracioso ao gradiente */
+    function ensureVideo(card){
+      if(card.__v!==undefined) return card.__v;
+      var src=card.getAttribute("data-video"); if(!src){ card.__v=null; return null; }
+      var v=document.createElement("video");
+      v.className="vfeed"; v.loop=true; v.muted=true; v.defaultMuted=true; v.playsInline=true;
+      v.setAttribute("muted",""); v.setAttribute("playsinline",""); v.setAttribute("webkit-playsinline",""); v.setAttribute("preload","auto");
+      v.addEventListener("playing",function(){ card.classList.add("has-video"); });
+      v.addEventListener("loadedmetadata",function(){ var t=card.querySelector(".vtime"); if(t&&isFinite(v.duration)&&v.duration>0){ var m=Math.floor(v.duration/60), s=Math.round(v.duration%60); if(s===60){s=0;m++;} t.textContent=m+":"+(s<10?"0":"")+s; } });
+      v.addEventListener("error",function(){ card.classList.remove("has-video"); if(v.parentNode) v.parentNode.removeChild(v); card.__v=null; });
+      v.addEventListener("timeupdate",function(){ var pb=card.querySelector(".vprog"); if(pb&&isFinite(v.duration)&&v.duration>0){ pb.style.width=(v.currentTime/v.duration*100).toFixed(2)+"%"; } });
+      v.src=src;
+      var ph=card.querySelector(".phone");
+      if(ph){
+        ph.appendChild(v);
+        var mb=document.createElement("button"); mb.type="button"; mb.className="vc vc-sound"; mb.setAttribute("aria-label","Ativar/silenciar som");
+        mb.innerHTML='<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><g class="wave"><path d="M16 9.2a4 4 0 0 1 0 5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M18.6 7a7 7 0 0 1 0 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></g><line class="slash" x1="3.5" y1="20.5" x2="20.5" y2="3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+        mb.addEventListener("click",function(e){ e.stopPropagation(); toggleSound(); });
+        var fb=document.createElement("button"); fb.type="button"; fb.className="vc vc-full"; fb.setAttribute("aria-label","Tela cheia");
+        fb.innerHTML='<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        fb.addEventListener("click",function(e){ e.stopPropagation(); openFull(v); });
+        ph.appendChild(mb); ph.appendChild(fb);
+      }
+      card.__v=v; return v;
+    }
+    /* som dos vídeos: começa mudo (autoplay exige mudo); usuário ativa no botão. Fallback re-muta se o browser bloquear */
+    var vidSound=false;
+    function curVideo(){ var a=visible[idx]; return a?a.querySelector("video"):null; }
+    function playCard(v){ if(!v) return; v.muted=!vidSound; var p=v.play(); if(p&&p.catch) p.catch(function(){ v.muted=true; v.play().catch(function(){}); }); }
+    function toggleSound(){ vidSound=!vidSound; stage.classList.toggle("snd-on",vidSound);
+      var v=curVideo(); if(v){ v.muted=!vidSound; if(vidSound){ var p=v.play(); if(p&&p.catch) p.catch(function(){}); } } }
+    function openFull(v){ if(!v) return; vidSound=true; stage.classList.add("snd-on"); v.muted=false; var p=v.play(); if(p&&p.catch) p.catch(function(){});
+      if(v.requestFullscreen){ v.controls=true; v.requestFullscreen().catch(function(){}); }
+      else if(v.webkitRequestFullscreen){ v.controls=true; v.webkitRequestFullscreen(); }
+      else if(v.webkitEnterFullscreen){ v.webkitEnterFullscreen(); } }   /* iOS: player nativo */
+    function onFsChange(){ if(!document.fullscreenElement && !document.webkitFullscreenElement){ cards.forEach(function(c){ var vd=c.querySelector("video"); if(vd) vd.controls=false; }); } }
+    document.addEventListener("fullscreenchange",onFsChange); document.addEventListener("webkitfullscreenchange",onFsChange);
+
     function buildDots(){ dotsWrap.innerHTML="";
       visible.forEach(function(_,i){ var b=document.createElement("button"); b.type="button";
         b.setAttribute("aria-label","Ir ao vídeo "+(i+1));
@@ -1447,9 +1498,11 @@
       var act=visible[idx];
       if(act && caption){ caption.style.opacity=0;
         setTimeout(function(){ caption.textContent=(act.getAttribute("data-caption")||"").replace(/&quot;/g,'"'); caption.style.opacity=1; },150); }
-      /* vídeo vivo: toca só no card ativo, pausa o resto (no-op enquanto forem gradientes) */
-      cards.forEach(function(c){ var vd=c.querySelector("video");
-        if(vd){ if(c.classList.contains("is-active")){ var pp=vd.play(); if(pp&&pp.catch){ pp.catch(function(){}); } } else { vd.pause(); } } });
+      /* vídeo vivo: cria sob demanda no card ativo; som conforme vidSound; pausa inativos/fora de vista */
+      cards.forEach(function(c){
+        if(c.classList.contains("is-active")){ var v=ensureVideo(c); if(v && inView) playCard(v); }
+        else { var ev=c.querySelector("video"); if(ev) ev.pause(); }
+      });
       Array.prototype.forEach.call(dotsWrap.children,function(d,i){ d.classList.toggle("on",i===idx); });
     }
 
@@ -1470,7 +1523,7 @@
     var down=false,dragging=false,startX=0,moved=0,pid=null,suppressClick=false,vel=0,lastX=0;
     function clampCenter(v){ return Math.max(-0.4,Math.min(visible.length-0.6,v)); }
     stage.addEventListener("pointerdown",function(e){
-      if(e.target.closest(".vnav")) return;             /* não sequestra o clique das setas */
+      if(e.target.closest(".vnav")||e.target.closest(".vc")) return;   /* não sequestra setas nem os controles do vídeo */
       down=true; dragging=false; startX=e.clientX; moved=0; pid=e.pointerId; lastX=e.clientX; vel=0;
     });
     stage.addEventListener("pointermove",function(e){
@@ -1499,10 +1552,12 @@
 
     /* autoplay suave — pausa no hover, no arrasto e fora da tela */
     var inView=false,hover=false;
-    new IntersectionObserver(function(es){ es.forEach(function(en){ inView=en.isIntersecting; }); },{threshold:0.35}).observe(stage);
+    new IntersectionObserver(function(es){ es.forEach(function(en){ inView=en.isIntersecting;
+      var v=curVideo(); if(!inView){ if(v) v.pause(); } else if(v){ playCard(v); }   /* pausa fora de vista (sem áudio off-screen) */
+    }); },{threshold:0.35}).observe(stage);
     stage.addEventListener("pointerenter",function(){ hover=true; });
     stage.addEventListener("pointerleave",function(){ hover=false; endDrag(); });
-    if(!reduce){ setInterval(function(){ if(inView && !hover && !dragging) next(); },6000); }
+    if(!reduce){ setInterval(function(){ if(inView && !hover && !dragging && !vidSound) next(); },6000); }   /* som ligado = não auto-avança */
 
     window.addEventListener("resize",layout);
     buildDots(); layout();
