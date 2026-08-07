@@ -1438,9 +1438,11 @@
       if(card.__v!==undefined) return card.__v;
       var src=card.getAttribute("data-video"); if(!src){ card.__v=null; return null; }
       var v=document.createElement("video");
-      v.className="vfeed"; v.loop=true; v.muted=true; v.defaultMuted=true; v.playsInline=true;
+      v.className="vfeed"; v.loop=false; v.muted=true; v.defaultMuted=true; v.playsInline=true;
       v.setAttribute("muted",""); v.setAttribute("playsinline",""); v.setAttribute("webkit-playsinline",""); v.setAttribute("preload","auto");
       v.addEventListener("playing",function(){ card.classList.add("has-video"); });
+      /* fim do vídeo: avança só se estiver ativo/ambiente; senão repete (não interrompe quem está assistindo) */
+      v.addEventListener("ended",function(){ if(card.classList.contains("is-active") && inView && !hover && !dragging && !vidSound){ next(); } else { v.currentTime=0; var pp=v.play(); if(pp&&pp.catch){ pp.catch(function(){}); } } });
       v.addEventListener("loadedmetadata",function(){ var t=card.querySelector(".vtime"); if(t&&isFinite(v.duration)&&v.duration>0){ var m=Math.floor(v.duration/60), s=Math.round(v.duration%60); if(s===60){s=0;m++;} t.textContent=m+":"+(s<10?"0":"")+s; } });
       v.addEventListener("error",function(){ card.classList.remove("has-video"); if(v.parentNode) v.parentNode.removeChild(v); card.__v=null; });
       v.addEventListener("timeupdate",function(){ var pb=card.querySelector(".vprog"); if(pb&&isFinite(v.duration)&&v.duration>0){ pb.style.width=(v.currentTime/v.duration*100).toFixed(2)+"%"; } });
@@ -1503,6 +1505,8 @@
         if(c.classList.contains("is-active")){ var v=ensureVideo(c); if(v && inView) playCard(v); }
         else { var ev=c.querySelector("video"); if(ev) ev.pause(); }
       });
+      /* pré-carrega vizinhos com vídeo real → troca sem flash de gradiente */
+      if(visible.length>1){ [visible[(idx+1)%visible.length], visible[(idx-1+visible.length)%visible.length]].forEach(function(nc){ if(nc && nc.getAttribute("data-video") && nc.__v===undefined) ensureVideo(nc); }); }
       Array.prototype.forEach.call(dotsWrap.children,function(d,i){ d.classList.toggle("on",i===idx); });
     }
 
@@ -1557,7 +1561,8 @@
     }); },{threshold:0.35}).observe(stage);
     stage.addEventListener("pointerenter",function(){ hover=true; });
     stage.addEventListener("pointerleave",function(){ hover=false; endDrag(); });
-    if(!reduce){ setInterval(function(){ if(inView && !hover && !dragging && !vidSound) next(); },6000); }   /* som ligado = não auto-avança */
+    /* auto-avanço só para cards SEM vídeo tocando (gradiente, 6s). Cards com vídeo avançam ao terminar ("ended"). */
+    if(!reduce){ setInterval(function(){ if(!inView||hover||dragging||vidSound) return; var a=visible[idx]; if(a && a.classList.contains("has-video")) return; next(); },6000); }
 
     window.addEventListener("resize",layout);
     buildDots(); layout();
