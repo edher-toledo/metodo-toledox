@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#070406">
-<meta name="description" content="Método TOLEDOX — sua mudança começa agora. O método completo de transformação em 90 dias: pele, cabelo, corpo, estilo e mente. Passo a passo, sem achismo.">
+<meta name="description" content="Método TOLEDOX — sua mudança começa agora. O método de looksmaxing completo em 90 dias: pele, cabelo, corpo, rosto e mente. Passo a passo, sem achismo.">
 <title>Método TOLEDOX — Sua mudança começa agora</title>
 <link rel="canonical" href="https://edher-toledo.github.io/metodo-toledox/">
 
@@ -15,20 +15,20 @@
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://edher-toledo.github.io/metodo-toledox/">
 <meta property="og:title" content="Método TOLEDOX — Sua mudança começa agora">
-<meta property="og:description" content="Método completo de transformação em 90 dias: pele, cabelo, corpo, estilo e mente. Passo a passo, sem achismo.">
+<meta property="og:description" content="Método de looksmaxing completo em 90 dias: pele, cabelo, corpo, rosto e mente. Passo a passo, sem achismo.">
 <meta property="og:image" content="https://edher-toledo.github.io/metodo-toledox/assets/og.jpg">
 <meta property="og:image:secure_url" content="https://edher-toledo.github.io/metodo-toledox/assets/og.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Método TOLEDOX — glow up e transformação em 90 dias">
+<meta property="og:image:alt" content="Método TOLEDOX — looksmaxing e transformação em 90 dias">
 
 <!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Método TOLEDOX — Sua mudança começa agora">
-<meta name="twitter:description" content="Método completo de transformação em 90 dias: pele, cabelo, corpo, estilo e mente. Passo a passo, sem achismo.">
+<meta name="twitter:description" content="Método de looksmaxing completo em 90 dias: pele, cabelo, corpo, rosto e mente. Passo a passo, sem achismo.">
 <meta name="twitter:image" content="https://edher-toledo.github.io/metodo-toledox/assets/og.jpg">
-<meta name="twitter:image:alt" content="Método TOLEDOX — glow up e transformação em 90 dias">
+<meta name="twitter:image:alt" content="Método TOLEDOX — looksmaxing e transformação em 90 dias">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
 <style>html,body{margin:0;padding:0}img{max-width:100%}</style>
 
@@ -263,6 +263,22 @@
   .manifesto .hot{color:var(--ink);font-style:italic}
   .manifesto .hot b{background:linear-gradient(92deg,var(--red-hot),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:500}
 
+  /* ---------- quem sou eu ---------- */
+  .who{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(30px,5vw,64px);align-items:center}
+  @media(max-width:900px){.who{grid-template-columns:1fr;gap:36px}}
+  .who-text p{margin-top:16px;color:var(--ink-dim);font-size:1rem;line-height:1.65}
+  .who-text p:first-child{margin-top:0}
+  .who-quote{margin-top:24px!important;padding-left:18px;border-left:2px solid var(--red);font-style:italic;color:var(--ink)!important;font-size:1.05rem!important}
+  .who-timeline{display:flex;align-items:center;justify-content:center;gap:clamp(6px,1.6vw,14px)}
+  .who-arrow{width:18px;height:18px;color:var(--ink-faint);flex:none}
+  .who-photo{position:relative;width:clamp(80px,20vw,132px);aspect-ratio:3/4;border-radius:16px;overflow:hidden;border:1px solid var(--line-strong);flex:none;transition:transform .4s,box-shadow .4s}
+  .who-ph{position:absolute;inset:0;background:radial-gradient(70% 55% at 50% 25%,#3a3338,#241d22 60%,#161116)}
+  .who-mid .who-ph{background:radial-gradient(70% 55% at 50% 25%,#5a2a2e,#3a1216 60%,#1c0a0c)}
+  .who-final{border-color:rgba(255,35,51,.5);box-shadow:0 0 40px -10px rgba(255,35,51,.6)}
+  .who-final .who-ph{background:radial-gradient(70% 55% at 50% 20%,#ffd9cf,#ff3344 45%,#7a0c14 90%)}
+  .who-img{position:absolute;inset:0;background-repeat:no-repeat;background-position:50% 22%;background-size:cover}
+  .who-yr{position:absolute;left:0;right:0;bottom:0;padding:6px 0;text-align:center;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:linear-gradient(0deg,rgba(0,0,0,.75),transparent)}
+
   /* ---------- método 3D ---------- */
   .method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;perspective:1400px}
   @media(max-width:900px){.method-grid{grid-template-columns:repeat(2,1fr)}}
@@ -405,9 +421,9 @@
   /* a foto vira o "rodapé visual" da seção: conteúdo em cima, figura embaixo, dissolvida no --bg */
   .final{text-align:center;padding-block:clamp(90px,13vh,180px);z-index:1;isolation:isolate}
   .final::before{content:"";position:absolute;left:50%;top:-6%;bottom:-10%;transform:translateX(-50%);width:100vw;z-index:-1;pointer-events:none;
-    background:radial-gradient(58% 62% at 50% 46%,rgba(157,0,255,.14),transparent 72%)}
+    background:radial-gradient(58% 62% at 50% 46%,rgba(255,35,51,.14),transparent 72%)}
   .final h2{font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.012em;font-size:clamp(2.5rem,9.5vw,7rem);line-height:.9;text-wrap:balance}
-  .final h2 em{font-family:var(--font-accent);font-style:italic;font-weight:500;text-transform:none;background:linear-gradient(92deg,var(--red-hot),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:.015em 0 rgba(255,90,99,.3),-.015em 0 rgba(157,0,255,.28)}
+  .final h2 em{font-family:var(--font-accent);font-style:italic;font-weight:500;text-transform:none;background:linear-gradient(92deg,var(--red-hot),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:.015em 0 rgba(255,90,99,.3)}
   .final .sub{margin:26px auto 40px;max-width:44ch;color:var(--ink-dim);font-size:1.1rem}
 
   /* ---------- footer ---------- */
@@ -448,19 +464,14 @@
 
   /* ---------- parede viva (vídeos) ---------- */
   #videos{overflow:hidden}
-  .vfilters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:clamp(20px,3vw,30px)}
-  .vchip{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer;min-height:40px;transition:color .25s,border-color .25s,background .25s,box-shadow .25s;-webkit-appearance:none;appearance:none}
-  .vchip:hover{color:var(--ink);border-color:var(--line-strong)}
-  .vchip.active{color:#fff;background:linear-gradient(180deg,var(--red-soft),var(--red));border-color:var(--red);box-shadow:0 8px 26px -10px rgba(255,35,51,.7)}
-  .vchip:focus-visible{outline:2px solid var(--red);outline-offset:3px}
 
-  .vstage{position:relative;height:clamp(430px,66vh,560px);perspective:1600px;perspective-origin:50% 45%;touch-action:pan-y;user-select:none;overflow:hidden;cursor:grab}
+  .vstage{position:relative;height:clamp(480px,76vh,680px);perspective:1600px;perspective-origin:50% 45%;touch-action:pan-y;user-select:none;overflow:hidden;cursor:grab}
   .vstage::before{content:"";position:absolute;left:50%;bottom:2%;transform:translateX(-50%);width:66%;height:20%;z-index:0;pointer-events:none;
     background:radial-gradient(50% 100% at 50% 100%,rgba(255,35,51,.2),transparent 72%);filter:blur(10px)}
   .vstage.grabbing{cursor:grabbing}
   .vstage.grabbing .vcard{transition:none;cursor:grabbing}
   .vtrack{position:absolute;inset:0;transform-style:preserve-3d}
-  .vcard{position:absolute;inset:0;margin:auto;height:min(90%,470px);width:auto;aspect-ratio:9/19.5;cursor:pointer;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.16,1,.3,1),opacity .5s;will-change:transform,opacity}
+  .vcard{position:absolute;inset:0;margin:auto;height:min(92%,600px);width:auto;aspect-ratio:9/19.5;cursor:pointer;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.16,1,.3,1),opacity .5s;will-change:transform,opacity}
   .vcard[hidden]{display:none}
   .phone{position:relative;width:100%;height:100%;border-radius:26px;overflow:hidden;border:1px solid var(--line-strong);background:#0a0406;box-shadow:0 40px 80px -40px rgba(0,0,0,.9),inset 0 0 0 2px rgba(0,0,0,.5)}
   .phone::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:38%;height:5px;border-radius:999px;background:rgba(0,0,0,.55);z-index:4}
@@ -473,14 +484,10 @@
   .cover{position:absolute;inset:0;background-size:220% 220%;animation:vsheen 9s ease-in-out infinite}
   .cover::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 55% at 50% 20%,rgba(255,255,255,.14),transparent 60%),linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55));mix-blend-mode:screen}
   @keyframes vsheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-  .c-skincare{background-image:linear-gradient(150deg,#ff8f6b,#ff3344 55%,#7a0c14)}
-  .c-skincare2{background-image:linear-gradient(150deg,#ffb27a,#ff5a63 55%,#8a1020)}
-  .c-cabelo{background-image:linear-gradient(150deg,#5a1220,#b00d1c 55%,#2a0810)}
-  .c-corpo{background-image:linear-gradient(150deg,#ff5a63,#b00d1c 55%,#3a0a10)}
-  .c-corpo2{background-image:linear-gradient(150deg,#ff7a5a,#c2101c 55%,#4a0c12)}
-  .c-estilo{background-image:linear-gradient(150deg,#ffd9cf,#ff5a63 50%,#7a0c14)}
-  .c-estilo2{background-image:linear-gradient(150deg,#ffb199,#ff2333 55%,#5a0a12)}
-  .c-mente{background-image:linear-gradient(150deg,#ff9a7a,#b00d1c 55%,#1c0608)}
+  .c-v1{background-image:linear-gradient(150deg,#ff8f6b,#ff3344 55%,#7a0c14)}
+  .c-v2{background-image:linear-gradient(150deg,#5a1220,#b00d1c 55%,#2a0810)}
+  .c-v3{background-image:linear-gradient(150deg,#ffb27a,#ff5a63 55%,#8a1020)}
+  .c-v4{background-image:linear-gradient(150deg,#ff9a7a,#b00d1c 55%,#1c0608)}
   .vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(10,4,6,.42);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(4px);z-index:3;transition:transform .35s,opacity .35s}
   .vplay svg{width:22px;height:22px;fill:#fff;margin-left:2px}
   .vlabel{position:absolute;top:20px;left:14px;z-index:3;font-family:var(--font-mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:5px 10px;backdrop-filter:blur(4px)}
@@ -571,6 +578,7 @@
 <nav class="rail" id="rail" aria-label="Capítulos">
   <a href="#hero" data-rail="hero"><span class="lbl">Início</span><span class="dot"></span></a>
   <a href="#manifesto" data-rail="manifesto"><span class="lbl">O espelho</span><span class="dot"></span></a>
+  <a href="#autoridade" data-rail="autoridade"><span class="lbl">Quem sou eu</span><span class="dot"></span></a>
   <a href="#metodo" data-rail="metodo"><span class="lbl">O método</span><span class="dot"></span></a>
   <a href="#videos" data-rail="videos"><span class="lbl">Provas</span><span class="dot"></span></a>
   <a href="#antesdepois" data-rail="antesdepois"><span class="lbl">Transformação</span><span class="dot"></span></a>
@@ -592,12 +600,12 @@
     <canvas id="hero3d" aria-hidden="true"></canvas>
     <canvas id="hero3dBloom" aria-hidden="true"></canvas>
     <div class="hero-inner" id="heroInner">
-      <div class="kick"><span class="eyebrow">Glow up · transformação real</span></div>
+      <div class="kick"><span class="eyebrow">Looksmaxing · transformação real</span></div>
       <h1>
         <span class="line l1"><span class="i">Sua <span class="glow">mudança</span></span></span>
         <span class="line l2"><span class="i">começa agora</span></span>
       </h1>
-      <p class="sub">Um método completo — pele, cabelo, corpo, estilo e mente — para você virar a melhor versão de si mesmo em 90 dias. Sem achismo. Passo a passo.</p>
+      <p class="sub">Um método de looksmaxing completo — pele, cabelo, corpo, rosto e mente — para você virar a melhor versão de si mesmo em 90 dias. Sem achismo. Passo a passo.</p>
       <div class="hero-actions">
         <button class="btn btn-red" data-magnetic data-goto="#oferta">Quero começar
           <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -617,8 +625,8 @@
   <!-- MARQUEE -->
   <div class="marquee" aria-hidden="true">
     <div class="track" id="marq">
-      <span>Confiança</span><span class="on">Glow up</span><span>Estilo</span><span>Presença</span><span>Disciplina</span><span class="on">Transformação</span>
-      <span>Confiança</span><span class="on">Glow up</span><span>Estilo</span><span>Presença</span><span>Disciplina</span><span class="on">Transformação</span>
+      <span>Confiança</span><span class="on">Looksmaxing</span><span>Jawline</span><span>Presença</span><span>Disciplina</span><span class="on">Transformação</span>
+      <span>Confiança</span><span class="on">Looksmaxing</span><span>Jawline</span><span>Presença</span><span>Disciplina</span><span class="on">Transformação</span>
     </div>
   </div>
 
@@ -633,13 +641,42 @@
     <p class="lead" style="margin-top:44px" data-reveal>O Método TOLEDOX existe pra transformar esse desconforto em um plano — e esse plano em resultado que aparece.</p>
   </section>
 
+  <!-- QUEM SOU EU -->
+  <section class="wrap" id="autoridade">
+    <div class="shead" data-reveal>
+      <span class="eyebrow">Antes de continuar</span>
+      <h2>Eu sou o <em>Toledox</em></h2>
+    </div>
+    <div class="who">
+      <div class="who-text" data-reveal>
+        <p class="lead">No início da adolescência eu era considerado "feio", pouco atraente — essa foi a minha realidade por anos. Foi através do looksmaxing que consegui evoluir até atingir o meu próprio "Prime".</p>
+        <p>Hoje sou criador de conteúdo, com quase meio milhão de seguidores somados entre TikTok, YouTube e Instagram. O Método TOLEDOX não é teoria: é o passo a passo que eu segui, testei em mim mesmo e continuo aplicando.</p>
+        <p class="who-quote">"A genética tem seu papel, mas isso não define seu limite. O que importa é o que você faz com o que tem."</p>
+      </div>
+      <div class="who-timeline" data-reveal>
+        <div class="who-photo">
+          <div class="who-ph"></div><div class="who-img" style="background-image:url('assets/toledox-2023.jpg')"></div><span class="who-yr">2023</span>
+        </div>
+        <svg class="who-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="who-photo who-mid">
+          <div class="who-ph"></div><div class="who-img" style="background-image:url('assets/toledox-2024.jpg')"></div><span class="who-yr">2024</span>
+        </div>
+        <svg class="who-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="who-photo who-final">
+          <div class="who-ph"></div><div class="who-img" style="background-image:url('assets/toledox-2025.jpg')"></div><span class="who-yr">2025 · Prime</span>
+        </div>
+      </div>
+    </div>
+    <p class="ba-note">Fotos reais da jornada entram aqui — hoje é só o layout.</p>
+  </section>
+
   <!-- MÉTODO -->
   <section class="wrap" id="metodo">
     <div class="shead" data-reveal>
       <span class="eyebrow">O método</span>
-      <h2>5 áreas, <em>um</em> glow up de verdade</h2>
+      <h2>5 áreas, <em>um</em> looksmaxing de verdade</h2>
     </div>
-    <p class="lead" style="margin-top:-14px;margin-bottom:clamp(26px,5vw,50px)" data-reveal>As 5 áreas do seu glow up: <b style="color:var(--ink)">skincare, cabelo, corpo, estilo e mente</b>. Um passo de cada vez, sem enrolação.</p>
+    <p class="lead" style="margin-top:-14px;margin-bottom:clamp(26px,5vw,50px)" data-reveal>As 5 áreas do seu looksmaxing: <b style="color:var(--ink)">skincare, cabelo, corpo, rosto e mente</b>. Um passo de cada vez, sem enrolação.</p>
   </section>
 
   <!-- PAREDE VIVA — COLETÂNEA DE VÍDEOS -->
@@ -648,44 +685,10 @@
       <span class="eyebrow">Provas reais</span>
       <h2>Veja com os <em>próprios olhos</em></h2>
     </div>
-    <p class="lead" style="margin-top:-14px;margin-bottom:clamp(24px,4vw,40px)" data-reveal>Transformações de gente de verdade — uma por área. Arrasta pro lado e escolhe o que quer ver.</p>
-
-    <div class="vfilters" data-reveal>
-      <button class="vchip active" data-area="all" type="button">Tudo</button>
-      <button class="vchip" data-area="skincare" type="button">Skincare</button>
-      <button class="vchip" data-area="cabelo" type="button">Cabelo</button>
-      <button class="vchip" data-area="corpo" type="button">Corpo</button>
-      <button class="vchip" data-area="estilo" type="button">Estilo</button>
-      <button class="vchip" data-area="mente" type="button">Mente</button>
-    </div>
+    <p class="lead" style="margin-top:-14px;margin-bottom:clamp(24px,4vw,40px)" data-reveal>Sem atriz, sem stock footage — é o próprio criador do método, glow up ao vivo. Arrasta pro lado e sobe o som.</p>
 
     <div class="vstage" id="vstage" data-reveal>
-      <div class="vtrack" id="vtrack">
-        <article class="vcard" data-area="skincare" data-tag="Skincare" data-caption="&quot;minha pele antes vs agora 😳&quot; — 14 dias de rotina" data-video="assets/skincare-1.mp4" data-dur="0:32">
-          <div class="phone"><div class="cover c-skincare"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Skincare</span><span class="vtime">0:32</span><i class="vprog"></i></div>
-        </article>
-        <article class="vcard" data-area="cabelo" data-tag="Cabelo &amp; corte" data-caption="&quot;troquei o corte e virei outro 🔥&quot;" data-video="assets/cabelo-1.mp4" data-dur="0:21">
-          <div class="phone"><div class="cover c-cabelo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Cabelo</span><span class="vtime">0:21</span><i class="vprog"></i></div>
-        </article>
-        <article class="vcard" data-area="corpo" data-tag="Corpo &amp; treino" data-caption="&quot;90 dias de treino que cabe na rotina&quot;" data-video="assets/corpo-1.mp4" data-dur="0:45">
-          <div class="phone"><div class="cover c-corpo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Corpo</span><span class="vtime">0:45</span><i class="vprog"></i></div>
-        </article>
-        <article class="vcard" data-area="estilo" data-tag="Estilo &amp; imagem" data-caption="&quot;montei looks com o que eu já tinha&quot;" data-video="assets/estilo-1.mp4" data-dur="0:28">
-          <div class="phone"><div class="cover c-estilo"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Estilo</span><span class="vtime">0:28</span><i class="vprog"></i></div>
-        </article>
-        <article class="vcard" data-area="mente" data-tag="Mente &amp; confiança" data-caption="&quot;parei de me esconder e mudou tudo&quot;" data-video="assets/mente-1.mp4" data-dur="0:39">
-          <div class="phone"><div class="cover c-mente"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Mente</span><span class="vtime">0:39</span><i class="vprog"></i></div>
-        </article>
-        <article class="vcard" data-area="skincare" data-tag="Skincare" data-caption="&quot;rotina de 5 min que salvou minha pele&quot;" data-video="assets/skincare-2.mp4" data-dur="0:24">
-          <div class="phone"><div class="cover c-skincare2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Skincare</span><span class="vtime">0:24</span><i class="vprog"></i></div>
-        </article>
-        <article class="vcard" data-area="corpo" data-tag="Corpo &amp; treino" data-caption="&quot;postura muda tudo — antes/depois&quot;" data-video="assets/corpo-2.mp4" data-dur="0:33">
-          <div class="phone"><div class="cover c-corpo2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Corpo</span><span class="vtime">0:33</span><i class="vprog"></i></div>
-        </article>
-        <article class="vcard" data-area="estilo" data-tag="Estilo &amp; imagem" data-caption="&quot;achei as cores certas pro meu tom&quot;" data-video="assets/estilo-2.mp4" data-dur="0:19">
-          <div class="phone"><div class="cover c-estilo2"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">Estilo</span><span class="vtime">0:19</span><i class="vprog"></i></div>
-        </article>
-      </div>
+      <div class="vtrack" id="vtrack"></div>
 
       <button class="vnav prev" id="vprev" type="button" aria-label="Vídeo anterior"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button class="vnav next" id="vnext" type="button" aria-label="Próximo vídeo"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -697,7 +700,7 @@
       <span>Arraste para navegar</span>
     </div>
     <div class="vdots" id="vdots" aria-hidden="true"></div>
-    <p class="ba-note">Prévia conceitual — no site real entram os vídeos do TOLEDOX (TikTok / YouTube).</p>
+    <p class="ba-note">Solte o vídeo em <b style="color:var(--ink)">assets/</b> e acrescenta o nome no array <b style="color:var(--ink)">VIDEOS</b> (topo do script) — o card entra sozinho.</p>
   </section>
 
   <!-- ANTES / DEPOIS -->
@@ -775,7 +778,7 @@
             </div>
 
             <ul class="plist">
-              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Todos os 5 módulos do método</li>
+              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Todos os 15 capítulos do método</li>
               <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Plano de 90 dias passo a passo</li>
               <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Comunidade e acompanhamento</li>
               <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Atualizações vitalícias</li>
@@ -808,6 +811,9 @@
       <details data-reveal><summary>Quanto tempo por dia preciso? <span class="pm">+</span></summary><p>Entre 15 e 30 minutos por dia. O plano de 90 dias é dividido em passos curtos e realistas, pensados pra caber numa rotina cheia.</p></details>
       <details data-reveal><summary>Por quanto tempo tenho acesso? <span class="pm">+</span></summary><p>Acesso vitalício, incluindo todas as atualizações futuras do método, sem pagar de novo.</p></details>
       <details data-reveal><summary>E se eu não gostar? <span class="pm">+</span></summary><p>Você tem 7 dias de garantia incondicional. Se não for pra você, é só pedir e devolvemos 100% do valor.</p></details>
+      <details data-reveal><summary>Isso envolve algo perigoso ou substitui orientação médica? <span class="pm">+</span></summary><p>Não. É conteúdo informativo e estético — hábitos, rotina e técnicas não-invasivas, não diagnóstico nem prescrição. Nos pontos onde existem técnicas mais extremas, o próprio método é direto: não recomenda. Pra qualquer questão de saúde, o certo é sempre consultar um profissional.</p></details>
+      <details data-reveal><summary>Preciso ter "genética boa" pra funcionar? <span class="pm">+</span></summary><p>Não. O método parte do que você já tem — hábito, consistência e técnica, não sorteio genético. O próprio Toledox começou sendo considerado "feio" e construiu o resultado dele com o mesmo passo a passo que está aqui.</p></details>
+      <details data-reveal><summary>É só treino de academia? <span class="pm">+</span></summary><p>Não — é bem mais amplo. O método cobre pele, cabelo e barba, estrutura facial (mandíbula, simetria, mewing), corpo e hábitos diários. Treino é uma parte, não o todo.</p></details>
     </div>
   </section>
 
@@ -828,6 +834,7 @@
         <a class="holo" href="https://www.youtube.com/@toledox" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.6 12 31 31 0 0 0 2 15.8a3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1c.3-1.2.4-2.5.4-3.8s-.1-2.6-.4-3.8ZM10 15V9l5 3-5 3Z"/></svg>YouTube</a>
         <a class="holo" href="#oferta"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.9-1.4A10 10 0 1 0 12 2Zm5.3 14c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1-1.4-1-2.6s.6-1.8.9-2.1c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.5c-.2.2-.3.4-.1.6.2.4.9 1.4 1.9 2 .8.7 1.4.9 1.6 1 .2 0 .3 0 .5-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.2.1.4.2.4.3.1.2.1.9-.1 1.6Z"/></svg>WhatsApp</a>
       </div>
+      <p class="fine" style="flex-basis:100%;margin-top:2px">Conteúdo informativo e estético, baseado em experiência pessoal — não substitui orientação médica, dermatológica ou profissional de saúde.</p>
     </div>
   </footer>
 </main>
@@ -1298,7 +1305,7 @@
   if(!isTouch && !reduce){
     var cur=document.createElement("div"); cur.className="cur-ember"; cur.setAttribute("aria-hidden","true"); document.body.appendChild(cur);
     var cxr=window.innerWidth/2, cyr=window.innerHeight/2, cxs=cxr, cys=cyr;
-    var curSel="a,button,summary,.vcard,.ba-handle,.vchip,[data-goto],[data-magnetic]";
+    var curSel="a,button,summary,.vcard,.ba-handle,[data-goto],[data-magnetic]";
     window.addEventListener("pointermove",function(e){ if(e.pointerType==="touch")return; cxr=e.clientX; cyr=e.clientY; cur.style.opacity="1";
       cur.classList.toggle("big", !!(e.target && e.target.closest && e.target.closest(curSel))); },{passive:true});
     window.addEventListener("pointerdown",function(){ cur.classList.add("pulse"); setTimeout(function(){ cur.classList.remove("pulse"); },450); });
@@ -1465,12 +1472,27 @@
   (function(){
     var track=document.getElementById("vtrack"); if(!track) return;
     var stage=document.getElementById("vstage");
-    var cards=Array.prototype.slice.call(track.querySelectorAll(".vcard"));
     var caption=document.getElementById("vcaption");
     var dotsWrap=document.getElementById("vdots");
     var prevBtn=document.getElementById("vprev"), nextBtn=document.getElementById("vnext");
-    var chips=Array.prototype.slice.call(document.querySelectorAll(".vchip"));
-    var visible=cards.slice(), idx=0;
+
+    /* lista de vídeos do carrossel — pra adicionar um novo, solta o mp4 em assets/ e acrescenta uma linha aqui */
+    var VIDEOS=[
+      { src:"assets/toledox-1.mp4", caption:"o glow up que virou método 🔥" },
+      { src:"assets/toledox-2.mp4", caption:"de NPC a protagonista em 90 dias 😳" }
+    ];
+    var COVERS=["c-v1","c-v2","c-v3","c-v4"];
+    VIDEOS.forEach(function(item,i){
+      var art=document.createElement("article");
+      art.className="vcard"; art.setAttribute("data-video",item.src); art.setAttribute("data-caption",item.caption);
+      art.innerHTML='<div class="phone"><div class="cover '+COVERS[i%COVERS.length]+'"></div><span class="vplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span class="vlabel">TOLEDOX</span><span class="vtime">0:00</span><i class="vprog"></i></div>';
+      track.appendChild(art);
+    });
+    var cards=Array.prototype.slice.call(track.querySelectorAll(".vcard"));
+    var idx=0;
+
+    /* formata segundos em m:ss (usado no rótulo total e na contagem regressiva) */
+    function fmtTime(sec){ var m=Math.floor(sec/60), s=Math.round(sec%60); if(s===60){s=0;m++;} return m+":"+(s<10?"0":"")+s; }
 
     /* cria o <video> do card sob demanda (lazy) com fallback gracioso ao gradiente */
     function ensureVideo(card){
@@ -1482,9 +1504,14 @@
       v.addEventListener("playing",function(){ card.classList.add("has-video"); });
       /* fim do vídeo: avança só se estiver ativo/ambiente; senão repete (não interrompe quem está assistindo) */
       v.addEventListener("ended",function(){ if(card.classList.contains("is-active") && inView && !hover && !dragging && !vidSound){ next(); } else { v.currentTime=0; var pp=v.play(); if(pp&&pp.catch){ pp.catch(function(){}); } } });
-      v.addEventListener("loadedmetadata",function(){ var t=card.querySelector(".vtime"); if(t&&isFinite(v.duration)&&v.duration>0){ var m=Math.floor(v.duration/60), s=Math.round(v.duration%60); if(s===60){s=0;m++;} t.textContent=m+":"+(s<10?"0":"")+s; } });
+      v.addEventListener("loadedmetadata",function(){ var t=card.querySelector(".vtime"); if(t&&isFinite(v.duration)&&v.duration>0) t.textContent=fmtTime(v.duration); });
       v.addEventListener("error",function(){ card.classList.remove("has-video"); if(v.parentNode) v.parentNode.removeChild(v); card.__v=null; });
-      v.addEventListener("timeupdate",function(){ var pb=card.querySelector(".vprog"); if(pb&&isFinite(v.duration)&&v.duration>0){ pb.style.width=(v.currentTime/v.duration*100).toFixed(2)+"%"; } });
+      /* contagem regressiva: barra de progresso sobe, tempo exibido desce (duração − tempo atual) */
+      v.addEventListener("timeupdate",function(){
+        if(!isFinite(v.duration)||v.duration<=0) return;
+        var pb=card.querySelector(".vprog"); if(pb) pb.style.width=(v.currentTime/v.duration*100).toFixed(2)+"%";
+        var t=card.querySelector(".vtime"); if(t) t.textContent=fmtTime(Math.max(0,v.duration-v.currentTime));
+      });
       v.src=src;
       var ph=card.querySelector(".phone");
       if(ph){
@@ -1501,7 +1528,7 @@
     }
     /* som dos vídeos: começa mudo (autoplay exige mudo); usuário ativa no botão. Fallback re-muta se o browser bloquear */
     var vidSound=false;
-    function curVideo(){ var a=visible[idx]; return a?a.querySelector("video"):null; }
+    function curVideo(){ var a=cards[idx]; return a?a.querySelector("video"):null; }
     function playCard(v){ if(!v) return; v.muted=!vidSound; var p=v.play(); if(p&&p.catch) p.catch(function(){ v.muted=true; v.play().catch(function(){}); }); }
     function toggleSound(){ vidSound=!vidSound; stage.classList.toggle("snd-on",vidSound);
       var v=curVideo(); if(v){ v.muted=!vidSound; if(vidSound){ var p=v.play(); if(p&&p.catch) p.catch(function(){}); } } }
@@ -1513,16 +1540,15 @@
     document.addEventListener("fullscreenchange",onFsChange); document.addEventListener("webkitfullscreenchange",onFsChange);
 
     function buildDots(){ dotsWrap.innerHTML="";
-      visible.forEach(function(_,i){ var b=document.createElement("button"); b.type="button";
+      cards.forEach(function(_,i){ var b=document.createElement("button"); b.type="button";
         b.setAttribute("aria-label","Ir ao vídeo "+(i+1));
         b.addEventListener("click",function(){ go(i); }); dotsWrap.appendChild(b); }); }
 
-    function stepPx(){ return Math.min(window.innerWidth*0.30,258); }
+    function stepPx(){ return Math.min(window.innerWidth*0.36,320); }
     /* posiciona os cards para um centro fracionário (permite arrasto contínuo) */
     function place(center){
       var spread=stepPx();
-      cards.forEach(function(c){ c.hidden=(visible.indexOf(c)===-1); });
-      visible.forEach(function(c,i){
+      cards.forEach(function(c,i){
         var off=i-center, abs=Math.abs(off);
         var ry=Math.max(-58,Math.min(58,-off*38));
         var sc=Math.max(0.6,1-abs*0.14);
@@ -1536,7 +1562,7 @@
     }
     function layout(){
       place(idx);
-      var act=visible[idx];
+      var act=cards[idx];
       if(act && caption){ caption.style.opacity=0;
         setTimeout(function(){ caption.textContent=(act.getAttribute("data-caption")||"").replace(/&quot;/g,'"'); caption.style.opacity=1; },150); }
       /* vídeo vivo: cria sob demanda no card ativo; som conforme vidSound; pausa inativos/fora de vista */
@@ -1545,26 +1571,19 @@
         else { var ev=c.querySelector("video"); if(ev) ev.pause(); }
       });
       /* pré-carrega vizinhos com vídeo real → troca sem flash de gradiente */
-      if(visible.length>1){ [visible[(idx+1)%visible.length], visible[(idx-1+visible.length)%visible.length]].forEach(function(nc){ if(nc && nc.getAttribute("data-video") && nc.__v===undefined) ensureVideo(nc); }); }
+      if(cards.length>1){ [cards[(idx+1)%cards.length], cards[(idx-1+cards.length)%cards.length]].forEach(function(nc){ if(nc && nc.getAttribute("data-video") && nc.__v===undefined) ensureVideo(nc); }); }
       Array.prototype.forEach.call(dotsWrap.children,function(d,i){ d.classList.toggle("on",i===idx); });
     }
 
-    function go(i){ idx=Math.max(0,Math.min(visible.length-1,i)); layout(); }
-    function wrap(d){ if(!visible.length)return; idx=(idx+d+visible.length)%visible.length; layout(); }
+    function go(i){ idx=Math.max(0,Math.min(cards.length-1,i)); layout(); }
+    function wrap(d){ if(!cards.length)return; idx=(idx+d+cards.length)%cards.length; layout(); }
     function next(){ wrap(1); } function prev(){ wrap(-1); }
 
     nextBtn.addEventListener("click",next); prevBtn.addEventListener("click",prev);
-    cards.forEach(function(c){ c.addEventListener("click",function(){ if(suppressClick) return; var i=visible.indexOf(c); if(i>-1 && i!==idx) go(i); }); });
-
-    chips.forEach(function(ch){ ch.addEventListener("click",function(){
-      chips.forEach(function(x){ x.classList.remove("active"); }); ch.classList.add("active");
-      var area=ch.getAttribute("data-area");
-      visible=(area==="all")?cards.slice():cards.filter(function(c){ return c.getAttribute("data-area")===area; });
-      idx=0; buildDots(); layout();
-    }); });
+    cards.forEach(function(c){ c.addEventListener("click",function(){ if(suppressClick) return; var i=cards.indexOf(c); if(i>-1 && i!==idx) go(i); }); });
 
     var down=false,dragging=false,startX=0,moved=0,pid=null,suppressClick=false,vel=0,lastX=0;
-    function clampCenter(v){ return Math.max(-0.4,Math.min(visible.length-0.6,v)); }
+    function clampCenter(v){ return Math.max(-0.4,Math.min(cards.length-0.6,v)); }
     stage.addEventListener("pointerdown",function(e){
       if(e.target.closest(".vnav")||e.target.closest(".vc")) return;   /* não sequestra setas nem os controles do vídeo */
       down=true; dragging=false; startX=e.clientX; moved=0; pid=e.pointerId; lastX=e.clientX; vel=0;
@@ -1577,7 +1596,7 @@
     function endDrag(){ if(!down) return; down=false;
       if(dragging){ stage.classList.remove("grabbing");
         /* inércia: a velocidade final "joga" o anel alguns cards adiante */
-        idx=Math.max(0,Math.min(visible.length-1,Math.round(idx - moved/stepPx() - vel*0.06)));
+        idx=Math.max(0,Math.min(cards.length-1,Math.round(idx - moved/stepPx() - vel*0.06)));
         layout();
         suppressClick=true; setTimeout(function(){ suppressClick=false; },80); }
       dragging=false; }
@@ -1601,7 +1620,7 @@
     stage.addEventListener("pointerenter",function(){ hover=true; });
     stage.addEventListener("pointerleave",function(){ hover=false; endDrag(); });
     /* auto-avanço só para cards SEM vídeo tocando (gradiente, 6s). Cards com vídeo avançam ao terminar ("ended"). */
-    if(!reduce){ setInterval(function(){ if(!inView||hover||dragging||vidSound) return; var a=visible[idx]; if(a && a.classList.contains("has-video")) return; next(); },6000); }
+    if(!reduce){ setInterval(function(){ if(!inView||hover||dragging||vidSound) return; var a=cards[idx]; if(a && a.classList.contains("has-video")) return; next(); },6000); }
 
     window.addEventListener("resize",layout);
     buildDots(); layout();
@@ -1612,11 +1631,11 @@
   var rio=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ var id=en.target.id;
     document.querySelectorAll(".rail a").forEach(function(a){ a.classList.toggle("active",a.getAttribute("data-rail")===id); });
     if(id!==lastRail){ if(lastRail!==null) Sound.whoosh(); lastRail=id; } } }); },{threshold:0.5});
-  ["hero","manifesto","metodo","videos","antesdepois","numeros","oferta","faq"].forEach(function(id){ var s=document.getElementById(id); if(s)rio.observe(s); });
+  ["hero","manifesto","autoridade","metodo","videos","antesdepois","numeros","oferta","faq"].forEach(function(id){ var s=document.getElementById(id); if(s)rio.observe(s); });
 
   /* tick sutil em cliques interativos (só quando o som está ligado) */
   document.addEventListener("click",function(e){ if(!Sound.isOn()) return;
-    if(e.target && e.target.closest && e.target.closest("button,.vchip,.ba-tag,.rail a,[data-goto]")) Sound.tick(); },true);
+    if(e.target && e.target.closest && e.target.closest("button,.ba-tag,.rail a,[data-goto]")) Sound.tick(); },true);
 
   var topbar=document.getElementById("topbar"), dock=document.getElementById("dock"), footer=document.querySelector("footer"), progressBar=document.getElementById("progress");
   var offerSec=document.getElementById("oferta"), finalSec=document.getElementById("final");
