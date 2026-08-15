@@ -176,7 +176,7 @@
   .hero-inner{position:relative;z-index:2;will-change:transform,opacity}
   #hero3d{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.92}
   /* bloom barato: cópia desfocada da esfera em blend screen (0 risco em ANGLE) */
-  #hero3dBloom{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;mix-blend-mode:screen;opacity:.34;filter:blur(7px) brightness(1.28) saturate(1.1)}
+  #hero3dBloom{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;mix-blend-mode:screen;opacity:.6;filter:blur(11px) brightness(1.45) saturate(1.12)}
   .hero .kick{margin-bottom:24px;overflow:hidden}
   .hero h1{font-family:var(--font-display);font-weight:700;text-transform:uppercase;font-size:clamp(2.6rem,10.5vw,8.6rem);line-height:.92;letter-spacing:-.012em;text-wrap:balance;max-width:100%}
   /* telas estreitas: o piso de 2.6rem fazia "COMEÇA AGORA" vazar — reduz sem perder o impacto */
@@ -314,12 +314,12 @@
 
   /* ---------- gema (capítulo dedicado ao objeto 3D — só texto; a gema é o canvas de fundo persistente) ---------- */
   .gema-pin-wrap{padding-block:0}
-  .gema-pin{position:relative;height:360vh}
+  .gema-pin{position:relative;height:220vh}
   .gema-pin-stick{position:sticky;top:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
     opacity:var(--go,0);transform:translateY(calc((1 - var(--go,0)) * 18px))}
   .gema-title{margin-top:14px;font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;font-size:clamp(1.8rem,5.2vw,3.1rem);line-height:1.12;text-shadow:0 0 40px rgba(255,35,51,.3)}
   .gema-title em{font-style:normal;color:var(--red-soft)}
-  @media(max-width:600px){.gema-pin{height:270vh}}
+  @media(max-width:600px){.gema-pin{height:170vh}}
   @media(prefers-reduced-motion:reduce){
     .gema-pin{height:auto}
     .gema-pin-stick{position:static;min-height:0;opacity:1;transform:none}
@@ -602,38 +602,6 @@
   }
 </style>
 
-<style>
-  /* ===== capitulo da gema: legendas da lapidacao ===== */
-  .gema-pin-stick .eyebrow,.gema-title{opacity:var(--gt,1)}
-  .gema-beats{position:relative;width:min(92vw,660px);height:3.6em;margin-top:clamp(16px,3vh,26px);opacity:var(--gt,1)}
-  .gema-beats .gb{position:absolute;inset:0;display:block;text-align:center;text-wrap:pretty;
-    font-size:clamp(.92rem,2.1vw,1.06rem);line-height:1.5;color:var(--ink-dim);
-    opacity:0;transform:translateY(12px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
-  .gema-beats .gb b{color:var(--ink);font-weight:600}
-  .gema-beats .gb.on{opacity:1;transform:none}
-  .gema-facets{margin-top:2px;font-family:var(--font-mono);font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-faint)}
-  .gema-facets i{font-style:normal;color:var(--red-soft);font-variant-numeric:tabular-nums}
-  .gema-hint{margin-top:clamp(14px,3vh,26px);display:flex;flex-direction:column;align-items:center;gap:7px;
-    font-family:var(--font-mono);font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);opacity:var(--gh,1)}
-  .gema-hint .bar{width:1px;height:34px;background:linear-gradient(var(--red),transparent)}
-
-  /* ===== scroll-driven animations nativas: reveals scrubbados pelo proprio scroll ===== */
-  @supports (animation-timeline: view()){
-    @media (prefers-reduced-motion:no-preference){
-      [data-reveal]{animation:sdReveal linear both;animation-timeline:view();animation-range:entry 4% cover 34%}
-      .manifesto p span[data-reveal]{animation-range:entry 10% cover 48%}
-      @keyframes sdReveal{from{opacity:0;transform:translateY(30px);filter:blur(7px)}to{opacity:1;transform:none;filter:blur(0)}}
-      .shead h2{animation:sdWipe linear both;animation-timeline:view();animation-range:entry 8% cover 38%}
-      @keyframes sdWipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 -6% 0 0)}}
-      .stat{animation:sdStat linear both;animation-timeline:view();animation-range:entry 6% cover 44%}
-      @keyframes sdStat{from{opacity:.18;transform:translateY(26px) scale(.975)}to{opacity:1;transform:none}}
-      .who-quote{animation:sdQuote linear both;animation-timeline:view();animation-range:entry 12% cover 46%}
-      @keyframes sdQuote{from{opacity:.2;padding-left:38px}to{opacity:1;padding-left:18px}}
-      .progress{width:100%!important;transform-origin:0 50%;animation:sdProg linear both;animation-timeline:scroll(root block)}
-      @keyframes sdProg{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-    }
-  }
-</style>
 <canvas id="aura" aria-hidden="true"></canvas>
 <canvas id="embers" aria-hidden="true"></canvas>
 <div id="aura-fallback" aria-hidden="true"></div>
@@ -697,7 +665,7 @@
         </div>
       </div>
     </div>
-    <div class="scrollcue" aria-hidden="true"><span>role para lapidar</span><span class="bar"></span></div>
+    <div class="scrollcue" aria-hidden="true"><span>role para transformar</span><span class="bar"></span></div>
   </section>
 
   <!-- MARQUEE -->
@@ -822,15 +790,6 @@
       <div class="gema-pin-stick" id="gemaStick">
         <span class="eyebrow">O resultado</span>
         <h2 class="gema-title">Lapidado.<br>Não por sorte —<br><em>por método.</em></h2>
-        <div class="gema-beats" aria-hidden="true">
-          <span class="gb"><b>Bruto.</b> Todo o valor já está dentro — só que nenhuma luz consegue sair.</span>
-          <span class="gb"><b>A mesa.</b> O primeiro corte é uma decisão: começar.</span>
-          <span class="gb"><b>A coroa.</b> 33 facetas aprendem a captar a luz.</span>
-          <span class="gb"><b>O pavilhão.</b> 25 facetas devolvem tudo pra fora.</span>
-          <span class="gb"><b>57 facetas.</b> A mesma pedra. Outro resultado.</span>
-        </div>
-        <div class="gema-facets" aria-hidden="true"><i id="gemaFacets">00</i> facetas lapidadas</div>
-        <div class="gema-hint" aria-hidden="true"><span>continue rolando</span><span class="bar"></span></div>
       </div>
     </div>
   </section>
@@ -1172,306 +1131,328 @@
   progTarget=progCur=scrollProg();
   requestAnimationFrame(frame);
 
-  /* ---------------- GEMA 3D - brilhante redondo ray-traced ----------------
-     Um fragment shader traca o raio contra o poliedro convexo do corte brilhante
-     (mesa + 8 bizel + 8 estrelas + 8 cinta alta + cinta + 8 pavilhao + 8 cinta baixa + culatra,
-     angulos reais: coroa 34,5 / pavilhao 40,75 / mesa 55%).
-     Entrada -> refracao (IOR 2,417) -> reflexao interna total -> saida, com IOR por canal (dispersao = "fogo").
-     O corpo e INCOLOR: o vermelho e o violeta vem do estudio ao redor, como numa foto de joalheria.
-     Toda a coreografia (lapidacao, giro, zoom interno, explosao) e dirigida pelo SCROLL.
-     Performance: 2 passes - poeira em tela cheia (barata) + gema restrita a sua bounding box (caro por pixel,
-     poucos pixels) - mais escala de render adaptativa por medicao de frame. */
+  /* ---------------- hero 3D — esfera de partículas (glow up) ---------------- */
+  /* Billboards (quads) em vez de gl.POINTS: o ANGLE/Chrome-Windows limita gl_PointSize a 1px. */
   (function(){
     var c=document.getElementById("hero3d"); if(!c) return;
-    var bc=document.getElementById("hero3dBloom"), bx=null;
-    var glopts={alpha:true,premultipliedAlpha:true,antialias:false,preserveDrawingBuffer:true,powerPreference:"high-performance"};
+    /* bloom da esfera: FBO real no desktop (setupBloomPath) ou cópia 2D desfocada (bx) como fallback */
+    var bc=document.getElementById("hero3dBloom");
+    var bx=null;
+    /* NÃO usar preserveDrawingBuffer: com antialias:true em ANGLE/D3D11 (Chrome-Windows) deixa o canvas em branco.
+       O bloom captura via drawImage síncrono no mesmo frame — não precisa da flag. */
+    var glopts={alpha:true,premultipliedAlpha:false,antialias:true,powerPreference:"high-performance"};
     var g=null; try{ g=c.getContext("webgl",glopts)||c.getContext("experimental-webgl",glopts); }catch(e){}
     if(!g){ c.style.display="none"; if(bc) bc.style.display="none"; return; }
-
-    var PREC=["#ifdef GL_FRAGMENT_PRECISION_HIGH","precision highp float;","#else","precision mediump float;","#endif"];
-    var COMMON=[
-    "uniform vec2 uRes;",
-    "float st(float a,float b,float x){ float t=clamp((x-a)/(b-a),0.0,1.0); return t*t*(3.0-2.0*t); }",
-    "float h21(vec2 p){ p=fract(p*vec2(123.34,345.45)); p+=dot(p,p+34.345); return fract(p.x*p.y); }"];
-
-    /* ---- estudio de joalheria: sala escura, softbox branca, fill fria, rim vermelho + rim violeta ---- */
-    var ENV=[
-    "vec3 env(vec3 d){",
-    " vec3 c=mix(vec3(0.008,0.005,0.011),vec3(0.020,0.013,0.030),d.y*0.5+0.5);",
-    " c+=vec3(0.17,0.020,0.045)*pow(max(-d.y,0.0),2.0);",
-    " float k=max(dot(d,normalize(vec3(0.22,0.86,0.46))),0.0);",
-    " c+=vec3(1.0,0.985,0.96)*(pow(k,60.0)*9.5+pow(k,7.0)*0.42);",
-    " float k2=max(dot(d,normalize(vec3(-0.62,0.50,-0.52))),0.0);",
-    " c+=vec3(0.90,0.94,1.0)*(pow(k2,130.0)*7.0+pow(k2,12.0)*0.16);",
-    " float r=max(dot(d,normalize(vec3(-0.86,-0.28,0.34))),0.0);",
-    " c+=vec3(1.0,0.10,0.16)*pow(r,18.0)*2.8;",
-    " float v=max(dot(d,normalize(vec3(0.82,0.06,-0.50))),0.0);",
-    " c+=vec3(0.55,0.05,1.0)*pow(v,22.0)*2.2;",
-    " float w=max(dot(d,normalize(vec3(0.06,-0.72,0.69))),0.0);",
-    " c+=vec3(0.95,0.62,0.55)*pow(w,44.0)*0.9;",
-    " return c; }"];
-
-    /* ---- pass 1: poeira de diamante (substitui a nuvem de 17 mil quads do prototipo) ---- */
-    var FS_DUST=PREC.concat(COMMON,[
-    "uniform vec2 uDrift; uniform float uTime,uDust;",
-    "void main(){",
-    " vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;",
-    " vec3 acc=vec3(0.0);",
-    " for(int i=0;i<1;i++){",
-    "  float fi=float(i);",
-    "  vec2 p=uv*(7.5+fi*9.0)+vec2(uDrift.x*(0.5+fi*0.6),uDrift.y*(0.4+fi*0.5))+fi*17.3;",
-    "  vec2 ip=floor(p), fp=fract(p)-0.5;",
-    "  float h=h21(ip+fi*31.7);",
-    "  if(h<0.62) continue;",
-    "  vec2 off=vec2(h21(ip+7.1),h21(ip+13.3))-0.5;",
-    "  float d=length(fp-off*0.7);",
-    "  float tw=0.35+0.65*pow(0.5+0.5*sin(uTime*1.9+h*40.0),3.0);",
-    "  float sp=exp(-d*d*(150.0+fi*90.0))*tw;",
-    "  vec3 cc=(h>0.94)?vec3(0.62,0.14,1.0):((h>0.82)?vec3(1.0,0.22,0.26):vec3(0.92,0.95,1.0));",
-    "  acc+=cc*sp; }",
-    " acc*=uDust*1.3;",
-    " float al=clamp(max(max(acc.r,acc.g),acc.b),0.0,1.0);",
-    " gl_FragColor=vec4(acc,al*0.6); }"]).join("\n");
-
-    /* ---- pass 2: a gema ---- */
-    function CLIP(n,d){ return [
-      "  { vec3 pn="+n+"; float pd="+d+";",
-      "    float den=dot(rd,pn), dist=pd-dot(ro,pn);",
-      "    if(abs(den)<1e-5){ if(dist<0.0) return false; }",
-      "    else { float tp=dist/den;",
-      "      if(den>0.0){ if(tp<tf){ tf=tp; nf=pn; rf=0.0; } }",
-      "      else { if(tp>tn){ tn=tp; nn=pn; rn=0.0; } } } }"].join("\n"); }
-
-    var FS_GEM=PREC.concat(COMMON,ENV,[
-    "uniform vec2 uCenter;",
-    "uniform float uTime,uCut,uExp,uSize,uCamZ,uAlpha,uFire;",
-    "uniform mat3 uRot;",
-    /* superficie acucarada da pedra bruta */
-    "vec3 bumpN(vec3 p,vec3 n,float k){",
-    " float b1=sin(p.x*17.0)*sin(p.y*15.3)*sin(p.z*19.7);",
-    " float b2=sin(p.x*33.0+1.7)*sin(p.y*29.0+0.4)*sin(p.z*37.0+2.1);",
-    " return normalize(n+vec3(b1+0.5*b2,b2-0.4*b1,b1*0.7-b2*0.6)*k); }",
-    /* solido convexo: esfera (bruto) ^ cilindro (cinta) ^ planos das facetas */
-    "bool trace(vec3 ro,vec3 rd,out float tn,out float tf,out vec3 nn,out vec3 nf,out float rn,out float rf){",
-    " tn=-1e9; tf=1e9; nn=vec3(0.0,1.0,0.0); nf=vec3(0.0,-1.0,0.0); rn=0.0; rf=0.0;",
-    " float R=mix(1.07,1.02,st(0.0,0.80,uCut))+uExp*0.30;",
-    " float b=dot(ro,rd), cc=dot(ro,ro)-R*R, dd=b*b-cc;",
-    " if(dd<0.0) return false;",
-    " float sq=sqrt(dd); tn=-b-sq; tf=-b+sq;",
-    " nn=normalize(ro+rd*tn); nf=normalize(ro+rd*tf); rn=1.0; rf=1.0;",
-    " float rg=mix(2.2,1.0,st(0.06,0.46,uCut))+uExp*0.22;",
-    " vec2 o2=ro.xz,d2=rd.xz; float A=dot(d2,d2),B=dot(o2,d2),C=dot(o2,o2)-rg*rg;",
-    " if(A>1e-6){ float e=B*B-A*C; if(e<0.0) return false; float sc=sqrt(e);",
-    "  float c0=(-B-sc)/A,c1=(-B+sc)/A;",
-    "  if(c0>tn){ tn=c0; vec3 p=ro+rd*c0; nn=normalize(vec3(p.x,0.0,p.z)); rn=0.25; }",
-    "  if(c1<tf){ tf=c1; vec3 p=ro+rd*c1; nf=normalize(vec3(p.x,0.0,p.z)); rf=0.25; } }",
-    " else if(C>0.0) return false;",
-    " float sT=st(0.00,0.20,uCut),sB=st(0.10,0.42,uCut),sS=st(0.34,0.58,uCut),sU=st(0.48,0.70,uCut),sP=st(0.60,0.84,uCut),sL=st(0.78,0.97,uCut),sC=st(0.90,1.00,uCut);",
-    CLIP("vec3(0.0,1.0,0.0)","mix(4.0,0.309+uExp*0.34,sT)"),
-    CLIP("vec3(0.0,-1.0,0.0)","mix(4.0,0.845+uExp*0.34,sC)"),
-    " for(int k=0;k<8;k++){",
-    "  float a=float(k)*0.7853982;",
-    "  float ex=uExp*(0.25+0.75*h21(vec2(float(k),3.7)));",
-    "  vec2 e=vec2(cos(a),sin(a));",
-    "  vec2 e2=vec2(cos(a+0.3926991),sin(a+0.3926991));",
-    "  vec2 e3=vec2(cos(a+0.1963495),sin(a+0.1963495));",
-    CLIP("vec3(e.x*0.5664,0.8241,e.y*0.5664)","mix(4.0,0.5664+ex,sB)"),
-    CLIP("vec3(e2.x*0.3827,0.9239,e2.y*0.3827)","mix(4.0,0.5134+ex,sS)"),
-    CLIP("vec3(e3.x*0.6561,0.7547,e3.y*0.6561)","mix(4.0,0.6150+ex,sU)"),
-    CLIP("vec3(e.x*0.6527,-0.7576,e.y*0.6527)","mix(4.0,0.6530+ex,sP)"),
-    CLIP("vec3(e3.x*0.7771,-0.6293,e3.y*0.7771)","mix(4.0,0.7350+ex,sL)"),
-    " }",
-    " return tf>tn; }",
-    "void main(){",
-    " vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;",
-    " vec3 ro=uRot*vec3(0.0,0.0,uCamZ);",
-    " vec3 rd=uRot*normalize(vec3((uv-uCenter)*uSize,-1.0));",
-    " float t0,t1,r0,r1; vec3 n0,n1;",
-    " if(!trace(ro,rd,t0,t1,n0,n1,r0,r1)){ discard; }",
-    " float span=t1-max(t0,0.0);",
-    " if(span<=0.0){ discard; }",
-    " vec3 p=ro+rd*max(t0,0.0);",
-    " vec3 n=normalize(n0); if(dot(n,rd)>0.0) n=-n;",
-    " float rough=r0*(1.0-st(0.40,0.92,uCut));",
-    " if(rough>0.01) n=bumpN(p,n,rough*0.20);",
-    " float dsp=1.0+uFire*2.2;",
-    " float iR=2.417-0.013*dsp, iG=2.417, iB=2.417+0.042*dsp;",
-    " float ct=clamp(dot(-rd,n),0.0,1.0);",
-    " float F=0.172+0.828*pow(1.0-ct,5.0);",
-    " vec3 acc=env(reflect(rd,n))*F;",
-    " vec3 dR=refract(rd,n,1.0/iR), dG=refract(rd,n,1.0/iG), dB=refract(rd,n,1.0/iB);",
-    " float w=1.0-F; vec3 pp=p;",
-    " for(int i=0;i<1;i++){",
-    "  float a0,a1,q0,q1; vec3 m0,m1;",
-    "  vec3 bp=pp+dG*0.0025;",
-    "  if(!trace(bp,dG,a0,a1,m0,m1,q0,q1)) break;",
-    "  if(a1<=0.0) break;",
-    "  pp=bp+dG*a1;",
-    "  vec3 nx=normalize(m1); if(dot(nx,dG)<0.0) nx=-nx;",
-    "  float ci=clamp(dot(dG,nx),0.0,1.0);",
-    "  float sn=iG*sqrt(max(0.0,1.0-ci*ci));",
-    "  float Fi=(sn>=1.0)?1.0:(0.172+0.828*pow(1.0-ci,5.0));",
-    "  float ow=w*(1.0-Fi);",
-    "  vec3 oR=refract(dR,-nx,iR), oG=refract(dG,-nx,iG), oB=refract(dB,-nx,iB);",
-    "  if(dot(oR,oR)>0.0) acc.r+=env(oR).r*ow;",
-    "  if(dot(oG,oG)>0.0) acc.g+=env(oG).g*ow;",
-    "  if(dot(oB,oB)>0.0) acc.b+=env(oB).b*ow;",
-    "  w*=Fi*0.985;",
-    "  dR=reflect(dR,nx); dG=reflect(dG,nx); dB=reflect(dB,nx);",
-    "  if(w<0.004) break; }",
-    " acc+=env(dG)*w*0.62+env(reflect(dG,n))*w*0.18;",
-    " vec3 frost=(env(n)*0.34+env(normalize(n*0.6+vec3(0.35,0.55,-0.20)))*0.24+env(normalize(n*0.6+vec3(-0.40,-0.20,0.50)))*0.18)*vec3(0.90,0.87,0.87)+vec3(0.016,0.013,0.017);",
-    " frost+=vec3(0.9,0.93,1.0)*pow(1.0-ct,3.5)*0.25;",
-    " vec3 gem=mix(acc,frost,rough*0.92);",
-    " gem=vec3(1.0)-exp(-gem*1.28);",
-    " float cov=smoothstep(0.0,0.045,span)*uAlpha;",
-    " gl_FragColor=vec4(gem*cov,cov*mix(0.66,0.88,rough)); }"]).join("\n");
-
-    function sh(t,s){ var o=g.createShader(t); g.shaderSource(o,s); g.compileShader(o);
-      if(!g.getShaderParameter(o,g.COMPILE_STATUS)){ try{ console.warn("gema shader:",g.getShaderInfoLog(o)); }catch(_){} return null; } return o; }
-    var VS="attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}";
-    var quad=null;
-    function mk(fsSrc,names){
-      var v=sh(g.VERTEX_SHADER,VS), f=sh(g.FRAGMENT_SHADER,fsSrc); if(!v||!f) return null;
-      var pr=g.createProgram(); g.attachShader(pr,v); g.attachShader(pr,f); g.linkProgram(pr);
-      if(!g.getProgramParameter(pr,g.LINK_STATUS)) return null;
-      var o={pr:pr,U:{},loc:g.getAttribLocation(pr,"p")};
-      for(var i=0;i<names.length;i++) o.U[names[i]]=g.getUniformLocation(pr,names[i]);
-      return o;
+    var vsrc=[
+     "attribute vec3 aCenter; attribute vec2 aCorner; attribute float aSeed; attribute vec3 aPrism; attribute vec3 aNormal;",
+     "uniform mat3 uRot; uniform vec2 uScale; uniform float uPointR; uniform float uAspect; uniform float uTime;",
+     "uniform float uDisp; uniform mediump float uPrism; uniform float uSwirl; uniform float uCluster;", // mediump: casa com a precisão do fragment (senão o link falha)
+     "varying float vD; varying float vR; varying vec2 vC; varying vec3 vN; varying float vSeed;",
+     "void main(){",
+     " vSeed=aSeed;",
+     " vec3 ac=aCenter;",
+     " float az=atan(ac.z, ac.x+0.0001);",       // agrupa a longitude em 5 constelações (guarda contra (0,0))
+     " float sect=1.2566371;",                   // 2π/5
+     " float naz=mix(az, floor(az/sect+0.5)*sect, uCluster*0.85);",
+     " float hor=length(vec2(ac.x, ac.z));",
+     " ac=mix(ac, vec3(cos(naz)*hor, ac.y, sin(naz)*hor), uCluster);",
+     " vR=length(ac);",
+     " float ang=uSwirl*(ac.y*1.6);",
+     " float cs=cos(ang), sn=sin(ang);",
+     " vec3 sw=vec3(ac.x*cs-ac.z*sn, ac.y, ac.x*sn+ac.z*cs);",
+     " float tb=0.55+0.45*sin(aSeed*28.0+uTime*0.6);",
+     " vec3 pos=sw+normalize(ac+vec3(0.0001))*uDisp*tb;",
+     " pos=mix(pos, aPrism, uPrism);",
+     " vec3 p=uRot*pos;",
+     " vN=uRot*aNormal;",
+     " vD=p.z*0.5+0.5;",
+     " vC=aCorner;",
+     " vec2 c=vec2(p.x*uScale.x, p.y*uScale.y);",
+     " float tw=0.78+0.22*sin(uTime*2.0+aSeed*6.2831);",
+     " float rad=uPointR*(0.5+0.75*vD)*tw*mix(1.0,1.3,uPrism);", // facetas mais cheias na gema lapidada (menos "poeira", mais superfície)
+     " c+=vec2(aCorner.x*rad/uAspect, aCorner.y*rad);",
+     " gl_Position=vec4(c,0.0,1.0);",
+     "}"].join("\n");
+    var fsrc=[
+     "precision mediump float;",
+     "uniform float uAlpha; uniform float uPrism;",
+     "varying float vD; varying float vR; varying vec2 vC; varying vec3 vN; varying float vSeed;",
+     "void main(){",
+     " float r=length(vC);",
+     " if(r>1.0) discard;",
+     " float soft=smoothstep(1.0,0.0,r);",
+     " vec3 deep=vec3(0.55,0.03,0.06), rose=vec3(1.0,0.10,0.14), hot=vec3(1.0,0.30,0.16);",
+     " vec3 col=mix(deep,rose,vD); col=mix(col,hot,pow(vD,3.0)*0.7);",
+     " float shell=smoothstep(0.55,1.0,vR);",
+     " vec3 nrm=normalize(vN);",
+     " vec3 lightDir=normalize(vec3(0.45,0.85,0.55));",
+     " vec3 viewDir=vec3(0.0,0.0,1.0);",
+     " float lit=mix(1.0, 0.55+0.45*max(dot(nrm,lightDir),0.0), uPrism);", // facetas ganham volume só na bipirâmide
+     " col*=lit;",
+     // gema lapidada: brilho especular por faceta + Fresnel + glitter por partícula — só entra ao condensar (uPrism)
+     " vec3 halfV=normalize(lightDir+viewDir);",
+     " float sparkle=0.6+0.4*sin(vSeed*97.0);",
+     " float spec=pow(max(dot(nrm,halfV),0.0),70.0)*sparkle;",
+     " float fres=pow(1.0-max(dot(nrm,viewDir),0.0),2.5);",
+     " vec3 glint=vec3(1.0,0.92,0.86)*spec*1.6 + vec3(1.0,0.35,0.30)*fres*0.5;",
+     " col+=glint*uPrism;",
+     " float a=soft*(0.14+0.66*vD)*(0.55+0.6*shell)*uAlpha;",
+     " a=max(a, spec*uPrism*soft*0.9);", // o brilho da faceta fica opaco, como luz batendo num corte real
+     " gl_FragColor=vec4(col,a);",
+     "}"].join("\n");
+    // cada partícula = 2 triângulos (6 vértices)
+    var N=isTouch?3800:17000;   // mobile mais denso p/ presença (via contagem, não tamanho — texto legível)
+    var corners=[-1,-1, 1,-1, -1,1,  -1,1, 1,-1, 1,1];
+    var V=N*6;
+    var aCenter=new Float32Array(V*3), aCorner=new Float32Array(V*2), aSeed=new Float32Array(V), aPrism=new Float32Array(V*3), aNormal=new Float32Array(V*3);
+    // corte brilhante (diamante de verdade): mesa no topo + 8 facetas na coroa + cinta + 8 facetas no pavilhão até a culatra
+    var DN=8, Rtable=0.30, yTable=0.62, Rgirdle=0.95, yGirdle=0.12, yCulet=-1.05;
+    var tableCenter=[0,yTable,0], culet=[0,yCulet,0], tablePts=[], girdlePts=[];
+    for(var di=0;di<DN;di++){ var dth=di*(2*Math.PI/DN);
+      tablePts.push([Rtable*Math.cos(dth),yTable,Rtable*Math.sin(dth)]);
+      girdlePts.push([Rgirdle*Math.cos(dth),yGirdle,Rgirdle*Math.sin(dth)]); }
+    var BF=[];
+    for(di=0;di<DN;di++) BF.push([tableCenter,tablePts[di],tablePts[(di+1)%DN]]);                 // mesa (leque)
+    for(di=0;di<DN;di++){ var t0=tablePts[di],t1=tablePts[(di+1)%DN],g0=girdlePts[di],g1=girdlePts[(di+1)%DN];
+      BF.push([t0,g0,g1]); BF.push([t0,g1,t1]); }                                                   // coroa (facetas até a cinta)
+    for(di=0;di<DN;di++) BF.push([girdlePts[di],girdlePts[(di+1)%DN],culet]);                       // pavilhão (leque até a culatra)
+    function faceNormal(f){ var P0=f[0],P1=f[1],P2=f[2];
+      var ax=P1[0]-P0[0],ay=P1[1]-P0[1],az=P1[2]-P0[2], bx2=P2[0]-P0[0],by=P2[1]-P0[1],bz=P2[2]-P0[2];
+      var nx=ay*bz-az*by, ny=az*bx2-ax*bz, nz=ax*by-ay*bx2, l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;
+      return [nx/l,ny/l,nz/l]; }
+    var BFN=BF.map(faceNormal);
+    /* malha sólida do diamante (produto "profissional"): mesmas facetas, viram triângulos de verdade.
+       Sem backface culling — o fragment shader decide a normal pelo lado visível (gl_FrontFacing), então
+       funciona certo independente do winding, e sobra menos "costura" visual entre facetas. */
+    var GFACES=BF.length, GVERTS=GFACES*3;
+    var aGPos=new Float32Array(GVERTS*3), aGNrm=new Float32Array(GVERTS*3);
+    for(var fi=0;fi<GFACES;fi++){
+      var f=BF[fi], n=BFN[fi];
+      for(var k=0;k<3;k++){ var vi=fi*3+k;
+        aGPos[vi*3]=f[k][0]; aGPos[vi*3+1]=f[k][1]; aGPos[vi*3+2]=f[k][2];
+        aGNrm[vi*3]=n[0]; aGNrm[vi*3+1]=n[1]; aGNrm[vi*3+2]=n[2]; }
     }
-    var Pd=null,Pg=null,glok=false;
-    function build(){
-      quad=g.createBuffer(); g.bindBuffer(g.ARRAY_BUFFER,quad);
-      g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);
-      Pd=mk(FS_DUST,["uRes","uDrift","uTime","uDust"]);
-      Pg=mk(FS_GEM,["uRes","uCenter","uTime","uCut","uExp","uSize","uCamZ","uAlpha","uFire","uRot"]);
-      if(!Pd||!Pg) return false;
-      g.disable(g.DEPTH_TEST); g.clearColor(0,0,0,0);
+    /* ---- mat4 mínimo (column-major, convenção WebGL) — só o necessário pra uma câmera em perspectiva fixa ---- */
+    function mat4Perspective(fovy,aspect,near,far){ var f=1/Math.tan(fovy/2), nf=1/(near-far);
+      return new Float32Array([f/aspect,0,0,0, 0,f,0,0, 0,0,(far+near)*nf,-1, 0,0,2*far*near*nf,0]); }
+    function mat4MulTranslateZ(m,tz){ var o=m.slice(); // m * translate(0,0,tz) — só a coluna 3 muda
+      o[12]+=m[8]*tz; o[13]+=m[9]*tz; o[14]+=m[10]*tz; o[15]+=m[11]*tz; return o; }
+    var GFOV=42*Math.PI/180, GNEAR=1.2, GFAR=8, GCAM=3.3;
+    var gPV=mat4MulTranslateZ(mat4Perspective(GFOV,1,GNEAR,GFAR),-GCAM);
+    function prismPoint(){
+      var fi=(Math.random()*BF.length)|0, f=BF[fi], P0=f[0],P1=f[1],P2=f[2];
+      var u=Math.random(), v=Math.random(); if(u+v>1){ u=1-u; v=1-v; }
+      return { p:[ P0[0]+(P1[0]-P0[0])*u+(P2[0]-P0[0])*v,
+                   P0[1]+(P1[1]-P0[1])*u+(P2[1]-P0[1])*v,
+                   P0[2]+(P1[2]-P0[2])*u+(P2[2]-P0[2])*v ], n:BFN[fi] };
+    }
+    for(var i=0;i<N;i++){
+      var y=1-(i/(N-1))*2, rad=Math.sqrt(Math.max(0.0,1-y*y)), th=i*2.399963, rr=0.62+0.38*Math.random();
+      var px=Math.cos(th)*rad*rr, py=y*rr, pz=Math.sin(th)*rad*rr, sd=Math.random();
+      var qp=prismPoint();
+      for(var k=0;k<6;k++){ var vi=i*6+k;
+        aCenter[vi*3]=px; aCenter[vi*3+1]=py; aCenter[vi*3+2]=pz;
+        aPrism[vi*3]=qp.p[0]; aPrism[vi*3+1]=qp.p[1]; aPrism[vi*3+2]=qp.p[2];
+        aNormal[vi*3]=qp.n[0]; aNormal[vi*3+1]=qp.n[1]; aNormal[vi*3+2]=qp.n[2];
+        aCorner[vi*2]=corners[k*2]; aCorner[vi*2+1]=corners[k*2+1];
+        aSeed[vi]=sd; }
+    }
+    /* malha sólida "profissional": mesma rotação da esfera de partículas, mas com profundidade real
+       (projeção em perspectiva + depth test) e sombreamento tipo joalheria (estúdio + Fresnel).
+       Sem culling — a coroa tem pontas finas, então a normal se ajusta por gl_FrontFacing (dois lados sempre corretos). */
+    var gvsrc=[
+     "attribute vec3 aGPos; attribute vec3 aGNrm;",
+     "uniform mat3 uGRot; uniform mat4 uGPV; uniform float uGScale;",
+     "varying vec3 vGN; varying vec3 vWp;",
+     "void main(){",
+     " vec3 wp=uGRot*(aGPos*uGScale);",
+     " vGN=uGRot*aGNrm; vWp=wp;",
+     " gl_Position=uGPV*vec4(wp,1.0);",
+     "}"].join("\n");
+    var gfsrc=[
+     "precision mediump float;",
+     "uniform float uGAlpha;",
+     "varying vec3 vGN; varying vec3 vWp;",
+     "void main(){",
+     " vec3 n=normalize(vGN); if(!gl_FrontFacing) n=-n;",
+     // câmera fica em (0,0,3.3) olhando pra origem (bate com GCAM do JS) — direção de visão calculada por PIXEL, não por faceta,
+     // pra faceta plana ainda ter gradiente interno (senão vira "cartão" liso, sem leitura de volume)
+     " vec3 viewDir=normalize(vec3(0.0,0.0,3.3)-vWp);",
+     " vec3 lightDir=normalize(vec3(0.5,0.82,0.5));",
+     " float ndl=max(dot(n,lightDir),0.0);",
+     " vec3 refl=reflect(-viewDir,n);",
+     // diamante de verdade: quase preto → quase branco/gelo (não colorido) — o gradiente vem do reflexo (refl.y), varia dentro da própria faceta
+     " float sky=smoothstep(-0.5,1.0,refl.y);",
+     " vec3 base=mix(vec3(0.035,0.035,0.04),vec3(0.92,0.93,0.97),sky);",
+     " vec3 col=base*(0.4+0.6*ndl);",
+     " vec3 halfV=normalize(lightDir+viewDir);",
+     " float spec=pow(max(dot(n,halfV),0.0),90.0);",
+     " float fres=pow(1.0-max(dot(n,viewDir),0.0),2.0);",
+     // "fogo" do diamante: dispersão cromática vermelho ↔ violeta (paleta da marca), muda com o ângulo — não é cor do corpo, é reflexo
+     " float disp=refl.x*0.5+0.5;",
+     " vec3 fire=mix(vec3(0.62,0.05,1.0),vec3(1.0,0.16,0.22),disp);",
+     " col+=vec3(1.0)*spec*1.7;",
+     " col+=fire*fres*0.8;",
+     " col+=fire*pow(spec,0.35)*0.22;",
+     " gl_FragColor=vec4(col,uGAlpha);",
+     "}"].join("\n");
+    /* recursos GL recriáveis — permite recuperar de um webglcontextlost sem recarregar a página */
+    var pr,uRot,uScale,uPointR,uAspect,uT,uAlpha,uDisp,uPrism,uSwirl,uCluster,glok=false;
+    var prG,uGRot,uGPV,uGAlpha,uGScale,gemOK=false;
+    var sphereAttrs=[], gemAttrs=[];
+    function sh(t,s){ var o=g.createShader(t); g.shaderSource(o,s); g.compileShader(o);
+      if(!g.getShaderParameter(o,g.COMPILE_STATUS)){ try{ console.warn("hero3d shader falhou:", g.getShaderInfoLog(o)); }catch(_){} return null; } return o; }
+    function attr(name,data,size){ var b=g.createBuffer(); g.bindBuffer(g.ARRAY_BUFFER,b); g.bufferData(g.ARRAY_BUFFER,data,g.STATIC_DRAW);
+      var l=g.getAttribLocation(pr,name); if(l<0) return; g.enableVertexAttribArray(l); g.vertexAttribPointer(l,size,g.FLOAT,false,0,0); sphereAttrs.push({l:l,b:b,s:size}); }
+    function bindSphereAttrs(){ for(var i=0;i<sphereAttrs.length;i++){ var a=sphereAttrs[i]; g.bindBuffer(g.ARRAY_BUFFER,a.b); g.enableVertexAttribArray(a.l); g.vertexAttribPointer(a.l,a.s,g.FLOAT,false,0,0); } }
+    function attrG(name,data,size){ var b=g.createBuffer(); g.bindBuffer(g.ARRAY_BUFFER,b); g.bufferData(g.ARRAY_BUFFER,data,g.STATIC_DRAW);
+      var l=g.getAttribLocation(prG,name); if(l<0) return; g.enableVertexAttribArray(l); g.vertexAttribPointer(l,size,g.FLOAT,false,0,0); gemAttrs.push({l:l,b:b,s:size}); }
+    function bindGemAttrs(){ for(var i=0;i<gemAttrs.length;i++){ var a=gemAttrs[i]; g.bindBuffer(g.ARRAY_BUFFER,a.b); g.enableVertexAttribArray(a.l); g.vertexAttribPointer(a.l,a.s,g.FLOAT,false,0,0); } }
+    function setupGemGL(){
+      var v=sh(g.VERTEX_SHADER,gvsrc), f=sh(g.FRAGMENT_SHADER,gfsrc);
+      if(!v||!f) return false;
+      prG=g.createProgram(); g.attachShader(prG,v); g.attachShader(prG,f); g.linkProgram(prG);
+      if(!g.getProgramParameter(prG,g.LINK_STATUS)){ try{ console.warn("hero3d gema link falhou:", g.getProgramInfoLog(prG)); }catch(_){} return false; }
+      g.useProgram(prG);
+      gemAttrs.length=0;
+      attrG("aGPos",aGPos,3); attrG("aGNrm",aGNrm,3);
+      uGRot=g.getUniformLocation(prG,"uGRot"); uGPV=g.getUniformLocation(prG,"uGPV");
+      uGAlpha=g.getUniformLocation(prG,"uGAlpha"); uGScale=g.getUniformLocation(prG,"uGScale");
       return true;
     }
-    glok=build();
+    function setupGL(){
+      var v=sh(g.VERTEX_SHADER,vsrc), f=sh(g.FRAGMENT_SHADER,fsrc);
+      if(!v||!f){ return false; }
+      pr=g.createProgram(); g.attachShader(pr,v); g.attachShader(pr,f); g.linkProgram(pr);
+      if(!g.getProgramParameter(pr,g.LINK_STATUS)){ try{ console.warn("hero3d link falhou:", g.getProgramInfoLog(pr)); }catch(_){} return false; }
+      g.useProgram(pr);
+      sphereAttrs.length=0;
+      attr("aCenter",aCenter,3); attr("aCorner",aCorner,2); attr("aSeed",aSeed,1); attr("aPrism",aPrism,3); attr("aNormal",aNormal,3);
+      uRot=g.getUniformLocation(pr,"uRot"); uScale=g.getUniformLocation(pr,"uScale");
+      uPointR=g.getUniformLocation(pr,"uPointR"); uAspect=g.getUniformLocation(pr,"uAspect");
+      uT=g.getUniformLocation(pr,"uTime"); uAlpha=g.getUniformLocation(pr,"uAlpha");
+      uDisp=g.getUniformLocation(pr,"uDisp"); uPrism=g.getUniformLocation(pr,"uPrism"); uSwirl=g.getUniformLocation(pr,"uSwirl"); uCluster=g.getUniformLocation(pr,"uCluster");
+      g.enable(g.BLEND); g.blendFunc(g.SRC_ALPHA,g.ONE); g.clearColor(0,0,0,0);
+      gemOK = !isTouch && setupGemGL();
+      return true;
+    }
+    glok=setupGL();
     if(!glok){ c.style.display="none"; if(bc) bc.style.display="none"; return; }
-    function bindQuad(P){ g.useProgram(P.pr); g.bindBuffer(g.ARRAY_BUFFER,quad);
-      g.enableVertexAttribArray(P.loc); g.vertexAttribPointer(P.loc,2,g.FLOAT,false,0,0); }
-    bx=(!reduce && bc && bc.getContext)?bc.getContext("2d"):null;
-    if(bc) bc.style.display=bx?"block":"none";
 
-    /* escala de render adaptativa: mede o frame e ajusta a resolucao (GPU integrada / celular) */
-    var gdpr=Math.min(window.devicePixelRatio||1,2), MAXS=isTouch?0.75:1.0, MINS=isTouch?0.5:0.6, gscale=isTouch?0.62:0.85;
-    function gres(){
-      var w=Math.max(1,Math.floor(c.clientWidth*gdpr*gscale)), h=Math.max(1,Math.floor(c.clientHeight*gdpr*gscale));
-      var cap=isTouch?1300000:2400000, px=w*h;
-      if(px>cap){ var f=Math.sqrt(cap/px); w=Math.max(1,Math.floor(w*f)); h=Math.max(1,Math.floor(h*f)); }
-      c.width=w; c.height=h;
-      if(bx){ bc.width=Math.max(1,Math.round(w*0.42)); bc.height=Math.max(1,Math.round(h*0.42)); }
-    }
-    gres(); window.addEventListener("resize",gres);
-
-    /* ---- timeline: indice da secao + progresso local (robusto a alturas e viewports diferentes) ---- */
-    var SECS=["hero","manifesto","autoridade","videos","antesdepois","numeros","gema","capa","oferta","faq","final"];
-    var secEls=SECS.map(function(id){ return document.getElementById(id); });
-    function timelineT(){
-      var ref=window.innerHeight*0.5, first=-1;
-      for(var i=0;i<secEls.length;i++){
-        var sEl=secEls[i]; if(!sEl) continue;
-        var r=sEl.getBoundingClientRect(); if(r.height<=0) continue;
-        if(r.top<=ref && r.bottom>ref) return i+Math.min(Math.max((ref-r.top)/r.height,0),1);
-        if(r.top>ref && first<0) first=i;
-      }
-      return first>=0?Math.max(0,first-0.02):(secEls.length-1);
-    }
-    /* [t, corte, explosao, centro x, centro y, tamanho(maior = gema menor), camera z, opacidade, poeira, fogo] */
-    var KF=[
-      [0.00, 0.05,0.00, 0.30,-0.02, 1.20,3.50,0.60,0.75,0.30],
-      [0.50, 0.08,0.00, 0.30,-0.02, 1.20,3.50,0.60,0.75,0.30],
-      [1.00, 0.18,0.00, 0.16, 0.04, 1.40,3.50,0.70,0.80,0.30],
-      [1.55, 0.30,0.00,-0.42,-0.06, 1.75,3.45,0.70,0.62,0.30],
-      [2.50, 0.44,0.00, 0.46, 0.22, 2.10,3.45,0.55,0.50,0.30],
-      [3.50, 0.54,0.00,-0.50,-0.26, 2.35,3.45,0.42,0.45,0.30],
-      [4.50, 0.66,0.00, 0.48, 0.20, 2.15,3.45,0.50,0.50,0.35],
-      [5.50, 0.78,0.00, 0.00, 0.00, 1.95,3.45,0.60,0.70,0.40],
-      [6.06, 0.88,0.00, 0.00, 0.02, 1.42,3.40,1.00,1.00,0.45],
-      [6.32, 1.00,0.00, 0.00, 0.00, 1.02,3.30,1.00,1.10,0.55],
-      [6.52, 1.00,0.00, 0.00, 0.00, 0.66,1.90,1.00,0.80,1.00],
-      [6.70, 1.00,0.60, 0.00, 0.00, 1.15,2.70,1.00,1.70,0.85],
-      [6.92, 1.00,0.00, 0.00, 0.00, 1.00,3.25,1.00,1.05,0.60],
-      [7.60, 1.00,0.00,-0.02,-0.34, 2.60,3.45,0.42,0.50,0.40],
-      [8.40, 1.00,0.00, 0.42, 0.40, 2.20,3.45,0.70,0.80,0.55],
-      [9.60, 1.00,0.00, 0.02, 0.10, 2.05,3.45,0.48,0.60,0.45],
-      [11.0, 1.00,0.00, 0.02, 0.10, 2.05,3.45,0.48,0.60,0.45]
-    ];
-    var S=[0,0,0,0,0,0,0,0,0];
-    function sample(t){
-      var i=0; while(i<KF.length-2 && t>KF[i+1][0]) i++;
-      var A=KF[i], B=KF[i+1];
-      var u=(B[0]-A[0])>0?Math.min(Math.max((t-A[0])/(B[0]-A[0]),0),1):0;
-      u=u*u*(3-2*u);
-      for(var j=1;j<10;j++) S[j-1]=A[j]+(B[j]-A[j])*u;
-      if(isTouch){ S[2]*=0.45; S[3]*=0.55; S[4]=S[4]*1.18+0.08; S[6]*=0.85; }
-    }
-
-    var t0s=performance.now(), tCur=null, awake=true, ema=16, fcount=0, prev=0;
-    window.__txGem={cut:0,t:0,fps:0,scale:gscale};
-    function gframe(now){
-      if(!glok) return;
-      var tt=reduce?0.6:(now-t0s)/1000;
-      var tg=timelineT();
-      var fdt=prev?Math.min(Math.max(now-prev,4),100):16.7;
-      /* lerp compensado pelo tempo real do frame: a gema anda na mesma velocidade a 30 ou 120fps (sem tranco) */
-      if(tCur===null||reduce) tCur=tg; else tCur+=(tg-tCur)*(1-Math.pow(0.90,fdt/16.7));
-      sample(tCur);
-      var cut=S[0],ex=S[1],cx=S[2],cy=S[3],size=S[4],camz=S[5],alpha=S[6],dust=S[7],fire=S[8];
-      window.__txGem.cut=cut; window.__txGem.t=tCur;
-      var chap=Math.min(Math.max(tCur-6.0,0),1);
-      var ry=tCur*1.05+chap*4.60+mx*0.28+(reduce?0:Math.sin(tt*0.10)*0.02);
-      var rx=0.18+Math.min(tCur,7.0)*0.030+chap*0.20+my*0.16+(reduce?0:Math.sin(tt*0.15)*0.012);
-      var cb=Math.cos(ry),sb=Math.sin(ry),ca=Math.cos(rx),sa=Math.sin(rx);
-      var M=new Float32Array([cb,sb*sa,sb*ca,0,ca,-sa,-sb,cb*sa,cb*ca]);
-      var W=c.width,H=c.height;
-      g.viewport(0,0,W,H);
-      g.disable(g.BLEND);
-      g.clear(g.COLOR_BUFFER_BIT);
-      if(dust>0.01){
-        bindQuad(Pd);
-        g.uniform2f(Pd.U.uRes,W,H);
-        g.uniform2f(Pd.U.uDrift,tt*0.10+tCur*0.35,-tCur*1.10);
-        g.uniform1f(Pd.U.uTime,tt); g.uniform1f(Pd.U.uDust,dust);
-        g.drawArrays(g.TRIANGLES,0,3);
-      }
-      if(alpha>0.004){
-        /* bounding box da gema em pixels: so esses fragmentos pagam o ray-trace */
-        var Rb=1.30+ex*0.9, qm=Rb/Math.sqrt(Math.max(camz*camz-Rb*Rb,0.04));
-        var half=(qm/size)*H*1.06;
-        var px=0.5*W+cx*H, py=0.5*H+cy*H;
-        var x0=Math.max(0,Math.floor(px-half)), y0=Math.max(0,Math.floor(py-half));
-        var x1=Math.min(W,Math.ceil(px+half)), y1=Math.min(H,Math.ceil(py+half));
-        if(x1>x0&&y1>y0){
-          g.viewport(x0,y0,x1-x0,y1-y0);
-          g.enable(g.BLEND); g.blendFunc(g.ONE,g.ONE_MINUS_SRC_ALPHA);
-          bindQuad(Pg);
-          g.uniform2f(Pg.U.uRes,W,H);
-          g.uniform2f(Pg.U.uCenter,cx,cy);
-          g.uniform1f(Pg.U.uTime,tt);
-          g.uniform1f(Pg.U.uCut,cut); g.uniform1f(Pg.U.uExp,ex);
-          g.uniform1f(Pg.U.uSize,size); g.uniform1f(Pg.U.uCamZ,camz);
-          g.uniform1f(Pg.U.uAlpha,alpha); g.uniform1f(Pg.U.uFire,fire);
-          g.uniformMatrix3fv(Pg.U.uRot,false,M);
-          g.drawArrays(g.TRIANGLES,0,3);
+    /* ---- bloom FBO real (desktop): esfera → textura → bright+blur separável → composita aditivo.
+       Fail-safe: se qualquer passo falhar, makeBloom() devolve null e cai no bloom CSS (bx). ---- */
+    var bloom=null;
+    function makeBloom(){
+      try{
+        var pv="attribute vec2 p;varying vec2 uv;void main(){uv=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
+        var kern="float w0=0.2270,w1=0.1946,w2=0.1216,w3=0.0540,w4=0.0162;";
+        var tap="c+=texture2D(uTex,uv+uTexel).rgb*w1;c+=texture2D(uTex,uv-uTexel).rgb*w1;c+=texture2D(uTex,uv+uTexel*2.0).rgb*w2;c+=texture2D(uTex,uv-uTexel*2.0).rgb*w2;c+=texture2D(uTex,uv+uTexel*3.0).rgb*w3;c+=texture2D(uTex,uv-uTexel*3.0).rgb*w3;c+=texture2D(uTex,uv+uTexel*4.0).rgb*w4;c+=texture2D(uTex,uv-uTexel*4.0).rgb*w4;";
+        var pfH="precision mediump float;uniform sampler2D uTex;uniform vec2 uTexel;varying vec2 uv;void main(){"+kern+"vec3 c=texture2D(uTex,uv).rgb*w0;"+tap+"float l=max(c.r,max(c.g,c.b));c*=smoothstep(0.24,0.62,l);gl_FragColor=vec4(c,1.0);}";
+        var pfV="precision mediump float;uniform sampler2D uTex;uniform vec2 uTexel;uniform float uInt;varying vec2 uv;void main(){"+kern+"vec3 c=texture2D(uTex,uv).rgb*w0;"+tap+"c*=uInt;float a=max(c.r,max(c.g,c.b));gl_FragColor=vec4(c,a);}";
+        function mkProg(vs,fs){ var v=sh(g.VERTEX_SHADER,vs),f=sh(g.FRAGMENT_SHADER,fs); if(!v||!f)return null; var p=g.createProgram(); g.attachShader(p,v); g.attachShader(p,f); g.linkProgram(p); return g.getProgramParameter(p,g.LINK_STATUS)?p:null; }
+        var progH=mkProg(pv,pfH), progV=mkProg(pv,pfV); if(!progH||!progV) return null;
+        var quad=g.createBuffer(); g.bindBuffer(g.ARRAY_BUFFER,quad); g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);
+        var qH=g.getAttribLocation(progH,"p"), qV=g.getAttribLocation(progV,"p");
+        var uTexH=g.getUniformLocation(progH,"uTex"), uTxH=g.getUniformLocation(progH,"uTexel");
+        var uTexV=g.getUniformLocation(progV,"uTex"), uTxV=g.getUniformLocation(progV,"uTexel"), uIntV=g.getUniformLocation(progV,"uInt");
+        var texA,fboA,texB,fboB,bw=1,bh=1;
+        function mkTarget(){ var t=g.createTexture(); g.bindTexture(g.TEXTURE_2D,t); g.texImage2D(g.TEXTURE_2D,0,g.RGBA,bw,bh,0,g.RGBA,g.UNSIGNED_BYTE,null);
+          g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR); g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);
+          g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE); g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
+          var fb=g.createFramebuffer(); g.bindFramebuffer(g.FRAMEBUFFER,fb); g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,t,0); return {t:t,f:fb}; }
+        function resize(){ bw=Math.max(1,Math.round(c.width*0.5)); bh=Math.max(1,Math.round(c.height*0.5));
+          if(texA){ g.deleteTexture(texA); g.deleteFramebuffer(fboA); g.deleteTexture(texB); g.deleteFramebuffer(fboB); }
+          var A=mkTarget(); texA=A.t; fboA=A.f; var B=mkTarget(); texB=B.t; fboB=B.f;
+          if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE) throw new Error("FBO incompleto"); }
+        resize();
+        function bindQuad(loc){ g.bindBuffer(g.ARRAY_BUFFER,quad); g.enableVertexAttribArray(loc); g.vertexAttribPointer(loc,2,g.FLOAT,false,0,0); }
+        function render(drawSphere){
+          g.bindFramebuffer(g.FRAMEBUFFER,fboA); g.viewport(0,0,bw,bh); g.clear(g.COLOR_BUFFER_BIT);
+          g.useProgram(pr); bindSphereAttrs(); g.enable(g.BLEND); g.blendFunc(g.SRC_ALPHA,g.ONE); drawSphere();   // esfera → textura (aditivo)
           g.disable(g.BLEND);
+          g.bindFramebuffer(g.FRAMEBUFFER,fboB); g.viewport(0,0,bw,bh); g.useProgram(progH); bindQuad(qH);        // bright + blur horizontal
+          g.activeTexture(g.TEXTURE0); g.bindTexture(g.TEXTURE_2D,texA); g.uniform1i(uTexH,0); g.uniform2f(uTxH,1.0/bw,0.0); g.drawArrays(g.TRIANGLES,0,3);
+          g.bindFramebuffer(g.FRAMEBUFFER,null); g.viewport(0,0,c.width,c.height);                                // blur vertical → tela (aditivo)
+          g.enable(g.BLEND); g.blendFunc(g.ONE,g.ONE); g.useProgram(progV); bindQuad(qV);
+          g.activeTexture(g.TEXTURE0); g.bindTexture(g.TEXTURE_2D,texB); g.uniform1i(uTexV,0); g.uniform2f(uTxV,0.0,1.0/bh); g.uniform1f(uIntV,0.55); g.drawArrays(g.TRIANGLES,0,3);
+          g.blendFunc(g.SRC_ALPHA,g.ONE); g.useProgram(pr); bindSphereAttrs();                                    // restaura estado da esfera
+        }
+        return {resize:resize, render:render};
+      }catch(e){ try{ console.warn("bloom FBO indisponível:", e.message); }catch(_){} return null; }
+    }
+    function setupBloomPath(){
+      bloom = (!isTouch) ? makeBloom() : null;
+      if(bloom){ bx=null; if(bc) bc.style.display="none"; }
+      else { bx = (!isTouch && bc && bc.getContext) ? bc.getContext("2d") : null; if(bc) bc.style.display = bx ? "block" : "none"; }
+    }
+
+    var gdpr=Math.min(window.devicePixelRatio||1, isTouch?1.25:2), gscale=isTouch?0.7:1.0, R=0.95, sx=R, sy=R, aspect=1, pr_ndc=0.02;
+    var basePx=isTouch?5.2:(10*gdpr);   // diâmetro da partícula em px de buffer (escala com o DPI → nitidez constante)
+    function gres(){ var w=Math.max(1,Math.floor(c.clientWidth*gdpr*gscale)), h=Math.max(1,Math.floor(c.clientHeight*gdpr*gscale));
+      c.width=w; c.height=h; g.viewport(0,0,w,h); aspect=w/h;
+      if(w>=h){ sx=R*h/w; sy=R; } else { sx=R; sy=R*w/h; }
+      pr_ndc=basePx/h;
+      gPV=mat4MulTranslateZ(mat4Perspective(GFOV,aspect,GNEAR,GFAR),-GCAM);
+      if(bloom){ try{ bloom.resize(); g.bindFramebuffer(g.FRAMEBUFFER,null); g.viewport(0,0,w,h); }catch(e){ bloom=null; } }
+      if(bx){ bc.width=Math.max(1,Math.round(w*0.5)); bc.height=Math.max(1,Math.round(h*0.5)); } }
+    gres(); setupBloomPath(); gres(); window.addEventListener("resize",gres);
+    /* pausa só quando a aba está oculta — a esfera persiste por todos os capítulos */
+    var awake=true;
+    document.addEventListener("visibilitychange",function(){ awake=!document.hidden && glok; if(awake) requestAnimationFrame(gframe); });
+    /* recuperação de contexto (ANGLE/D3D11 pode perder o contexto → evita tela preta permanente) */
+    c.addEventListener("webglcontextlost",function(e){ e.preventDefault(); glok=false; awake=false; if(bx) try{ bx.clearRect(0,0,bc.width,bc.height); }catch(_){} },false);
+    c.addEventListener("webglcontextrestored",function(){ glok=setupGL(); if(glok){ setupBloomPath(); gres(); awake=true; requestAnimationFrame(gframe); } },false);
+    function sstep(e0,e1,x){ var t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3.0-2.0*t); }
+    function mrot(ry,rx){ var cy=Math.cos(ry),syr=Math.sin(ry),cx=Math.cos(rx),sxr=Math.sin(rx);
+      return new Float32Array([ cy, sxr*syr, -cx*syr,  0.0, cx, sxr,  syr, -sxr*cy, cx*cy ]); }
+    var gs=performance.now();
+    function drawSphere(){ g.drawArrays(g.TRIANGLES,0,V); }
+    var gemaEl=document.getElementById("gemaPin");
+    function gframe(now){
+      if(!glok){ return; }
+      g.bindFramebuffer(g.FRAMEBUFFER,null); g.viewport(0,0,c.width,c.height);
+      g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);
+      var tt=reduce?0.6:(now-gs)/1000;
+      /* progCur (0..1) é o scroll global — dita a coreografia por capítulo; chapterP é o progresso local do capítulo "gema" */
+      var P=progCur;
+      var chapterP=(gemaEl&&!reduce)?pinProgress(gemaEl):0; // reduced-motion: sem capítulo pinado, mantém só a coreografia por P
+      var disp=0.62*sstep(0.05,0.40,P)*(1.0-sstep(0.58,0.95,P)); // dispersa no meio, reforma nas pontas
+      var prism=Math.max(sstep(0.60,0.95,P),chapterP,0.26);       // presença desde o hero, atrás do título — mas contida (não domina layouts densos)
+      var swirl=(0.12+P*1.5)*(1.0-prism);                         // solta o giro ao formar o diamante (facetas limpas)
+      var mob=isTouch?0.35:0.7;
+      /* rotação dominada pelo SCROLL, não pelo tempo — gira/recua exatamente ao rolar pra frente/trás, como os produtos da Apple.
+         Só sobra um resíduo bem pequeno de tempo pra não parecer "morto" quando o usuário para de rolar. */
+      var ry=P*4.5+chapterP*6.28318+mx*mob*0.6+(reduce?0:Math.sin(tt*0.15)*0.04);
+      var rx=0.28+P*0.55+my*0.35+(reduce?0:Math.sin(tt*0.2)*0.025);
+      var rotM=mrot(ry,rx);
+      var gAlpha=0;
+      if(gemOK){
+        gAlpha=sstep(0.05,0.45,prism);
+        if(gAlpha>0.002){
+          g.disable(g.BLEND);
+          g.enable(g.DEPTH_TEST); g.depthFunc(g.LEQUAL);
+          g.useProgram(prG); bindGemAttrs();
+          g.uniformMatrix3fv(uGRot,false,rotM);
+          g.uniformMatrix4fv(uGPV,false,gPV);
+          g.uniform1f(uGAlpha,gAlpha);
+          g.uniform1f(uGScale,0.55+0.75*Math.pow(prism,1.3));        // pequeno/discreto como presença ambiente, GRANDE no capítulo dedicado
+          g.enable(g.BLEND); g.blendFunc(g.SRC_ALPHA,g.ONE_MINUS_SRC_ALPHA); // sólida/opaca — não aditiva como as partículas
+          g.drawArrays(g.TRIANGLES,0,GVERTS);
+          g.disable(g.DEPTH_TEST);
         }
       }
-      if(bx){ bx.clearRect(0,0,bc.width,bc.height); try{ bx.drawImage(c,0,0,bc.width,bc.height); }catch(_){} }
-      /* auto-tuning: mede o intervalo REAL entre frames (o custo e de GPU, nao de JS) e ajusta a resolucao */
-      if(prev){ var dt=now-prev; if(dt<400) ema=ema*0.85+dt*0.15; }
-      prev=now; fcount++;
-      if(fcount>30){ fcount=0; window.__txGem.fps=Math.round(1000/Math.max(ema,1)); window.__txGem.scale=Math.round(gscale*100)/100;
-        if(ema>26 && gscale>MINS){ gscale=Math.max(MINS,gscale*0.88); gres(); }
-        else if(ema<17 && gscale<MAXS){ gscale=Math.min(MAXS,gscale*1.05); gres(); } }
+      g.useProgram(pr); bindSphereAttrs(); g.enable(g.BLEND); g.blendFunc(g.SRC_ALPHA,g.ONE);
+      g.uniformMatrix3fv(uRot,false,rotM);
+      var breathe=1.0+(reduce?0.0:0.05*Math.sin(tt*0.5))+P*0.05;   // respiro: leve dolly acompanhando o scroll
+      g.uniform2f(uScale,sx*breathe,sy*breathe); g.uniform1f(uPointR,pr_ndc); g.uniform1f(uAspect,aspect);
+      g.uniform1f(uT,tt);
+      g.uniform1f(uDisp,disp); g.uniform1f(uPrism,prism); g.uniform1f(uSwirl,swirl); g.uniform1f(uCluster,metCur*(1.0-prism));
+      g.uniform1f(uAlpha, (isTouch?1.0:(0.82+0.18*P))*(1.0-gAlpha*0.88)); // partículas recuam ainda mais — o diamante domina a cena
+      g.drawArrays(g.TRIANGLES,0,V);
+      if(bloom){ bloom.render(drawSphere); }
+      else if(bx){ bx.clearRect(0,0,bc.width,bc.height); try{ bx.drawImage(c,0,0,bc.width,bc.height); }catch(_){} }
       if(awake) requestAnimationFrame(gframe);
     }
-    document.addEventListener("visibilitychange",function(){ awake=!document.hidden&&glok; if(awake) requestAnimationFrame(gframe); });
-    c.addEventListener("webglcontextlost",function(e){ e.preventDefault(); glok=false; awake=false; },false);
-    c.addEventListener("webglcontextrestored",function(){ glok=build(); if(glok){ gres(); awake=true; requestAnimationFrame(gframe); } },false);
     requestAnimationFrame(gframe);
   })();
 
@@ -1523,33 +1504,12 @@
     apply(pinProgress(wrap));
   })();
 
-  /* ---------------- capitulo da gema: legendas e contador seguem o mesmo scroll que lapida a pedra ---------------- */
+  /* ---------------- gema: texto do capítulo acompanha o mesmo progresso que gira a gema 3D ---------------- */
   (function(){
     var wrap=document.getElementById("gemaPin"), stick=document.getElementById("gemaStick"); if(!wrap||!stick) return;
-    var beats=Array.prototype.slice.call(stick.querySelectorAll(".gb"));
-    var fEl=document.getElementById("gemaFacets");
-    /* mesmas etapas do shader: mesa 1 + bizel 8 + estrelas 8 + cinta alta 16 + pavilhao 8 + cinta baixa 16 = 57 */
-    function facets(cut){
-      var f=1*Math.min(1,Math.max(0,(cut-0.00)/0.20))
-           +8*Math.min(1,Math.max(0,(cut-0.10)/0.32))
-           +8*Math.min(1,Math.max(0,(cut-0.34)/0.24))
-           +16*Math.min(1,Math.max(0,(cut-0.48)/0.22))
-           +8*Math.min(1,Math.max(0,(cut-0.60)/0.24))
-           +16*Math.min(1,Math.max(0,(cut-0.78)/0.19));
-      return Math.round(f); }
-    if(reduce){ stick.style.setProperty("--go","1"); if(beats.length) beats[beats.length-1].classList.add("on"); if(fEl) fEl.textContent="57"; return; }
-    var cur=0, raf=false, last=-1;
-    function ss(a,b,x){ var t=Math.min(Math.max((x-a)/(b-a),0),1); return t*t*(3-2*t); }
-    function apply(p){
-      stick.style.setProperty("--go", ss(0,0.30,p).toFixed(3));
-      /* o texto sai de cena no zoom interno e na explosao - e volta pra fechar o capitulo */
-      var out=ss(0.42,0.52,p)*(1-ss(0.74,0.86,p));
-      stick.style.setProperty("--gt", (1-0.92*out).toFixed(3));
-      stick.style.setProperty("--gh", (1-ss(0.50,0.70,p)).toFixed(3));
-      var idx=p<0.13?0:(p<0.27?1:(p<0.42?2:(p<0.70?3:4)));
-      if(idx!==last){ last=idx; for(var i=0;i<beats.length;i++) beats[i].classList.toggle("on",i===idx); }
-      if(fEl){ var f=facets((window.__txGem&&window.__txGem.cut)||0); fEl.textContent=(f<10?"0":"")+f; }
-    }
+    if(reduce){ stick.style.setProperty("--go","1"); return; }
+    var cur=0, raf=false;
+    function apply(p){ stick.style.setProperty("--go", Math.min(1,p/0.7).toFixed(3)); }
     function tick(){ var g=pinProgress(wrap); cur+=(g-cur)*0.18; apply(cur);
       if(Math.abs(g-cur)>0.001){ requestAnimationFrame(tick); } else { raf=false; } }
     function kick(){ if(!raf){ raf=true; requestAnimationFrame(tick); } }
@@ -1595,29 +1555,14 @@
     (function cstep(){ cxs+=(cxr-cxs)*0.18; cys+=(cyr-cys)*0.18; cur.style.transform="translate("+cxs.toFixed(1)+"px,"+cys.toFixed(1)+"px) translate(-50%,-50%)"; requestAnimationFrame(cstep); })();
   }
 
-  /* ---------------- numeros: contadores scrubbados pelo scroll (sobem e voltam com voce) ---------------- */
-  (function(){
-    var els=Array.prototype.slice.call(document.querySelectorAll(".count")); if(!els.length) return;
-    var sec=document.getElementById("numeros");
-    var goal=els.map(function(el){ return parseInt(el.getAttribute("data-target"),10)||0; });
-    if(reduce||!sec){ els.forEach(function(el,i){ el.textContent=goal[i].toLocaleString("pt-BR"); }); return; }
-    var cur=0, raf=false, litDone=false;
-    function prog(){ var r=sec.getBoundingClientRect(), vh=window.innerHeight;
-      return Math.min(Math.max((vh*0.88-r.top)/(r.height*0.62+vh*0.24),0),1); }
-    function apply(p){
-      var e=1-Math.pow(1-p,3);
-      for(var i=0;i<els.length;i++) els[i].textContent=Math.round(goal[i]*e).toLocaleString("pt-BR");
-      if(p>0.985&&!litDone){ litDone=true;
-        els.forEach(function(el){ var n=el.closest?el.closest(".n"):null; if(!n) return;
-          n.classList.add("lit"); setTimeout(function(){ n.classList.remove("lit"); },900); }); }
-      if(p<0.90) litDone=false;
-    }
-    function tick(){ var g=prog(); cur+=(g-cur)*0.22; apply(cur);
-      if(Math.abs(g-cur)>0.002){ requestAnimationFrame(tick); } else { raf=false; } }
-    function kick(){ if(!raf){ raf=true; requestAnimationFrame(tick); } }
-    window.addEventListener("scroll",kick,{passive:true}); window.addEventListener("resize",kick);
-    apply(prog());
-  })();
+  /* ---------------- count up ---------------- */
+  var cio=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ countUp(en.target); cio.unobserve(en.target); } }); },{threshold:0.5});
+  document.querySelectorAll(".count").forEach(function(el){ cio.observe(el); });
+  function countUp(el){ var target=parseInt(el.getAttribute("data-target"),10)||0;
+    if(reduce){ el.textContent=target.toLocaleString("pt-BR"); return; }
+    var t0=null,dur=1600; function step(ts){ if(!t0)t0=ts; var p=Math.min((ts-t0)/dur,1); var e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(target*e).toLocaleString("pt-BR");
+      if(p<1){ requestAnimationFrame(step); } else { var n=el.closest?el.closest(".n"):null; if(n){ n.classList.add("lit"); setTimeout(function(){ n.classList.remove("lit"); },1000); } } } requestAnimationFrame(step); }
 
   /* ---------------- 3D pillar tilt ---------------- */
   var grid=document.getElementById("methodGrid");
