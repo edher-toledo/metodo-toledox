@@ -1194,21 +1194,31 @@
     "float st(float a,float b,float x){ float t=clamp((x-a)/(b-a),0.0,1.0); return t*t*(3.0-2.0*t); }",
     "float h21(vec2 p){ p=fract(p*vec2(123.34,345.45)); p+=dot(p,p+34.345); return fract(p.x*p.y); }"];
 
-    /* ---- estudio de joalheria: sala escura, softbox branca, fill fria, rim vermelho + rim violeta ---- */
+    /* ---- estudio de joalheria fotorrealista: sala escura + SOFTBOXES RETANGULARES (a assinatura visual
+       de diamante fotografado — reflexos em barra nas facetas), fill fria e rims vermelho/violeta ---- */
     var ENV=[
+    "uniform sampler2D uEnv;",
+    /* softbox retangular: projeta a direcao no plano do painel e testa se cai dentro do retangulo (borda suave) */
+    "float sbox(vec3 d,vec3 c,vec2 sz,float sh){",
+    " float dz=dot(d,c); if(dz<0.06) return 0.0;",
+    " vec3 rt=normalize(cross(c,vec3(0.0,1.0,0.0))); vec3 up=cross(rt,c);",
+    " vec2 pj=vec2(dot(d,rt),dot(d,up))/dz; vec2 q=abs(pj)-sz;",
+    " float edge=smoothstep(sh,-sh,max(q.x,q.y));",
+    " float grad=0.70+0.30*(1.0-clamp(max(abs(pj.x)/sz.x,abs(pj.y)/sz.y),0.0,1.0));",
+    " return edge*grad*smoothstep(0.05,0.40,dz); }",
     "vec3 env(vec3 d){",
-    " vec3 c=mix(vec3(0.008,0.005,0.011),vec3(0.020,0.013,0.030),d.y*0.5+0.5);",
-    " c+=vec3(0.17,0.020,0.045)*pow(max(-d.y,0.0),2.0);",
-    " float k=max(dot(d,normalize(vec3(0.22,0.86,0.46))),0.0);",
-    " c+=vec3(1.0,0.985,0.96)*(pow(k,60.0)*9.5+pow(k,7.0)*0.42);",
-    " float k2=max(dot(d,normalize(vec3(-0.62,0.50,-0.52))),0.0);",
-    " c+=vec3(0.90,0.94,1.0)*(pow(k2,130.0)*7.0+pow(k2,12.0)*0.16);",
-    " float r=max(dot(d,normalize(vec3(-0.86,-0.28,0.34))),0.0);",
-    " c+=vec3(1.0,0.10,0.16)*pow(r,18.0)*2.8;",
-    " float v=max(dot(d,normalize(vec3(0.82,0.06,-0.50))),0.0);",
-    " c+=vec3(0.55,0.05,1.0)*pow(v,22.0)*2.2;",
-    " float w=max(dot(d,normalize(vec3(0.06,-0.72,0.69))),0.0);",
-    " c+=vec3(0.95,0.62,0.55)*pow(w,44.0)*0.9;",
+    /* base: mapa de ambiente de estudio embutido (bitmap equirretangular) — da a variacao e a estrutura
+       de um ambiente real que a funcao procedural pura nao alcanca */
+    " float eu=atan(d.z,d.x)*0.1591549+0.5, ev=acos(clamp(d.y,-1.0,1.0))*0.3183099;",
+    " vec3 c=texture2D(uEnv,vec2(eu,ev)).rgb; c=c*c*1.45;",
+    /* softboxes analiticos HDR por cima: o brilho nitido e o punch que fazem o diamante cintilar */
+    " vec3 K=vec3(0.320,0.779,0.539);",
+    " c+=vec3(1.0,0.99,0.97)*sbox(d,K,vec2(0.36,0.15),0.11)*6.4;",
+    " c+=vec3(1.0,0.985,0.96)*pow(max(dot(d,K),0.0),6.0)*0.30;",
+    " c+=vec3(0.93,0.96,1.0)*sbox(d,vec3(-0.224,0.918,-0.326),vec2(0.44,0.075),0.08)*4.4;",
+    " c+=vec3(0.96,0.97,1.0)*sbox(d,vec3(0.602,0.160,0.782),vec2(0.10,0.30),0.10)*2.9;",
+    " c+=vec3(1.0,0.12,0.16)*pow(max(dot(d,vec3(-0.922,-0.214,0.322)),0.0),20.0)*1.5;",
+    " c+=vec3(0.55,0.06,1.0)*pow(max(dot(d,vec3(0.824,0.021,-0.566)),0.0),24.0)*1.2;",
     " return c; }"];
 
     /* ---- pass 1: poeira de diamante (substitui a nuvem de 17 mil quads do prototipo) ---- */
@@ -1234,27 +1244,33 @@
     " gl_FragColor=vec4(acc,al*0.6); }"]).join("\n");
 
     /* ---- pass 2: a gema ---- */
-    function CLIP(n,d){ return [
+    function CLIP(n,d){ return CLIPR(n,d,"0.0"); }
+    /* variante que carrega uma rugosidade propria (rn/rf) — usada pelas faces do octaedro em bruto,
+       que devem ler como pedra fosca natural, nao como faceta polida */
+    function CLIPR(n,d,rv){ return [
       "  { vec3 pn="+n+"; float pd="+d+";",
       "    float den=dot(rd,pn), dist=pd-dot(ro,pn);",
       "    if(abs(den)<1e-5){ if(dist<0.0) return false; }",
       "    else { float tp=dist/den;",
-      "      if(den>0.0){ if(tp<tf){ tf=tp; nf=pn; rf=0.0; } }",
-      "      else { if(tp>tn){ tn=tp; nn=pn; rn=0.0; } } } }"].join("\n"); }
+      "      if(den>0.0){ if(tp<tf){ tf=tp; nf=pn; rf="+rv+"; } }",
+      "      else { if(tp>tn){ tn=tp; nn=pn; rn="+rv+"; } } } }"].join("\n"); }
 
     var FS_GEM=PREC.concat(COMMON,ENV,[
     "uniform vec2 uCenter;",
-    "uniform float uTime,uCut,uExp,uSize,uCamZ,uAlpha,uFire;",
+    "uniform float uTime,uCut,uExp,uSize,uCamZ,uAlpha,uFire,uSpark;",
     "uniform mat3 uRot;",
-    /* superficie acucarada da pedra bruta */
+    /* micro-superficie da pedra bruta: 3 oitavas (relevo grosso + medio + granulado fino tipo trigons/etch),
+       da o aspecto acetinado natural de face de cristal bruto no lugar de uma face lisa de CG */
     "vec3 bumpN(vec3 p,vec3 n,float k){",
-    " float b1=sin(p.x*17.0)*sin(p.y*15.3)*sin(p.z*19.7);",
+    " float b1=sin(p.x*16.0)*sin(p.y*14.7)*sin(p.z*18.3);",
     " float b2=sin(p.x*33.0+1.7)*sin(p.y*29.0+0.4)*sin(p.z*37.0+2.1);",
-    " return normalize(n+vec3(b1+0.5*b2,b2-0.4*b1,b1*0.7-b2*0.6)*k); }",
+    " float b3=sin(p.x*61.0+0.9)*sin(p.y*57.0+2.3)*sin(p.z*67.0+1.5);",
+    " vec3 g=vec3(b1+0.5*b2+0.30*b3, b2-0.4*b1+0.32*b3, b1*0.7-b2*0.6+0.26*b3);",
+    " return normalize(n+g*k); }",
     /* solido convexo: esfera (bruto) ^ cilindro (cinta) ^ planos das facetas */
     "bool trace(vec3 ro,vec3 rd,out float tn,out float tf,out vec3 nn,out vec3 nf,out float rn,out float rf){",
     " tn=-1e9; tf=1e9; nn=vec3(0.0,1.0,0.0); nf=vec3(0.0,-1.0,0.0); rn=0.0; rf=0.0;",
-    " float R=mix(1.07,1.02,st(0.0,0.80,uCut))+uExp*0.30;",
+    " float R=mix(1.16,1.02,st(0.0,0.80,uCut))+uExp*0.30;",
     " float b=dot(ro,rd), cc=dot(ro,ro)-R*R, dd=b*b-cc;",
     " if(dd<0.0) return false;",
     " float sq=sqrt(dd); tn=-b-sq; tf=-b+sq;",
@@ -1266,7 +1282,24 @@
     "  if(c0>tn){ tn=c0; vec3 p=ro+rd*c0; nn=normalize(vec3(p.x,0.0,p.z)); rn=0.25; }",
     "  if(c1<tf){ tf=c1; vec3 p=ro+rd*c1; nf=normalize(vec3(p.x,0.0,p.z)); rf=0.25; } }",
     " else if(C>0.0) return false;",
-    " float sT=st(0.00,0.20,uCut),sB=st(0.10,0.42,uCut),sS=st(0.34,0.58,uCut),sU=st(0.48,0.70,uCut),sP=st(0.60,0.84,uCut),sL=st(0.78,0.97,uCut),sC=st(0.90,1.00,uCut);",
+    /* pedra bruta: cristal irregular real de diamante — poliedro de 24 faces distribuidas uniformemente
+       (esfera de Fibonacci) com distancia aleatoria por face e leve alongamento vertical, cantos
+       arredondados pela esfera. sRaw=1.0 durante todo o hero e dissolve so quando comeca a lapidacao. */
+    " float sRaw=1.0-st(0.16,0.42,uCut);",
+    " if(sRaw>0.003){ for(int i=0;i<24;i++){",
+    "  float fi=float(i)+0.5;",
+    "  float ph=fi*2.3999632;",
+    "  float zz=1.0-fi*(2.0/24.0);",
+    "  float rr=sqrt(max(0.0,1.0-zz*zz));",
+    "  vec3 pn=vec3(rr*cos(ph),zz,rr*sin(ph));",
+    "  float el=1.0-0.16*pn.y*pn.y;",
+    "  float pd=R*el*(0.60+0.30*h21(vec2(fi,fi*1.7)))/sRaw;",
+    "  float den=dot(rd,pn), dist=pd-dot(ro,pn);",
+    "  if(abs(den)<1e-5){ if(dist<0.0) return false; }",
+    "  else { float tp=dist/den;",
+    "   if(den>0.0){ if(tp<tf){ tf=tp; nf=pn; rf=1.0; } }",
+    "   else { if(tp>tn){ tn=tp; nn=pn; rn=1.0; } } } } }",
+    " float sT=st(0.16,0.34,uCut),sB=st(0.20,0.44,uCut),sS=st(0.36,0.58,uCut),sU=st(0.48,0.70,uCut),sP=st(0.60,0.84,uCut),sL=st(0.78,0.97,uCut),sC=st(0.90,1.00,uCut);",
     CLIP("vec3(0.0,1.0,0.0)","mix(4.0,0.309+uExp*0.34,sT)"),
     CLIP("vec3(0.0,-1.0,0.0)","mix(4.0,0.845+uExp*0.34,sC)"),
     " for(int k=0;k<8;k++){",
@@ -1287,45 +1320,94 @@
     " vec3 ro=uRot*vec3(0.0,0.0,uCamZ);",
     " vec3 rd=uRot*normalize(vec3((uv-uCenter)*uSize,-1.0));",
     " float t0,t1,r0,r1; vec3 n0,n1;",
-    " if(!trace(ro,rd,t0,t1,n0,n1,r0,r1)){ discard; }",
-    " float span=t1-max(t0,0.0);",
-    " if(span<=0.0){ discard; }",
-    " vec3 p=ro+rd*max(t0,0.0);",
-    " vec3 n=normalize(n0); if(dot(n,rd)>0.0) n=-n;",
-    " float rough=r0*(1.0-st(0.40,0.92,uCut));",
-    " if(rough>0.01) n=bumpN(p,n,rough*0.20);",
-    " float dsp=1.0+uFire*2.2;",
-    " float iR=2.417-0.013*dsp, iG=2.417, iB=2.417+0.042*dsp;",
-    " float ct=clamp(dot(-rd,n),0.0,1.0);",
-    " float F=0.172+0.828*pow(1.0-ct,5.0);",
-    " vec3 acc=env(reflect(rd,n))*F;",
-    " vec3 dR=refract(rd,n,1.0/iR), dG=refract(rd,n,1.0/iG), dB=refract(rd,n,1.0/iB);",
-    " float w=1.0-F; vec3 pp=p;",
-    " for(int i=0;i<1;i++){",
-    "  float a0,a1,q0,q1; vec3 m0,m1;",
-    "  vec3 bp=pp+dG*0.0025;",
-    "  if(!trace(bp,dG,a0,a1,m0,m1,q0,q1)) break;",
-    "  if(a1<=0.0) break;",
-    "  pp=bp+dG*a1;",
-    "  vec3 nx=normalize(m1); if(dot(nx,dG)<0.0) nx=-nx;",
-    "  float ci=clamp(dot(dG,nx),0.0,1.0);",
-    "  float sn=iG*sqrt(max(0.0,1.0-ci*ci));",
-    "  float Fi=(sn>=1.0)?1.0:(0.172+0.828*pow(1.0-ci,5.0));",
-    "  float ow=w*(1.0-Fi);",
-    "  vec3 oR=refract(dR,-nx,iR), oG=refract(dG,-nx,iG), oB=refract(dB,-nx,iB);",
-    "  if(dot(oR,oR)>0.0) acc.r+=env(oR).r*ow;",
-    "  if(dot(oG,oG)>0.0) acc.g+=env(oG).g*ow;",
-    "  if(dot(oB,oB)>0.0) acc.b+=env(oB).b*ow;",
-    "  w*=Fi*0.985;",
-    "  dR=reflect(dR,nx); dG=reflect(dG,nx); dB=reflect(dB,nx);",
-    "  if(w<0.004) break; }",
-    " acc+=env(dG)*w*0.62+env(reflect(dG,n))*w*0.18;",
-    " vec3 frost=(env(n)*0.34+env(normalize(n*0.6+vec3(0.35,0.55,-0.20)))*0.24+env(normalize(n*0.6+vec3(-0.40,-0.20,0.50)))*0.18)*vec3(0.90,0.87,0.87)+vec3(0.016,0.013,0.017);",
-    " frost+=vec3(0.9,0.93,1.0)*pow(1.0-ct,3.5)*0.25;",
-    " vec3 gem=mix(acc,frost,rough*0.92);",
-    " gem=vec3(1.0)-exp(-gem*1.28);",
-    " float cov=smoothstep(0.0,0.045,span)*uAlpha;",
-    " gl_FragColor=vec4(gem*cov,cov*mix(0.66,0.88,rough)); }"]).join("\n");
+    " bool hit=trace(ro,rd,t0,t1,n0,n1,r0,r1);",
+    " float span=hit?(t1-max(t0,0.0)):0.0;",
+    " vec3 outCol=vec3(0.0); float outA=0.0;",
+    " if(hit && span>0.0){",
+    "  vec3 p=ro+rd*max(t0,0.0);",
+    "  vec3 n=normalize(n0); if(dot(n,rd)>0.0) n=-n;",
+    /* pedra bruta de diamante de verdade e vitrea/translucida (nao opaca) — so tem a face natural
+       fosca-satinada (nao polida a espelho) e imperfeicoes internas (inclusoes, fraturas) */
+    "  float rawness=1.0-st(0.0,0.55,uCut);",
+    "  float rough=r0*(1.0-st(0.40,0.92,uCut))*mix(1.0,0.22,rawness);",
+    "  if(rough>0.01) n=bumpN(p,n,rough*mix(0.09,0.13,rawness));",
+    "  float dsp=1.0+uFire*2.2;",
+    "  float iR=2.417-0.013*dsp, iG=2.417, iB=2.417+0.042*dsp;",
+    "  float ct=clamp(dot(-rd,n),0.0,1.0);",
+    "  float F=0.172+0.828*pow(1.0-ct,5.0);",
+    "  vec3 acc=env(reflect(rd,n))*F;",
+    "  vec3 dR=refract(rd,n,1.0/iR), dG=refract(rd,n,1.0/iG), dB=refract(rd,n,1.0/iB);",
+    "  float w=1.0-F; vec3 pp=p;",
+    "  for(int i=0;i<3;i++){",
+    "   float a0,a1,q0,q1; vec3 m0,m1;",
+    "   vec3 bp=pp+dG*0.0025;",
+    "   if(!trace(bp,dG,a0,a1,m0,m1,q0,q1)) break;",
+    "   if(a1<=0.0) break;",
+    "   pp=bp+dG*a1;",
+    "   vec3 nx=normalize(m1); if(dot(nx,dG)<0.0) nx=-nx;",
+    "   float ci=clamp(dot(dG,nx),0.0,1.0);",
+    "   float sn=iG*sqrt(max(0.0,1.0-ci*ci));",
+    "   float Fi=(sn>=1.0)?1.0:(0.172+0.828*pow(1.0-ci,5.0));",
+    "   float ow=w*(1.0-Fi);",
+    "   vec3 oR=refract(dR,-nx,iR), oG=refract(dG,-nx,iG), oB=refract(dB,-nx,iB);",
+    "   if(dot(oR,oR)>0.0) acc.r+=env(oR).r*ow;",
+    "   if(dot(oG,oG)>0.0) acc.g+=env(oG).g*ow;",
+    "   if(dot(oB,oB)>0.0) acc.b+=env(oB).b*ow;",
+    "   w*=Fi*0.985;",
+    "   dR=reflect(dR,nx); dG=reflect(dG,nx); dB=reflect(dB,nx);",
+    "   if(w<0.004) break; }",
+    "  acc+=env(dG)*w*0.62+env(reflect(dG,n))*w*0.18;",
+    "  vec3 frost=(env(n)*0.34+env(normalize(n*0.6+vec3(0.35,0.55,-0.20)))*0.24+env(normalize(n*0.6+vec3(-0.40,-0.20,0.50)))*0.18)*vec3(0.90,0.87,0.87)+vec3(0.016,0.013,0.017);",
+    "  frost+=vec3(0.9,0.93,1.0)*pow(1.0-ct,3.5)*0.25;",
+    "  vec3 gem=mix(acc,frost,rough*0.92);",
+    /* a pedra bruta reflete o estudio como vidro fosco neutro (branco/cinza) — as luzes violeta/vermelha
+       de acento so devem colorir a pedra depois que ela vira um brilhante facetado de verdade */
+    "  float neutral=1.0-st(0.28,0.82,uCut);",
+    "  float gemL=dot(gem,vec3(0.299,0.587,0.114));",
+    "  gem=mix(gem,mix(gem,vec3(gemL),0.86)*vec3(1.02,1.01,1.0)+vec3(0.012),neutral*0.82);",
+    "  gem=vec3(1.0)-exp(-gem*mix(1.28,1.95,rawness));",
+    "  gem*=mix(vec3(0.975,0.99,1.035),vec3(1.0),rawness);",
+    /* inclusoes minerais escuras dentro da pedra (fisionomia real de diamante em bruto) — desaparecem
+       conforme a peca e lapidada, como se as imperfeicoes fossem removidas pelo metodo */
+    "  vec3 pin=mix(p,pp,0.5);",
+    "  vec3 incA=vec3(0.24,-0.13,0.33), incB=vec3(-0.22,0.26,-0.20), incC=vec3(0.06,-0.33,-0.11);",
+    "  float dIncA=length(pin-incA), dIncB=length(pin-incB), dIncC=length(pin-incC);",
+    "  float inc=(exp(-dIncA*dIncA*10.0)*0.85+exp(-dIncB*dIncB*13.0)*0.55+exp(-dIncC*dIncC*16.0)*0.45)*rawness;",
+    "  gem=mix(gem,gem*vec3(0.20,0.19,0.23),clamp(inc,0.0,0.62));",
+    /* veus/fraturas (feathers): lencois internos que reluzem esbranquicados em certos angulos — some ao lapidar */
+    "  float vf1=sin(dot(pin,vec3(3.3,1.6,2.4))+0.4)*sin(dot(pin,vec3(-1.4,2.9,1.2)));",
+    "  float vf2=sin(dot(pin,vec3(2.1,-2.6,1.9))-1.1);",
+    "  float feather=(smoothstep(0.86,1.0,abs(vf1))*0.7+smoothstep(0.90,1.0,abs(vf2))*0.5)*rawness;",
+    "  gem+=vec3(0.82,0.86,0.96)*feather*(0.10+0.30*pow(1.0-ct,2.0));",
+    "  float cov=smoothstep(0.0,0.045,span)*uAlpha;",
+    "  float rawA=mix(0.66,0.88,rough)*mix(1.0,1.08,rawness*rough);",
+    "  outCol=gem*cov; outA=clamp(cov*rawA,0.0,1.0);",
+    " }",
+    /* faiscas de lapidacao: particulas quentes disparando do ponto de corte ativo, com arco de gravidade
+       — a intensidade (uSpark) e conduzida pelo scroll em JS conforme cada grupo de facetas e talhado */
+    " if(uSpark>0.015){",
+    "  vec2 sp=(uv-uCenter)*uSize;",
+    "  vec3 sAcc=vec3(0.0); float sA=0.0;",
+    "  for(int i=0;i<16;i++){",
+    "   float fi=float(i);",
+    "   vec2 sd=vec2(fi*13.17+3.1,fi*7.31+1.7);",
+    "   float life=0.40+0.30*h21(sd);",
+    "   float lt=fract(uTime/life+h21(sd+11.0));",
+    "   float ang=h21(sd+21.0)*6.2832;",
+    "   float speed=(0.9+1.1*h21(sd+31.0))*uSpark;",
+    "   vec2 dir=vec2(cos(ang),sin(ang)*0.5+0.5);",
+    "   vec2 pos=dir*speed*lt; pos.y-=1.4*lt*lt;",
+    "   float d=length(sp-pos);",
+    "   float sizeK=mix(0.026,0.005,lt);",
+    "   float glow=exp(-d*d/(sizeK*sizeK))*(1.0-lt)*(1.0-lt);",
+    "   vec3 col=mix(vec3(1.0,0.93,0.78),vec3(1.0,0.32,0.06),lt*lt);",
+    "   sAcc+=col*glow; sA+=glow;",
+    "  }",
+    "  sAcc*=uSpark*1.3; sA=clamp(sA*uSpark*1.3,0.0,1.0);",
+    "  outCol+=sAcc*(1.0-outA); outA+=sA*(1.0-outA);",
+    " }",
+    " if(outA<0.003){ discard; }",
+    " gl_FragColor=vec4(outCol,outA); }"]).join("\n");
 
     function sh(t,s){ var o=g.createShader(t); g.shaderSource(o,s); g.compileShader(o);
       if(!g.getShaderParameter(o,g.COMPILE_STATUS)){ try{ console.warn("gema shader:",g.getShaderInfoLog(o)); }catch(_){} return null; } return o; }
@@ -1339,13 +1421,47 @@
       for(var i=0;i<names.length;i++) o.U[names[i]]=g.getUniformLocation(pr,names[i]);
       return o;
     }
+    /* ---- mapa de ambiente de estudio (bitmap equirretangular embutido, gerado em runtime = 0KB no arquivo):
+       fundo de estudio + softboxes borrados + toques de cor. Vira a base dos reflexos do diamante. ---- */
+    function makeEnvCanvas(){
+      var s=document.createElement("canvas"); s.width=1024; s.height=512; var x=s.getContext("2d");
+      var bg=x.createLinearGradient(0,0,0,512);
+      bg.addColorStop(0.00,"#0b0b14"); bg.addColorStop(0.40,"#171724"); bg.addColorStop(0.54,"#12101b"); bg.addColorStop(1.00,"#050408");
+      x.fillStyle=bg; x.fillRect(0,0,1024,512);
+      function panel(cx,cy,w,h,col,blur){ x.save(); if(x.filter!==undefined) x.filter="blur("+blur+"px)"; x.fillStyle=col; x.fillRect(cx-w/2,cy-h/2,w,h); x.restore(); }
+      /* softboxes brancos (as janelas de luz do estudio) */
+      panel(300,150,300,110,"rgba(255,253,248,0.95)",20);
+      panel(730,120,380,66,"rgba(236,242,255,0.85)",18);
+      panel(560,300,130,300,"rgba(240,244,255,0.72)",22);
+      panel(120,340,170,140,"rgba(255,250,245,0.5)",26);
+      panel(880,380,150,150,"rgba(250,250,255,0.45)",26);
+      /* toques de cor da identidade TOLEDOX (bem sutis) via screen */
+      x.save(); x.globalCompositeOperation="screen"; if(x.filter!==undefined) x.filter="blur(34px)";
+      x.fillStyle="rgba(255,32,42,0.55)"; x.fillRect(0,360,220,152);
+      x.fillStyle="rgba(150,20,255,0.5)"; x.fillRect(870,250,190,200);
+      x.restore();
+      return s;
+    }
+    var envTex=null;
+    function uploadEnv(){
+      if(!envTex) envTex=g.createTexture();
+      g.bindTexture(g.TEXTURE_2D,envTex);
+      g.pixelStorei(g.UNPACK_FLIP_Y_WEBGL,false);
+      try{ g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,makeEnvCanvas()); }catch(e){ return; }
+      g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.REPEAT);
+      g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
+      g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR_MIPMAP_LINEAR);
+      g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);
+      g.generateMipmap(g.TEXTURE_2D);
+    }
     var Pd=null,Pg=null,glok=false;
     function build(){
       quad=g.createBuffer(); g.bindBuffer(g.ARRAY_BUFFER,quad);
       g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);
       Pd=mk(FS_DUST,["uRes","uDrift","uTime","uDust"]);
-      Pg=mk(FS_GEM,["uRes","uCenter","uTime","uCut","uExp","uSize","uCamZ","uAlpha","uFire","uRot"]);
+      Pg=mk(FS_GEM,["uRes","uCenter","uTime","uCut","uExp","uSize","uCamZ","uAlpha","uFire","uRot","uSpark","uEnv"]);
       if(!Pd||!Pg) return false;
+      envTex=null; uploadEnv();
       g.disable(g.DEPTH_TEST); g.clearColor(0,0,0,0);
       return true;
     }
@@ -1357,10 +1473,10 @@
     if(bc) bc.style.display=bx?"block":"none";
 
     /* escala de render adaptativa: mede o frame e ajusta a resolucao (GPU integrada / celular) */
-    var gdpr=Math.min(window.devicePixelRatio||1,2), MAXS=isTouch?0.75:1.0, MINS=isTouch?0.5:0.6, gscale=isTouch?0.62:0.85;
+    var gdpr=Math.min(window.devicePixelRatio||1,2), MAXS=isTouch?0.8:1.5, MINS=isTouch?0.5:0.7, gscale=isTouch?0.62:1.3;
     function gres(){
       var w=Math.max(1,Math.floor(c.clientWidth*gdpr*gscale)), h=Math.max(1,Math.floor(c.clientHeight*gdpr*gscale));
-      var cap=isTouch?1300000:2400000, px=w*h;
+      var cap=isTouch?1300000:3800000, px=w*h;
       if(px>cap){ var f=Math.sqrt(cap/px); w=Math.max(1,Math.floor(w*f)); h=Math.max(1,Math.floor(h*f)); }
       c.width=w; c.height=h;
       if(bx){ bc.width=Math.max(1,Math.round(w*0.42)); bc.height=Math.max(1,Math.round(h*0.42)); }
@@ -1382,24 +1498,38 @@
     }
     /* [t, corte, explosao, centro x, centro y, tamanho(maior = gema menor), camera z, opacidade, poeira, fogo] */
     var KF=[
-      [0.00, 0.05,0.00, 0.30,-0.02, 1.20,3.50,0.60,0.75,0.30],
-      [0.50, 0.08,0.00, 0.30,-0.02, 1.20,3.50,0.60,0.75,0.30],
-      [1.00, 0.18,0.00, 0.16, 0.04, 1.40,3.50,0.70,0.80,0.30],
-      [1.55, 0.30,0.00,-0.42,-0.06, 1.75,3.45,0.70,0.62,0.30],
-      [2.50, 0.44,0.00, 0.46, 0.22, 2.10,3.45,0.55,0.50,0.30],
-      [3.50, 0.54,0.00,-0.50,-0.26, 2.35,3.45,0.42,0.45,0.30],
-      [4.50, 0.66,0.00, 0.48, 0.20, 2.15,3.45,0.50,0.50,0.35],
-      [5.50, 0.78,0.00, 0.00, 0.00, 1.95,3.45,0.60,0.70,0.40],
-      [6.06, 0.88,0.00, 0.00, 0.02, 1.42,3.40,1.00,1.00,0.45],
-      [6.32, 1.00,0.00, 0.00, 0.00, 1.02,3.30,1.00,1.10,0.55],
+      [0.00, 0.05,0.00, 0.30,-0.02, 0.98,3.50,0.60,0.75,0.06],
+      [0.50, 0.08,0.00, 0.30,-0.02, 0.98,3.50,0.60,0.75,0.08],
+      [1.00, 0.18,0.00, 0.16, 0.04, 1.20,3.50,0.70,0.80,0.14],
+      [1.55, 0.30,0.00,-0.42,-0.06, 1.75,3.45,0.70,0.62,0.26],
+      [2.50, 0.44,0.00, 0.46, 0.22, 2.10,3.45,0.55,0.50,0.36],
+      [3.50, 0.54,0.00,-0.50,-0.26, 2.35,3.45,0.42,0.45,0.44],
+      [4.50, 0.66,0.00, 0.48, 0.20, 2.15,3.45,0.50,0.50,0.52],
+      [5.50, 0.78,0.00, 0.00, 0.00, 1.95,3.45,0.60,0.70,0.62],
+      [6.06, 0.88,0.00, 0.00, 0.02, 1.42,3.40,1.00,1.00,0.74],
+      [6.32, 1.00,0.00, 0.00, 0.00, 1.02,3.30,1.00,1.10,0.88],
       [6.52, 1.00,0.00, 0.00, 0.00, 0.66,1.90,1.00,0.80,1.00],
-      [6.70, 1.00,0.60, 0.00, 0.00, 1.15,2.70,1.00,1.70,0.85],
-      [6.92, 1.00,0.00, 0.00, 0.00, 1.00,3.25,1.00,1.05,0.60],
-      [7.60, 1.00,0.00,-0.02,-0.34, 2.60,3.45,0.42,0.50,0.40],
+      [6.70, 1.00,0.60, 0.00, 0.00, 1.15,2.70,1.00,1.70,0.92],
+      [6.92, 1.00,0.00, 0.00, 0.00, 1.00,3.25,1.00,1.05,0.80],
+      [7.60, 1.00,0.00,-0.02,-0.34, 2.60,3.45,0.42,0.50,0.42],
       [8.40, 1.00,0.00, 0.42, 0.40, 2.20,3.45,0.70,0.80,0.55],
       [9.60, 1.00,0.00, 0.02, 0.10, 2.05,3.45,0.48,0.60,0.45],
       [11.0, 1.00,0.00, 0.02, 0.10, 2.05,3.45,0.48,0.60,0.45]
     ];
+    /* atividade de corte (0..1): pico quando um grupo de facetas esta sendo talhado agora — dirige as faiscas */
+    function bump01(t){ t=t<0?0:(t>1?1:t); return 4.0*t*(1.0-t); }
+    function sstep(a,b,x){ var t=(x-a)/(b-a); t=t<0?0:(t>1?1:t); return t*t*(3-2*t); }
+    function sparkActivity(cut){
+      var s=0;
+      s=Math.max(s,bump01(sstep(0.00,0.20,cut)));
+      s=Math.max(s,bump01(sstep(0.10,0.42,cut))*0.90);
+      s=Math.max(s,bump01(sstep(0.34,0.58,cut))*0.90);
+      s=Math.max(s,bump01(sstep(0.48,0.70,cut))*0.90);
+      s=Math.max(s,bump01(sstep(0.60,0.84,cut))*0.90);
+      s=Math.max(s,bump01(sstep(0.78,0.97,cut))*0.85);
+      s=Math.max(s,bump01(sstep(0.90,1.00,cut))*0.70);
+      return s;
+    }
     var S=[0,0,0,0,0,0,0,0,0];
     function sample(t){
       var i=0; while(i<KF.length-2 && t>KF[i+1][0]) i++;
@@ -1421,6 +1551,7 @@
       if(tCur===null||reduce) tCur=tg; else tCur+=(tg-tCur)*(1-Math.pow(0.90,fdt/16.7));
       sample(tCur);
       var cut=S[0],ex=S[1],cx=S[2],cy=S[3],size=S[4],camz=S[5],alpha=S[6],dust=S[7],fire=S[8];
+      var spark=sparkActivity(cut);
       window.__txGem.cut=cut; window.__txGem.t=tCur;
       var chap=Math.min(Math.max(tCur-6.0,0),1);
       var ry=tCur*1.05+chap*4.60+mx*0.28+(reduce?0:Math.sin(tt*0.10)*0.02);
@@ -1439,8 +1570,8 @@
         g.drawArrays(g.TRIANGLES,0,3);
       }
       if(alpha>0.004){
-        /* bounding box da gema em pixels: so esses fragmentos pagam o ray-trace */
-        var Rb=1.30+ex*0.9, qm=Rb/Math.sqrt(Math.max(camz*camz-Rb*Rb,0.04));
+        /* bounding box da gema em pixels: so esses fragmentos pagam o ray-trace (com folga extra p/ as faiscas) */
+        var Rb=1.30+ex*0.9+spark*0.40, qm=Rb/Math.sqrt(Math.max(camz*camz-Rb*Rb,0.04));
         var half=(qm/size)*H*1.06;
         var px=0.5*W+cx*H, py=0.5*H+cy*H;
         var x0=Math.max(0,Math.floor(px-half)), y0=Math.max(0,Math.floor(py-half));
@@ -1449,12 +1580,14 @@
           g.viewport(x0,y0,x1-x0,y1-y0);
           g.enable(g.BLEND); g.blendFunc(g.ONE,g.ONE_MINUS_SRC_ALPHA);
           bindQuad(Pg);
+          if(envTex){ g.activeTexture(g.TEXTURE0); g.bindTexture(g.TEXTURE_2D,envTex); g.uniform1i(Pg.U.uEnv,0); }
           g.uniform2f(Pg.U.uRes,W,H);
           g.uniform2f(Pg.U.uCenter,cx,cy);
           g.uniform1f(Pg.U.uTime,tt);
           g.uniform1f(Pg.U.uCut,cut); g.uniform1f(Pg.U.uExp,ex);
           g.uniform1f(Pg.U.uSize,size); g.uniform1f(Pg.U.uCamZ,camz);
           g.uniform1f(Pg.U.uAlpha,alpha); g.uniform1f(Pg.U.uFire,fire);
+          g.uniform1f(Pg.U.uSpark,spark);
           g.uniformMatrix3fv(Pg.U.uRot,false,M);
           g.drawArrays(g.TRIANGLES,0,3);
           g.disable(g.BLEND);
@@ -1530,9 +1663,9 @@
     var fEl=document.getElementById("gemaFacets");
     /* mesmas etapas do shader: mesa 1 + bizel 8 + estrelas 8 + cinta alta 16 + pavilhao 8 + cinta baixa 16 = 57 */
     function facets(cut){
-      var f=1*Math.min(1,Math.max(0,(cut-0.00)/0.20))
-           +8*Math.min(1,Math.max(0,(cut-0.10)/0.32))
-           +8*Math.min(1,Math.max(0,(cut-0.34)/0.24))
+      var f=1*Math.min(1,Math.max(0,(cut-0.16)/0.18))
+           +8*Math.min(1,Math.max(0,(cut-0.20)/0.24))
+           +8*Math.min(1,Math.max(0,(cut-0.36)/0.22))
            +16*Math.min(1,Math.max(0,(cut-0.48)/0.22))
            +8*Math.min(1,Math.max(0,(cut-0.60)/0.24))
            +16*Math.min(1,Math.max(0,(cut-0.78)/0.19));
