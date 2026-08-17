@@ -269,29 +269,25 @@
   .who-text p:first-child{margin-top:0}
   .who-quote{margin-top:24px!important;padding-left:18px;border-left:2px solid var(--red);font-style:italic;color:var(--ink)!important;font-size:1.05rem!important}
 
-  /* seção pinada: rola 1x, a viewport prende e a timeline "acende" foto a foto */
-  .who-pin{position:relative;height:260vh;margin-top:clamp(40px,7vh,72px)}
-  .who-pin-stick{position:sticky;top:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(22px,4vh,34px)}
-  .who-pin-year{font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;font-size:clamp(1.6rem,5vw,2.6rem);color:var(--ink);text-shadow:0 0 30px rgba(255,35,51,.35)}
-  .who-pin-year em{font-style:normal;color:var(--red-soft)}
-  .who-timeline{display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,18px)}
-  .who-arrow{width:22px;height:22px;color:var(--ink-faint);flex:none}
-  .who-photo{position:relative;width:clamp(92px,24vw,190px);aspect-ratio:3/4;border-radius:16px;overflow:hidden;border:1px solid var(--line-strong);flex:none;
-    transform:scale(var(--foc,.86));opacity:calc(.4 + var(--foc,.86)*.6);filter:saturate(calc(.55 + var(--foc,.86)*.45))}
-  .who-ph{position:absolute;inset:0;background:radial-gradient(70% 55% at 50% 25%,#3a3338,#241d22 60%,#161116)}
-  .who-mid .who-ph{background:radial-gradient(70% 55% at 50% 25%,#5a2a2e,#3a1216 60%,#1c0a0c)}
+  /* timeline vertical: fotos grandes empilhadas; a que está no centro da tela ganha destaque ao rolar */
+  .who-pin{position:relative;margin-top:clamp(40px,7vh,72px)}
+  .who-pin-stick{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,3.5vh,32px)}
+  .who-pin-year,.who-pin-track{display:none}
+  .who-timeline{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(20px,4vh,44px)}
+  .who-arrow{width:30px;height:30px;color:var(--ink-faint);flex:none;transform:rotate(90deg)}
+  .who-photo{position:relative;width:clamp(260px,80vw,460px);aspect-ratio:3/4;border-radius:22px;overflow:hidden;border:1px solid var(--line-strong);flex:none;
+    transform:scale(calc(.93 + var(--foc,.5)*.12));opacity:calc(.55 + var(--foc,.5)*.45);filter:saturate(calc(.62 + var(--foc,.5)*.38));
+    transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .5s,filter .5s}
+  /* placeholder "blur-up": foto borrada até a foto real (.who-img) entrar por cima */
+  .who-ph{position:absolute;inset:0;background-color:#161116;background-size:cover;background-position:50% 26%}
   .who-final{border-color:rgba(255,35,51,.5)}
-  .who-final .who-ph{background:radial-gradient(70% 55% at 50% 20%,#ffd9cf,#ff3344 45%,#7a0c14 90%)}
-  .who-final{box-shadow:0 0 calc(var(--foc,.86)*46px) calc(var(--foc,.86)*-8px) rgba(255,35,51,.7)}
+  .who-final{box-shadow:0 0 calc(var(--foc,.5)*60px) calc(var(--foc,.5)*-10px) rgba(255,35,51,.7)}
   .who-img{position:absolute;inset:0;background-repeat:no-repeat;background-position:50% 22%;background-size:cover}
-  .who-yr{position:absolute;left:0;right:0;bottom:0;padding:6px 0;text-align:center;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:linear-gradient(0deg,rgba(0,0,0,.75),transparent)}
-  .who-pin-track{width:min(220px,60vw);height:3px;background:var(--line-strong);border-radius:3px;overflow:hidden}
-  .who-pin-fill{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--crimson),var(--red))}
-  @media(max-width:600px){.who-pin{height:210vh}}
+  /* desfoque de profundidade: nítida quando em foco (--foc→1), desfocada quando sai do centro (--foc→0) */
+  .who-ph,.who-img{transform:scale(1.06);filter:blur(calc((1.0 - var(--foc,.5))*14px));transition:filter .45s cubic-bezier(.2,.8,.2,1)}
+  .who-yr{position:absolute;left:0;right:0;bottom:0;padding:12px 0;text-align:center;font-family:var(--font-mono);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:linear-gradient(0deg,rgba(0,0,0,.8),transparent)}
   @media(prefers-reduced-motion:reduce){
-    .who-pin{height:auto}
-    .who-pin-stick{position:static;min-height:0}
-    .who-photo{--foc:1!important}
+    .who-photo{--foc:1!important;transition:none}
   }
 
   /* ---------- capa do ebook (reveal pinado) ---------- */
@@ -525,9 +521,9 @@
   .phone::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;
     background:linear-gradient(180deg,rgba(176,13,28,0) 40%,rgba(120,8,16,.55));opacity:var(--fog,0);transition:opacity .5s}
   /* vídeo vivo no card ativo (deixe cair um <video class="vfeed"> dentro de .phone) */
-  .vfeed{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .5s}
-  .vcard.has-video.is-active .vfeed{opacity:1}   /* só revela quando o vídeo realmente toca (senão fica o gradiente) */
-  .cover{position:absolute;inset:0;background-size:220% 220%;animation:vsheen 9s ease-in-out infinite}
+  .vfeed{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .5s,filter .55s cubic-bezier(.2,.8,.2,1),transform .55s cubic-bezier(.2,.8,.2,1)}
+  .vcard.has-video .vfeed{opacity:1}   /* mostra o frame do vídeo (nítido no ativo, borrado como capa nos laterais) */
+  .cover{position:absolute;inset:0;background-size:220% 220%;animation:vsheen 9s ease-in-out infinite;transition:filter .55s cubic-bezier(.2,.8,.2,1),transform .55s cubic-bezier(.2,.8,.2,1)}
   .cover::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 55% at 50% 20%,rgba(255,255,255,.14),transparent 60%),linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55));mix-blend-mode:screen}
   @keyframes vsheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
   .c-v1{background-image:linear-gradient(150deg,#ff8f6b,#ff3344 55%,#7a0c14)}
@@ -545,7 +541,9 @@
   .vcard.is-active .vprog{animation:vplay 6s linear infinite}
   .vcard.has-video .vprog{animation:none}   /* com vídeo real, a barra segue o tempo do vídeo (JS), não a animação fake */
   @keyframes vplay{0%{width:0}100%{width:100%}}
-  .vcard:not(.is-active) .cover{animation-play-state:paused;filter:saturate(.7) brightness(.6)}
+  /* desfoque de profundidade: só o card em foco (.is-active) fica nítido; os demais desfocam */
+  .vcard:not(.is-active) .cover{animation-play-state:paused;filter:saturate(.7) brightness(.6) blur(8px);transform:scale(1.05)}
+  .vcard:not(.is-active) .vfeed{filter:blur(8px) brightness(.7);transform:scale(1.05)}
   .vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:var(--glass);border:1px solid var(--line-strong);color:var(--ink);cursor:pointer;backdrop-filter:blur(10px);transition:transform .25s,border-color .25s,color .25s;-webkit-appearance:none;appearance:none}
   .vnav svg{width:22px;height:22px}
   .vnav:hover{border-color:var(--red);color:var(--red-soft)}
@@ -736,21 +734,21 @@
         <div class="who-pin-year" id="whoPinYear" aria-hidden="true">2023</div>
         <div class="who-timeline">
           <div class="who-photo" id="whoPh0">
-            <div class="who-ph"></div><div class="who-img" style="background-image:url('assets/toledox-2023.jpg')"></div><span class="who-yr">2023</span>
+            <div class="who-ph" style="background-image:url('assets/possibilidade-1.png')"></div><div class="who-img" style="background-image:url('assets/toledox-2023.jpg')"></div><span class="who-yr">2023</span>
           </div>
           <svg class="who-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <div class="who-photo who-mid" id="whoPh1">
-            <div class="who-ph"></div><div class="who-img" style="background-image:url('assets/toledox-2024.jpg')"></div><span class="who-yr">2024</span>
+            <div class="who-ph" style="background-image:url('assets/possibilidade-3.png')"></div><div class="who-img" style="background-image:url('assets/toledox-2024.jpg')"></div><span class="who-yr">2024</span>
           </div>
           <svg class="who-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <div class="who-photo who-final" id="whoPh2">
-            <div class="who-ph"></div><div class="who-img" style="background-image:url('assets/toledox-2025.jpg')"></div><span class="who-yr">2025 · Prime</span>
+            <div class="who-ph" style="background-image:url('assets/possibilidade-5.png')"></div><div class="who-img" style="background-image:url('assets/toledox-2025.jpg')"></div><span class="who-yr">2025 · Prime</span>
           </div>
         </div>
         <div class="who-pin-track" aria-hidden="true"><i class="who-pin-fill" id="whoPinFill"></i></div>
       </div>
     </div>
-    <p class="ba-note">Fotos reais da jornada entram aqui — hoje é só o layout.</p>
+    <p class="ba-note">Prévia borrada no lugar — solte as fotos reais em <b style="color:var(--ink)">assets/toledox-2023.jpg</b>, <b style="color:var(--ink)">2024</b> e <b style="color:var(--ink)">2025</b> que elas entram nítidas por cima.</p>
   </section>
 
   <!-- PAREDE VIVA — COLETÂNEA DE VÍDEOS -->
@@ -1267,6 +1265,8 @@
     " float b3=sin(p.x*61.0+0.9)*sin(p.y*57.0+2.3)*sin(p.z*67.0+1.5);",
     " vec3 g=vec3(b1+0.5*b2+0.30*b3, b2-0.4*b1+0.32*b3, b1*0.7-b2*0.6+0.26*b3);",
     " return normalize(n+g*k); }",
+    /* distancia de um ponto ao segmento a-b (para desenhar o RASTRO da faisca como um risco, nao um ponto) */
+    "float segd(vec2 p,vec2 a,vec2 b){ vec2 pa=p-a,ba=b-a; float h=clamp(dot(pa,ba)/max(dot(ba,ba),1e-6),0.0,1.0); return length(pa-ba*h); }",
     /* solido convexo: esfera (bruto) ^ cilindro (cinta) ^ planos das facetas */
     "bool trace(vec3 ro,vec3 rd,out float tn,out float tf,out vec3 nn,out vec3 nf,out float rn,out float rf){",
     " tn=-1e9; tf=1e9; nn=vec3(0.0,1.0,0.0); nf=vec3(0.0,-1.0,0.0); rn=0.0; rf=0.0;",
@@ -1379,31 +1379,72 @@
     "  float vf2=sin(dot(pin,vec3(2.1,-2.6,1.9))-1.1);",
     "  float feather=(smoothstep(0.86,1.0,abs(vf1))*0.7+smoothstep(0.90,1.0,abs(vf2))*0.5)*rawness;",
     "  gem+=vec3(0.82,0.86,0.96)*feather*(0.10+0.30*pow(1.0-ct,2.0));",
+    /* CONTATO INCANDESCENTE do rebolo (scaife): uma banda de calor por atrito varre a pedra da coroa
+       (topo) ate a culatra (base) conforme uCut avanca; 3 pontos quentes correm ao redor da cinta,
+       como a pedra girando contra o disco de lapidacao. Emissivo -> estoura no bloom. */
+    "  if(uSpark>0.012){",
+    "   float sweepY=mix(0.46,-0.82,st(0.14,1.0,uCut));",
+    "   float band=exp(-pow((p.y-sweepY)*5.8,2.0));",
+    "   float az=atan(p.z,p.x);",
+    "   float hot=pow(0.5+0.5*cos(az*3.0-uTime*9.0),6.0);",
+    "   float flick=0.72+0.28*sin(uTime*52.0+p.y*38.0);",
+    "   float heat=band*uSpark*flick*(0.5+2.4*hot);",
+    "   vec3 hcol=mix(vec3(1.0,0.42,0.09),vec3(1.0,0.97,0.90),clamp(hot*1.1,0.0,1.0));",
+    "   gem+=hcol*heat*0.9;",
+    "  }",
     "  float cov=smoothstep(0.0,0.045,span)*uAlpha;",
     "  float rawA=mix(0.66,0.88,rough)*mix(1.0,1.08,rawness*rough);",
     "  outCol=gem*cov; outA=clamp(cov*rawA,0.0,1.0);",
     " }",
     /* faiscas de lapidacao: particulas quentes disparando do ponto de corte ativo, com arco de gravidade
        — a intensidade (uSpark) e conduzida pelo scroll em JS conforme cada grupo de facetas e talhado */
-    " if(uSpark>0.015){",
+    " if(uSpark>0.012){",
     "  vec2 sp=(uv-uCenter)*uSize;",
+    /* raio da silhueta da gema no plano de tela: o contato do rebolo fica NA BORDA, nao no centro */
+    "  float Rr=mix(1.16,1.02,st(0.0,0.80,uCut))+uExp*0.30;",
+    "  float rimR=Rr/sqrt(max(uCamZ*uCamZ-Rr*Rr,0.04));",
     "  vec3 sAcc=vec3(0.0); float sA=0.0;",
-    "  for(int i=0;i<16;i++){",
-    "   float fi=float(i);",
-    "   vec2 sd=vec2(fi*13.17+3.1,fi*7.31+1.7);",
-    "   float life=0.40+0.30*h21(sd);",
+    /* ponto de contato do rebolo raspando a cinta da pedra — gira ao redor da silhueta */
+    "  float cAng=uTime*2.6;",
+    "  vec2 cDir=vec2(cos(cAng),sin(cAng));",
+    /* achata o contato verticalmente (0.62): o brilhante e mais largo que alto, entao o ponto de contato
+       fica sobre a linha da CINTA em vez de flutuar acima da pedra */
+    "  vec2 cPos=vec2(cDir.x,cDir.y*0.62)*rimR;",
+    "  vec2 tang=vec2(-cDir.y,cDir.x);",
+    /* clarao incandescente do contato (o ponto onde o disco toca a pedra, branco-alaranjado) */
+    "  vec2 cf=sp-cPos; float cflare=exp(-dot(cf,cf)/(rimR*rimR*0.022));",
+    "  sAcc+=vec3(1.0,0.88,0.66)*cflare*1.15; sA=max(sA,cflare);",
+    /* LEQUE de faiscas de atrito jorrando do contato: risco com rastro (segmento), arco de gravidade e
+       temperatura de cor caindo de branco-quente -> laranja -> vermelho-brasa conforme a particula esfria */
+    "  for(int i=0;i<20;i++){",
+    "   vec2 sd=vec2(float(i)*12.99+1.3,float(i)*7.53+4.1);",
+    "   float life=0.28+0.30*h21(sd+5.0);",
     "   float lt=fract(uTime/life+h21(sd+11.0));",
-    "   float ang=h21(sd+21.0)*6.2832;",
-    "   float speed=(0.9+1.1*h21(sd+31.0))*uSpark;",
-    "   vec2 dir=vec2(cos(ang),sin(ang)*0.5+0.5);",
-    "   vec2 pos=dir*speed*lt; pos.y-=1.4*lt*lt;",
-    "   float d=length(sp-pos);",
-    "   float sizeK=mix(0.026,0.005,lt);",
-    "   float glow=exp(-d*d/(sizeK*sizeK))*(1.0-lt)*(1.0-lt);",
-    "   vec3 col=mix(vec3(1.0,0.93,0.78),vec3(1.0,0.32,0.06),lt*lt);",
-    "   sAcc+=col*glow; sA+=glow;",
+    "   float aa=cAng+(h21(sd+2.0)-0.5)*0.8;",
+    "   vec2 base=vec2(cos(aa),sin(aa)*0.62)*rimR;",
+    "   vec2 dir=normalize(tang+cDir*0.55+vec2((h21(sd+3.0)-0.5)*1.7,(h21(sd+6.0)-0.5)*1.7));",
+    "   float reach=rimR*(0.5+1.6*h21(sd+31.0));",
+    "   float lt2=max(lt-0.10,0.0);",
+    "   vec2 pos =base+dir*reach*lt;   pos.y -=reach*1.1*lt*lt;",
+    "   vec2 pos2=base+dir*reach*lt2;  pos2.y-=reach*1.1*lt2*lt2;",
+    "   float d=segd(sp,pos2,pos);",
+    "   float wdt=mix(0.012,0.002,lt)*(rimR/0.34);",
+    "   float glow=smoothstep(wdt,0.0,d)*(1.0-lt)*(1.0-lt*0.4);",
+    "   vec3 col=mix(vec3(1.0,0.97,0.88),vec3(1.0,0.36,0.07),lt*lt);",
+    "   col=mix(col,vec3(0.5,0.05,0.02),smoothstep(0.55,1.0,lt));",
+    "   sAcc+=col*glow; sA=max(sA,glow);",
     "  }",
-    "  sAcc*=uSpark*1.3; sA=clamp(sA*uSpark*1.3,0.0,1.0);",
+    /* poeira de diamante fina cintilando ao redor do contato (glints frios brancos/rosados) */
+    "  for(int j=0;j<6;j++){",
+    "   vec2 dd=vec2(float(j)*4.17+1.3,float(j)*9.71+2.7);",
+    "   float dl=fract(uTime*0.55/(0.5+h21(dd))+h21(dd+2.0));",
+    "   vec2 dp=cPos+vec2((h21(dd+4.0)-0.5),(h21(dd+7.0)-0.5))*rimR*(0.8+1.8*dl); dp.y-=rimR*1.0*dl*dl;",
+    "   vec2 df=sp-dp; float dg=exp(-dot(df,df)/(rimR*rimR*0.006));",
+    "   float tw=pow(0.5+0.5*sin(uTime*20.0+float(j)*8.0),4.0);",
+    "   sAcc+=mix(vec3(0.82,0.90,1.0),vec3(1.0,0.82,0.72),h21(dd+9.0))*dg*tw*(1.0-dl)*0.5;",
+    "  }",
+    "  float si=uSpark*1.3;",
+    "  sAcc*=si; sA=clamp(sA*si,0.0,1.0);",
     "  outCol+=sAcc*(1.0-outA); outA+=sA*(1.0-outA);",
     " }",
     " if(outA<0.003){ discard; }",
@@ -1519,15 +1560,18 @@
     /* atividade de corte (0..1): pico quando um grupo de facetas esta sendo talhado agora — dirige as faiscas */
     function bump01(t){ t=t<0?0:(t>1?1:t); return 4.0*t*(1.0-t); }
     function sstep(a,b,x){ var t=(x-a)/(b-a); t=t<0?0:(t>1?1:t); return t*t*(3-2*t); }
+    /* cada bump alinha ao intervalo REAL em que aquele grupo de facetas esta sendo talhado (ver sT..sC no shader),
+       entao a faisca dispara exatamente quando o rebolo toca aquele grupo. Serragem/bruting inicial fica sutil. */
     function sparkActivity(cut){
       var s=0;
-      s=Math.max(s,bump01(sstep(0.00,0.20,cut)));
-      s=Math.max(s,bump01(sstep(0.10,0.42,cut))*0.90);
-      s=Math.max(s,bump01(sstep(0.34,0.58,cut))*0.90);
-      s=Math.max(s,bump01(sstep(0.48,0.70,cut))*0.90);
-      s=Math.max(s,bump01(sstep(0.60,0.84,cut))*0.90);
-      s=Math.max(s,bump01(sstep(0.78,0.97,cut))*0.85);
-      s=Math.max(s,bump01(sstep(0.90,1.00,cut))*0.70);
+      s=Math.max(s,bump01(sstep(0.02,0.22,cut))*0.42); /* serragem / bruting (bem sutil) */
+      s=Math.max(s,bump01(sstep(0.16,0.34,cut))*0.95); /* mesa   */
+      s=Math.max(s,bump01(sstep(0.20,0.44,cut))*1.00); /* bizel  */
+      s=Math.max(s,bump01(sstep(0.36,0.58,cut))*1.00); /* estrela */
+      s=Math.max(s,bump01(sstep(0.48,0.70,cut))*1.00); /* cinta alta */
+      s=Math.max(s,bump01(sstep(0.60,0.84,cut))*1.00); /* pavilhao */
+      s=Math.max(s,bump01(sstep(0.78,0.97,cut))*1.00); /* cinta baixa */
+      s=Math.max(s,bump01(sstep(0.90,1.00,cut))*0.95); /* culatra (final) */
       return s;
     }
     var S=[0,0,0,0,0,0,0,0,0];
@@ -1612,26 +1656,23 @@
   var io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } }); },{threshold:0.15});
   document.querySelectorAll("[data-reveal]").forEach(function(el){ io.observe(el); });
 
-  /* ---------------- timeline pinada (quem sou eu): foto em foco acompanha o scroll ---------------- */
+  /* ---------------- timeline vertical (quem sou eu): a foto no centro da tela ganha destaque ---------------- */
   (function(){
     var wrap=document.getElementById("whoPin"); if(!wrap) return;
     var photos=[document.getElementById("whoPh0"),document.getElementById("whoPh1"),document.getElementById("whoPh2")];
-    var yearEl=document.getElementById("whoPinYear"), fill=document.getElementById("whoPinFill");
-    var years=["2023","2024","<em>2025 · Prime</em>"];
-    if(reduce){ photos.forEach(function(p){ if(p) p.style.setProperty("--foc","1"); }); if(fill) fill.style.width="100%"; if(yearEl) yearEl.innerHTML=years[2]; return; }
-    var cur=0, raf=false, lastIdx=-1;
-    function goal(){ return pinProgress(wrap)*2; }               // 0..2 — posição contínua entre as 3 fotos
-    function apply(v){
-      for(var i=0;i<photos.length;i++){ if(photos[i]) photos[i].style.setProperty("--foc", String(Math.max(0,1-Math.abs(v-i)))); }
-      if(fill) fill.style.width=(Math.min(Math.max(v/2,0),1)*100)+"%";
-      var idx=Math.round(Math.min(Math.max(v,0),2));
-      if(idx!==lastIdx && yearEl){ lastIdx=idx; yearEl.innerHTML=years[idx]; }
+    if(reduce){ photos.forEach(function(p){ if(p) p.style.setProperty("--foc","1"); }); return; }
+    var raf=false;
+    function apply(){
+      raf=false;
+      var vh=window.innerHeight, cy=vh*0.5, range=vh*0.60;
+      for(var i=0;i<photos.length;i++){ var p=photos[i]; if(!p) continue;
+        var r=p.getBoundingClientRect(), pc=r.top+r.height*0.5;
+        var f=Math.max(0,Math.min(1,1-Math.abs(pc-cy)/range));
+        p.style.setProperty("--foc", f.toFixed(3)); }
     }
-    function tick(){ var g=goal(); cur+=(g-cur)*0.18; apply(cur);
-      if(Math.abs(g-cur)>0.002){ requestAnimationFrame(tick); } else { raf=false; } }
-    function kick(){ if(!raf){ raf=true; requestAnimationFrame(tick); } }
+    function kick(){ if(!raf){ raf=true; requestAnimationFrame(apply); } }
     window.addEventListener("scroll",kick,{passive:true}); window.addEventListener("resize",kick);
-    apply(goal());
+    apply();
   })();
 
   /* ---------------- capa do ebook: reveal pinado (escala + brilho conforme o scroll) ---------------- */
@@ -1933,6 +1974,8 @@
       v.className="vfeed"; v.loop=false; v.muted=true; v.defaultMuted=true; v.playsInline=true;
       v.setAttribute("muted",""); v.setAttribute("playsinline",""); v.setAttribute("webkit-playsinline",""); v.setAttribute("preload","auto");
       v.addEventListener("playing",function(){ card.classList.add("has-video"); });
+      /* assim que o 1o frame carrega, ja revela o video (capa) — os cards laterais mostram frame borrado, nao o gradiente */
+      v.addEventListener("loadeddata",function(){ card.classList.add("has-video"); });
       /* fim do vídeo: avança só se estiver ativo/ambiente; senão repete (não interrompe quem está assistindo) */
       v.addEventListener("ended",function(){ if(card.classList.contains("is-active") && inView && !hover && !dragging && !vidSound){ next(); } else { v.currentTime=0; var pp=v.play(); if(pp&&pp.catch){ pp.catch(function(){}); } } });
       v.addEventListener("loadedmetadata",function(){ var t=card.querySelector(".vtime"); if(t&&isFinite(v.duration)&&v.duration>0) t.textContent=fmtTime(v.duration); });
