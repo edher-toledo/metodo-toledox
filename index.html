@@ -193,11 +193,11 @@
   .hero h1 .glow{font-family:var(--font-accent);font-style:italic;font-weight:500;text-transform:none;letter-spacing:-.01em;background:linear-gradient(92deg,var(--red-hot),var(--red),var(--crimson));-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.05em;text-shadow:.02em 0 rgba(255,90,99,.35),-.02em 0 rgba(157,0,255,.30)}
   @keyframes heatShift{0%,100%{text-shadow:.02em 0 rgba(255,90,99,.35),-.02em 0 rgba(157,0,255,.30)}50%{text-shadow:.032em 0 rgba(255,122,90,.42),-.032em 0 rgba(191,38,255,.38)}}
   body.loaded .hero h1 .glow{animation:heatShift 4.5s ease-in-out infinite}
-  .hero .sub,.hero-actions,.hero .pillrow{opacity:0;transform:translateY(22px);transition:opacity .9s .5s,transform .9s .5s}
+  .hero .sub,.hero-actions,.hero .qa-list,.hero .pillrow{opacity:0;transform:translateY(22px);transition:opacity .9s .5s,transform .9s .5s}
   body.loaded .hero .sub{transition-delay:.5s}
-  body.loaded .hero-actions{transition-delay:.62s}
+  body.loaded .hero-actions,body.loaded .hero .qa-list{transition-delay:.62s}
   body.loaded .hero .pillrow{transition-delay:.74s}
-  body.loaded .hero .sub,body.loaded .hero-actions,body.loaded .hero .pillrow{opacity:1;transform:none}
+  body.loaded .hero .sub,body.loaded .hero-actions,body.loaded .hero .qa-list,body.loaded .hero .pillrow{opacity:1;transform:none}
   .hero .sub{margin-top:32px;max-width:44ch;font-size:clamp(1rem,1.5vw,1.18rem);color:var(--ink-dim)}
   .hero-actions{margin-top:40px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
   .hero .pillrow{margin-top:36px}
@@ -235,6 +235,51 @@
   .shead{max-width:24ch;margin-bottom:clamp(26px,5vw,50px)}
   .shead h2{font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;font-size:clamp(2rem,5.4vw,3.9rem);line-height:.98;margin-top:20px;text-wrap:balance}
   .shead h2 em{font-family:var(--font-accent);font-style:italic;font-weight:500;text-transform:none;color:var(--red-soft)}
+
+  /* ---------- ATALHOS · três botões animados dentro do hero (mobile-first) ---------- */
+  .qa-list{display:flex;flex-direction:column;gap:10px;margin-top:32px;width:100%;max-width:560px}
+  .qa-card{position:relative;overflow:hidden;display:flex;align-items:center;gap:13px;padding:12px 14px;border-radius:16px;
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),linear-gradient(180deg,rgba(13,7,10,.72),rgba(8,5,7,.56));
+    -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);min-height:60px;isolation:isolate;color:inherit;
+    transition:border-color .4s,transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .45s,background .4s;-webkit-tap-highlight-color:transparent}
+  .qa-card::before{content:"";position:absolute;left:0;top:14%;bottom:14%;width:3px;border-radius:0 3px 3px 0;background:var(--acc);opacity:.22;transition:opacity .4s,box-shadow .4s}
+  .qa-card::after{content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .5s;background:radial-gradient(130% 140% at 6% 50%,var(--tint),transparent 62%)}
+  .qa-ic{flex:0 0 auto;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line-strong);color:var(--acc2);background:rgba(255,255,255,.03);
+    transition:transform .45s cubic-bezier(.2,.9,.2,1.3),background .4s,color .4s,border-color .4s,box-shadow .45s}
+  .qa-ic svg{width:21px;height:21px}
+  .qa-body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column}
+  .qa-t{font-family:var(--font-display);font-weight:700;font-size:1.04rem;color:var(--ink);line-height:1.1}
+  .qa-s{color:var(--ink-dim);font-size:.82rem;line-height:1.35;max-height:0;opacity:0;transform:translateY(-4px);overflow:hidden;
+    transition:max-height .55s cubic-bezier(.2,.8,.2,1),opacity .45s,transform .45s,margin-top .5s}
+  .qa-arrow{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;color:var(--ink-faint);transition:transform .4s cubic-bezier(.2,.8,.2,1),color .4s}
+  .qa-arrow svg{width:20px;height:20px}
+  .qa-shine{position:absolute;top:0;bottom:0;left:-45%;width:38%;pointer-events:none;z-index:3;opacity:0;background:linear-gradient(100deg,transparent,var(--tint),transparent);mix-blend-mode:screen}
+  .qa-prog{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;border-radius:2px}
+  .qa-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc2),var(--acc));box-shadow:0 0 8px var(--glow)}
+  /* estado ATIVO (destaque auto-rotativo) */
+  .qa-card.active{border-color:var(--acc2);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),linear-gradient(180deg,rgba(24,12,16,.78),rgba(12,7,10,.6));box-shadow:0 16px 44px -20px var(--glow),inset 0 0 0 1px var(--tint)}
+  .qa-card.active::before{opacity:1;box-shadow:0 0 16px var(--acc)}
+  .qa-card.active::after{opacity:1}
+  .qa-card.active .qa-ic{background:linear-gradient(180deg,var(--acc2),var(--acc));color:#fff;border-color:transparent;box-shadow:0 10px 26px -8px var(--glow);transform:translateY(-1px) scale(1.06)}
+  .qa-card.active .qa-s{max-height:4.6em;opacity:1;transform:none;margin-top:5px}
+  .qa-card.active .qa-arrow{color:var(--acc2);transform:translateX(3px)}
+  /* progresso e brilho só correm quando a seção está em vista (classe qa-run via JS) */
+  .qa-run .qa-card.active .qa-prog i{width:100%;transition:width var(--dwell,4.2s) linear}
+  .qa-run .qa-card.active .qa-shine{animation:qaShine 1.15s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes qaShine{0%{transform:translateX(0);opacity:0}22%{opacity:.9}100%{transform:translateX(360%);opacity:0}}
+  @media(hover:hover){.qa-card:hover{transform:translateY(-2px);border-color:var(--acc2)}.qa-card:hover .qa-arrow{color:var(--acc2);transform:translateX(3px)}}
+  /* estático (prefers-reduced-motion): mostra todos os resumos, sem ciclo */
+  .qa-static .qa-s{max-height:4.6em;opacity:1;transform:none;margin-top:5px}
+  .qa-static .qa-prog,.qa-static .qa-shine{display:none}
+  /* telas maiores: mantém a pilha vertical (acordeão) do hero, só com um pouco mais de respiro */
+  @media(min-width:640px){
+    .qa-list{gap:11px}
+    .qa-card{gap:14px;padding:14px 16px;min-height:64px}
+    .qa-ic{width:46px;height:46px;border-radius:13px}
+    .qa-ic svg{width:23px;height:23px}
+    .qa-t{font-size:1.08rem}
+  }
   .lead{font-size:clamp(1.05rem,2vw,1.35rem);color:var(--ink-dim);max-width:52ch}
 
   /* ---------- manifesto ---------- */
@@ -519,7 +564,7 @@
   .phone::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:38%;height:5px;border-radius:999px;background:rgba(0,0,0,.55);z-index:4}
   /* depth fog: cards ao fundo mergulham na brasa (integra o coverflow à atmosfera) */
   .phone::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;
-    background:linear-gradient(180deg,rgba(176,13,28,0) 40%,rgba(120,8,16,.55));opacity:var(--fog,0);transition:opacity .5s}
+    background:linear-gradient(180deg,rgba(7,4,6,.28) 0%,rgba(9,4,6,.62) 100%);opacity:var(--fog,0);transition:opacity .5s}
   /* vídeo vivo no card ativo (deixe cair um <video class="vfeed"> dentro de .phone) */
   .vfeed{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .5s,filter .55s cubic-bezier(.2,.8,.2,1),transform .55s cubic-bezier(.2,.8,.2,1)}
   .vcard.has-video .vfeed{opacity:1}   /* mostra o frame do vídeo (nítido no ativo, borrado como capa nos laterais) */
@@ -542,7 +587,7 @@
   .vcard.has-video .vprog{animation:none}   /* com vídeo real, a barra segue o tempo do vídeo (JS), não a animação fake */
   @keyframes vplay{0%{width:0}100%{width:100%}}
   /* desfoque de profundidade: só o card em foco (.is-active) fica nítido; os demais desfocam */
-  .vcard:not(.is-active) .cover{animation-play-state:paused;filter:saturate(.7) brightness(.6) blur(8px);transform:scale(1.05)}
+  .vcard:not(.is-active) .cover{animation-play-state:paused;filter:saturate(.5) brightness(.4) blur(9px);transform:scale(1.05)}
   .vcard:not(.is-active) .vfeed{filter:blur(8px) brightness(.7);transform:scale(1.05)}
   .vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:var(--glass);border:1px solid var(--line-strong);color:var(--ink);cursor:pointer;backdrop-filter:blur(10px);transition:transform .25s,border-color .25s,color .25s;-webkit-appearance:none;appearance:none}
   .vnav svg{width:22px;height:22px}
@@ -590,7 +635,7 @@
     .scrollcue .bar{animation:none}
     .hero h1 .i{transform:none}
     .hero h1 .ch{opacity:1;filter:none;transform:none}
-    .hero .sub,.hero-actions,.hero .pillrow{opacity:1;transform:none}
+    .hero .sub,.hero-actions,.hero .qa-list,.hero .pillrow{opacity:1;transform:none}
     .intro{display:none}
     .cover{animation:none}
     .vcard.is-active .vprog{animation:none;width:55%}
@@ -681,12 +726,49 @@
         <span class="line l1"><span class="i">Sua <span class="glow">mudança</span></span></span>
         <span class="line l2"><span class="i">começa agora</span></span>
       </h1>
-      <p class="sub">Um método de looksmaxing completo — pele, cabelo, corpo, rosto e mente — para você virar a melhor versão de si mesmo em 90 dias. Sem achismo. Passo a passo.</p>
-      <div class="hero-actions">
-        <button class="btn btn-red" data-magnetic data-goto="#oferta">Quero começar
-          <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="btn btn-ghost" data-goto="#capa">Ver o método</button>
+      <p class="sub">Um método de looksmaxing completo — para você virar a melhor versão de si mesmo em 90 dias. Sem achismo. Passo a passo.</p>
+      <!-- ATALHOS · três botões animados que resumem cada destino -->
+      <div class="qa-list" id="qa">
+
+        <a class="qa-card active" href="#oferta" data-goto="#oferta" data-magnetic
+           style="--acc:#ff2333;--acc2:#ff5a63;--glow:rgba(255,35,51,.85);--tint:rgba(255,45,55,.18)"
+           aria-label="Ir para a oferta e começar agora">
+          <span class="qa-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M13 3 5 13h5l-1 8 8-10h-5l1-8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+          <span class="qa-body">
+            <span class="qa-t">Começar agora</span>
+            <span class="qa-s">Método completo por 12× R$ 39,70 · garantia de 7 dias.</span>
+          </span>
+          <span class="qa-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="qa-shine" aria-hidden="true"></span>
+          <span class="qa-prog" aria-hidden="true"><i></i></span>
+        </a>
+
+        <a class="qa-card" href="#autoridade" data-goto="#autoridade" data-magnetic
+           style="--acc:#ff7a5a;--acc2:#ffb08f;--glow:rgba(255,122,90,.8);--tint:rgba(255,122,90,.16)"
+           aria-label="Conhecer o Toledox">
+          <span class="qa-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c.8-3.8 4-5.5 7.5-5.5s6.7 1.7 7.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+          <span class="qa-body">
+            <span class="qa-t">Eu sou o Toledox</span>
+            <span class="qa-s">De "feio" ao Prime — quem criou e testou o método em si mesmo.</span>
+          </span>
+          <span class="qa-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="qa-shine" aria-hidden="true"></span>
+          <span class="qa-prog" aria-hidden="true"><i></i></span>
+        </a>
+
+        <a class="qa-card" href="#capa" data-goto="#capa" data-magnetic
+           style="--acc:#9d00ff;--acc2:#c375ff;--glow:rgba(157,0,255,.75);--tint:rgba(157,0,255,.17)"
+           aria-label="Ver o método">
+          <span class="qa-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 12l9 4.5L21 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16.5 12 21l9-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/></svg></span>
+          <span class="qa-body">
+            <span class="qa-t">O método</span>
+            <span class="qa-s">15 capítulos, 5 áreas e um plano de 90 dias — passo a passo.</span>
+          </span>
+          <span class="qa-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="qa-shine" aria-hidden="true"></span>
+          <span class="qa-prog" aria-hidden="true"><i></i></span>
+        </a>
+
       </div>
       <div class="pillrow">
         <div class="stat-pill">
@@ -748,7 +830,6 @@
         <div class="who-pin-track" aria-hidden="true"><i class="who-pin-fill" id="whoPinFill"></i></div>
       </div>
     </div>
-    <p class="ba-note">Prévia borrada no lugar — solte as fotos reais em <b style="color:var(--ink)">assets/toledox-2023.jpg</b>, <b style="color:var(--ink)">2024</b> e <b style="color:var(--ink)">2025</b> que elas entram nítidas por cima.</p>
   </section>
 
   <!-- PAREDE VIVA — COLETÂNEA DE VÍDEOS -->
@@ -772,7 +853,6 @@
       <span>Arraste para navegar</span>
     </div>
     <div class="vdots" id="vdots" aria-hidden="true"></div>
-    <p class="ba-note">Solte o vídeo em <b style="color:var(--ink)">assets/</b> e acrescenta o nome no array <b style="color:var(--ink)">VIDEOS</b> (topo do script) — o card entra sozinho.</p>
   </section>
 
   <!-- ANTES / DEPOIS -->
@@ -790,7 +870,7 @@
     </div>
 
     <div class="ba-stage" data-reveal data-antes="assets/par2-antes.png?v=17" data-depois="assets/par2-depois.png?v=17">
-      <div class="ba-layer ba-before"><div class="figure"></div><div class="ba-img ba-img-before" role="img" aria-label="Antes da transformação" style="background-position:50% 50%;background-size:cover"></div></div>
+      <div class="ba-layer ba-before"><div class="figure"></div><div class="ba-img ba-img-before" role="img" aria-label="Antes da transformação" style="background-position:69.9% 79.4%;background-size:107.1% auto"></div></div>
       <div class="ba-layer ba-after"><div class="figure"></div><div class="ba-img ba-img-after" role="img" aria-label="Depois da transformação" style="background-position:50% 50%;background-size:cover"></div></div>
       <button type="button" class="ba-tag b ba-antes" aria-pressed="false">Antes</button>
       <button type="button" class="ba-tag a ba-depois" aria-pressed="false">Depois</button>
@@ -1664,10 +1744,15 @@
     var raf=false;
     function apply(){
       raf=false;
-      var vh=window.innerHeight, cy=vh*0.5, range=vh*0.60;
+      var vh=window.innerHeight, cy=vh*0.5, falloff=vh*0.42;
       for(var i=0;i<photos.length;i++){ var p=photos[i]; if(!p) continue;
         var r=p.getBoundingClientRect(), pc=r.top+r.height*0.5;
-        var f=Math.max(0,Math.min(1,1-Math.abs(pc-cy)/range));
+        /* plateau: a foto fica 100% em foco enquanto cabe inteira na tela (centro pode desviar até
+           (vh - altura)/2), tapando suave só quando começa a entrar/sair — assim ela não fica presa
+           num pico instantâneo no mobile e "assenta" totalmente visível enquanto está no campo de visão */
+        var plateau=Math.max(vh*0.10,(vh-r.height)/2-8);
+        var d=Math.abs(pc-cy);
+        var f=d<=plateau?1:Math.max(0,Math.min(1,1-(d-plateau)/falloff));
         p.style.setProperty("--foc", f.toFixed(3)); }
     }
     function kick(){ if(!raf){ raf=true; requestAnimationFrame(apply); } }
@@ -1894,6 +1979,40 @@
     });
   }
 
+  /* ---------------- ATALHOS: destaque auto-rotativo que revela o resumo de cada botão ---------------- */
+  (function(){
+    var qa=document.getElementById("qa"); if(!qa) return;
+    var cards=Array.prototype.slice.call(qa.querySelectorAll(".qa-card"));
+    if(cards.length<2) return;
+    /* prefers-reduced-motion: nada de ciclo — mostra todos os resumos de uma vez */
+    if(reduce){ qa.classList.add("qa-static"); return; }
+    var DWELL=4200, idx=0, timer=null;
+    var canHover=!!(window.matchMedia && window.matchMedia("(hover:hover)").matches);
+    cards.forEach(function(c){ c.style.setProperty("--dwell",(DWELL/1000)+"s"); });
+    function setActive(n){ idx=((n%cards.length)+cards.length)%cards.length;
+      for(var i=0;i<cards.length;i++) cards[i].classList.toggle("active", i===idx); }
+    function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+    function start(){ stop(); timer=setInterval(function(){ setActive(idx+1); }, DWELL); }
+    setActive(0);
+    cards.forEach(function(c,i){
+      if(canHover){
+        c.addEventListener("pointerenter",function(){ setActive(i); stop(); });
+        c.addEventListener("pointerleave",function(){ start(); });
+      }
+      c.addEventListener("focus",function(){ setActive(i); stop(); });
+      c.addEventListener("blur",function(){ start(); });
+      c.addEventListener("touchstart",function(){ setActive(i); start(); },{passive:true});
+    });
+    /* só cicla (e anima progresso/brilho) enquanto a seção está em vista */
+    if("IntersectionObserver" in window){
+      new IntersectionObserver(function(es){ es.forEach(function(e){
+        if(e.isIntersecting){ qa.classList.add("qa-run"); setActive(idx); start(); }
+        else { qa.classList.remove("qa-run"); stop(); }
+      }); }, {threshold:0.35}).observe(qa);
+    } else { qa.classList.add("qa-run"); start(); }
+    document.addEventListener("visibilitychange",function(){ if(document.hidden) stop(); else if(qa.classList.contains("qa-run")) start(); });
+  })();
+
   /* ---------------- antes/depois (cada quadro é independente) ---------------- */
   function initBA(stage){
     var after=stage.querySelector(".ba-after"), handle=stage.querySelector(".ba-handle");
@@ -2026,11 +2145,11 @@
         var off=i-center, abs=Math.abs(off);
         var ry=Math.max(-58,Math.min(58,-off*38));
         var sc=Math.max(0.6,1-abs*0.14);
-        var op=abs>2.4?0:Math.max(0.18,1-abs*0.34);
+        var op=abs>2.4?0:Math.max(0.14,1-abs*0.42);
         c.style.transform="translate3d("+(off*spread)+"px,0,"+(-abs*180)+"px) rotateY("+ry+"deg) scale("+sc+")";
         c.style.opacity=op; c.style.zIndex=String(100-Math.round(abs));
         c.style.pointerEvents=abs>2.4?"none":"auto";
-        c.style.setProperty("--fog",Math.min(0.7,abs*0.28).toFixed(2)); /* névoa cresce com a profundidade */
+        c.style.setProperty("--fog",Math.min(0.72,abs*0.44).toFixed(2)); /* névoa neutra escura cresce com a profundidade — cards laterais recuam no escuro em vez de virar um painel vermelho */
         c.classList.toggle("is-active",Math.abs(off)<0.5);
       });
     }
