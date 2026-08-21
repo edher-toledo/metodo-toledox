@@ -36,6 +36,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"Serve pra mim?","acceptedAnswer":{"@type":"Answer","text":"Sim. O método é feito pra qualquer pessoa que quer evoluir a própria imagem e confiança, começando do zero — sem depender de genética ou de gastar muito."}},
+{"@type":"Question","name":"Qual a diferença entre o ebook e o método completo?","acceptedAnswer":{"@type":"Answer","text":"O ebook (R$ 39,90, pagamento único) traz os 15 capítulos em PDF, direto ao ponto. O método completo (R$ 397 à vista ou 12× R$ 39,70) inclui os mesmos capítulos em vídeo-aula, mais comunidade, acompanhamento e atualizações vitalícias."}},
 {"@type":"Question","name":"Quanto tempo por dia preciso?","acceptedAnswer":{"@type":"Answer","text":"Entre 15 e 30 minutos por dia. O plano de 90 dias é dividido em passos curtos e realistas, pensados pra caber numa rotina cheia."}},
 {"@type":"Question","name":"Por quanto tempo tenho acesso?","acceptedAnswer":{"@type":"Answer","text":"Acesso vitalício, incluindo todas as atualizações futuras do método, sem pagar de novo."}},
 {"@type":"Question","name":"E se eu não gostar?","acceptedAnswer":{"@type":"Answer","text":"Você tem 7 dias de garantia incondicional. Se não for pra você, é só pedir e devolvemos 100% do valor."}}
@@ -345,6 +346,11 @@
   .capa-copy{text-align:center;opacity:var(--co,0);transform:translateY(calc((1 - var(--co,0)) * 16px))}
   .capa-title{margin-top:14px;font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;font-size:clamp(1.5rem,4.2vw,2.5rem);line-height:1.1}
   .capa-title em{font-style:normal;color:var(--red-soft)}
+  .capa-format{margin-top:16px;font-family:var(--font-mono);font-size:.78rem;letter-spacing:.06em;color:var(--ink-dim)}
+  .capa-format b{color:var(--ink);font-family:var(--font-ui)}
+  .capa-ctas{margin-top:22px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+  .capa-note{margin-top:16px;font-size:.82rem;color:var(--ink-faint)}
+  .capa-note a{color:var(--red-soft);text-decoration:underline;cursor:pointer}
   @media(max-width:600px){.capa-pin{height:190vh}}
   @media(prefers-reduced-motion:reduce){
     .capa-pin{height:auto}
@@ -413,8 +419,9 @@
   .stat .k{margin-top:12px;color:var(--ink-dim);font-size:.9rem}
 
   /* ---------- oferta ---------- */
-  .offer{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
-  @media(max-width:860px){.offer{grid-template-columns:1fr}}
+  .offer-head{max-width:640px}
+  .offer-cards{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin-top:56px}
+  @media(max-width:860px){.offer-cards{grid-template-columns:1fr;gap:76px}}
   .price-card{position:relative;padding:40px 36px;border-radius:26px;background:linear-gradient(165deg,rgba(40,14,18,.82),rgba(12,6,8,.72));border:1px solid var(--line-strong);box-shadow:0 50px 110px -55px rgba(255,35,51,.6),0 22px 55px -34px rgba(0,0,0,.75);transform-style:preserve-3d;will-change:transform}
   .price-card .ribbon{position:absolute;top:20px;right:20px;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--red-soft);border:1px solid rgba(255,35,51,.4);border-radius:999px;padding:5px 11px}
   .price-card .was{color:var(--ink-faint);text-decoration:line-through;font-size:1rem}
@@ -422,11 +429,15 @@
   .price-card .now span{font-size:1.4rem;vertical-align:top;color:var(--ink-dim)}
   .price-card .now b{font-size:clamp(3rem,7vw,4.4rem)}
   .price-card .split{color:var(--ink-dim);font-size:.95rem;margin-bottom:26px}
+  .pc-format{display:block;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:30px 0 4px;transform:translateZ(18px)}
   .plist{display:flex;flex-direction:column;gap:13px;margin-bottom:30px}
   .plist li{display:flex;gap:12px;align-items:flex-start;list-style:none;font-size:.96rem;color:var(--ink)}
   .plist svg{width:19px;height:19px;color:var(--red-soft);flex:none;margin-top:2px}
   .guarantee{display:flex;gap:14px;align-items:center;margin-top:22px;color:var(--ink-dim);font-size:.88rem}
   .guarantee .seal{width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;border:1px solid rgba(255,35,51,.4);color:var(--red-soft)}
+  .offer-cover{position:absolute;top:-18px;right:-14px;z-index:1;width:72px;aspect-ratio:3/4.24;border-radius:10px;overflow:hidden;border:1px solid var(--line-strong);transform:rotate(6deg);box-shadow:0 18px 40px -16px rgba(255,35,51,.5)}
+  .offer-cover img{width:100%;height:100%;object-fit:cover;display:block}
+  @media(max-width:860px){.offer-cover{top:-14px;right:14px;width:60px}}
 
   /* ===== oferta imersiva 3D ===== */
   @property --pang{syntax:"<angle>";inherits:false;initial-value:0deg}
@@ -464,6 +475,7 @@
   @keyframes pcSeal{0%,100%{transform:translateZ(92px) rotate(-12deg) translateY(0)}50%{transform:translateZ(92px) rotate(-8deg) translateY(-5px)}}
   /* corpo com profundidade */
   .pc-kick{display:inline-block;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--red-soft);margin:30px 0 12px;transform:translateZ(18px)}
+  .pc-format + .pc-kick{margin-top:2px}
   .price-card .now{transform:translateZ(46px)}
   .price-card .split b{color:var(--ink)}
   .price-card .split .save{color:var(--red-soft);white-space:nowrap}
@@ -512,6 +524,7 @@
   .final h2{font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.012em;font-size:clamp(2.5rem,9.5vw,7rem);line-height:.9;text-wrap:balance}
   .final h2 em{font-family:var(--font-accent);font-style:italic;font-weight:500;text-transform:none;background:linear-gradient(92deg,var(--red-hot),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:.015em 0 rgba(255,90,99,.3)}
   .final .sub{margin:26px auto 40px;max-width:44ch;color:var(--ink-dim);font-size:1.1rem}
+  .final-alt{margin-top:22px;color:var(--ink-faint);font-size:.9rem}
 
   /* ---------- footer ---------- */
   footer{position:relative;border-top:1px solid var(--line);padding:50px 0 40px}
@@ -918,11 +931,16 @@
     <div class="capa-pin" id="capaPin">
       <div class="capa-pin-stick">
         <div class="capa-cover" id="capaCover">
-          <img src="assets/MÉTODO.JPG" alt="Capa do ebook Método Toledox" loading="lazy">
+          <img src="assets/ebook.png" alt="Capa do ebook PRIME — Método Toledox em PDF" loading="lazy">
         </div>
         <div class="capa-copy" id="capaCopy">
           <span class="eyebrow">O método, em um só lugar</span>
           <h2 class="capa-title">15 capítulos.<br>90 dias.<br><em>Um método.</em></h2>
+          <p class="capa-format">E-book em PDF · <b>R$ 39,90</b></p>
+          <div class="capa-ctas">
+            <a class="btn btn-red" href="#ebook" data-goto="#ebook" data-magnetic>Quero o ebook agora</a>
+          </div>
+          <p class="capa-note">Prefere o pacote completo, com vídeo-aulas, comunidade e atualizações? <a href="#oferta" data-goto="#oferta">Conheça o método completo</a>.</p>
         </div>
       </div>
     </div>
@@ -930,18 +948,21 @@
 
   <!-- OFERTA -->
   <section class="wrap" id="oferta">
-    <div class="offer">
-      <div data-reveal>
-        <span class="eyebrow">A oferta</span>
-        <h2 style="font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;font-size:clamp(2rem,5vw,3.4rem);line-height:1;margin:18px 0 22px">Comece hoje a<br><span class="serif" style="text-transform:none;color:var(--red-soft)">moggar</span></h2>
-        <p class="lead">Acesso completo ao método, atualizações e comunidade. Um investimento único — resultado que fica pra vida.</p>
-        <div class="guarantee">
-          <span class="seal"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span>Garantia incondicional de <b style="color:var(--ink)">7 dias</b> — não gostou, devolvemos 100%.</span>
-        </div>
+    <div class="offer-head" data-reveal>
+      <span class="eyebrow">A oferta</span>
+      <h2 style="font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;font-size:clamp(2rem,5vw,3.4rem);line-height:1;margin:18px 0 22px">Comece hoje a<br><span class="serif" style="text-transform:none;color:var(--red-soft)">moggar</span></h2>
+      <p class="lead">Escolha como prefere começar: o pacote completo, com vídeo-aulas, comunidade e atualizações — ou o ebook, direto ao ponto em PDF.</p>
+      <div class="guarantee">
+        <span class="seal"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span>Garantia incondicional de <b style="color:var(--ink)">7 dias</b> — não gostou, devolvemos 100%.</span>
       </div>
+    </div>
+
+    <div class="offer-cards">
+      <!-- MÉTODO COMPLETO · com vídeo -->
       <div class="offer-stage" id="offerStage" data-reveal>
         <canvas class="offer-embers" id="offerEmbers" aria-hidden="true"></canvas>
+        <div class="offer-cover" aria-hidden="true"><img src="assets/MÉTODO.JPG" alt="" loading="lazy"></div>
         <div class="price-card pc3d" id="priceCard">
           <span class="pc-glowring" aria-hidden="true"></span>
           <span class="pc-foil" aria-hidden="true"></span>
@@ -952,6 +973,7 @@
           <div class="promo-seal" aria-hidden="true"><span><span class="p">20%</span><br><span class="o">OFF</span></span></div>
 
           <div class="pc-body">
+            <span class="pc-format">Pacote completo · vídeo-aulas + PDF</span>
             <span class="pc-kick">Oferta por tempo limitado</span>
             <div class="was">de R$ 497</div>
             <div class="now"><span>12× R$</span><b class="pc-amt" data-price="39">39</b><span>,70</span></div>
@@ -964,7 +986,7 @@
             </div>
 
             <ul class="plist">
-              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Todos os 15 capítulos do método</li>
+              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Os 15 capítulos em vídeo-aula + PDF completo</li>
               <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Plano de 90 dias passo a passo</li>
               <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Comunidade e acompanhamento</li>
               <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Atualizações vitalícias</li>
@@ -983,6 +1005,39 @@
           </div>
         </div>
       </div>
+
+      <!-- EBOOK PRIME · só PDF -->
+      <div class="offer-stage" id="ebook" data-reveal>
+        <div class="offer-cover" aria-hidden="true"><img src="assets/ebook.png" alt="" loading="lazy"></div>
+        <div class="price-card pc3d" id="ebookCard">
+          <span class="pc-glowring" aria-hidden="true"></span>
+          <span class="pc-foil" aria-hidden="true"></span>
+          <span class="pc-spot" aria-hidden="true"></span>
+          <span class="pc-sweep" aria-hidden="true"></span>
+
+          <span class="ribbon">E-book · PDF</span>
+
+          <div class="pc-body">
+            <span class="pc-format">Somente PDF · sem vídeo-aula</span>
+            <span class="pc-kick">Comece agora, mais leve</span>
+            <div class="now"><span>R$</span><b>39</b><span>,90</span></div>
+            <div class="split">pagamento único <span class="save">· garantia de 7 dias</span></div>
+
+            <ul class="plist">
+              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Os 15 capítulos, direto ao ponto, em PDF</li>
+              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Plano de 90 dias passo a passo</li>
+              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso imediato após a compra</li>
+              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Pagamento único, sem mensalidade</li>
+            </ul>
+
+            <div class="pc-cta-wrap">
+              <a class="btn btn-red pc-cta" style="width:100%;justify-content:center" href="https://pay.hotmart.com/J94983539D" data-buy>Quero o ebook
+                <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -994,6 +1049,7 @@
     </div>
     <div class="faq">
       <details data-reveal open><summary>Serve pra mim? <span class="pm">+</span></summary><p>Sim. O método é feito pra qualquer pessoa que quer evoluir a própria imagem e confiança, começando do zero — sem depender de genética ou de gastar muito.</p></details>
+      <details data-reveal><summary>Qual a diferença entre o ebook e o método completo? <span class="pm">+</span></summary><p>O ebook (R$ 39,90, pagamento único) traz os 15 capítulos em PDF, direto ao ponto. O método completo (R$ 397 à vista ou 12× R$ 39,70) inclui os mesmos capítulos em vídeo-aula, mais comunidade, acompanhamento e atualizações vitalícias.</p></details>
       <details data-reveal><summary>Quanto tempo por dia preciso? <span class="pm">+</span></summary><p>Entre 15 e 30 minutos por dia. O plano de 90 dias é dividido em passos curtos e realistas, pensados pra caber numa rotina cheia.</p></details>
       <details data-reveal><summary>Por quanto tempo tenho acesso? <span class="pm">+</span></summary><p>Acesso vitalício, incluindo todas as atualizações futuras do método, sem pagar de novo.</p></details>
       <details data-reveal><summary>E se eu não gostar? <span class="pm">+</span></summary><p>Você tem 7 dias de garantia incondicional. Se não for pra você, é só pedir e devolvemos 100% do valor.</p></details>
@@ -1009,6 +1065,7 @@
     <p class="sub d1" data-reveal>Não deixa pra depois o que pode começar agora. Sua transformação está a um clique.</p>
     <div class="d2" data-reveal><a class="btn btn-red" data-magnetic style="--pad:20px 42px;font-size:1.05rem" href="https://pay.hotmart.com/M104723306F" data-buy>Começar minha transformação
       <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <p class="final-alt d3" data-reveal>ou <a href="https://pay.hotmart.com/J94983539D" data-buy style="color:var(--red-soft);text-decoration:underline">comece pelo ebook por R$ 39,90</a></p>
   </section>
 
   <footer class="wrap">
