@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-30 -20 660 760" width="660" height="760">
+<defs><path id="geo-t" d="M60 40 H540 V140 H345 V600 H255 V140 H60 Z"></path><path id="geo-x" d="M100 150 H500 L300 375 Z M100 600 H500 L300 375 Z"></path></defs>
+
+    <defs>
+      <g id="mD-xq">
+        <polygon points="60,206 150,206 166,252 76,252"></polygon>
+        <polygon points="150,206 540,600 556,646 166,252"></polygon>
+        <polygon points="540,600 450,600 466,646 556,646"></polygon>
+        <polygon points="450,600 60,206 76,252 466,646"></polygon>
+        <polygon points="540,206 450,206 466,252 556,252"></polygon>
+        <polygon points="450,206 60,600 76,646 466,252"></polygon>
+        <polygon points="60,600 150,600 166,646 76,646"></polygon>
+        <polygon points="150,600 540,206 556,252 166,646"></polygon>
+      </g>
+      <g id="mD-tq">
+        <polygon points="60,40 540,40 556,86 76,86"></polygon>
+        <polygon points="540,40 540,140 556,186 556,86"></polygon>
+        <polygon points="540,140 345,140 361,186 556,186"></polygon>
+        <polygon points="345,140 345,600 361,646 361,186"></polygon>
+        <polygon points="345,600 255,600 271,646 361,646"></polygon>
+        <polygon points="255,600 255,140 271,186 271,646"></polygon>
+        <polygon points="255,140 60,140 76,186 271,186"></polygon>
+        <polygon points="60,140 60,40 76,86 76,186"></polygon>
+      </g>
+      <linearGradient id="mD-xside" gradientUnits="userSpaceOnUse" x1="50" y1="190" x2="560" y2="660">
+        <stop offset="0" stop-color="#2A0108"></stop>
+        <stop offset="0.42" stop-color="#120106"></stop>
+        <stop offset="1" stop-color="#05020C"></stop>
+      </linearGradient>
+      <linearGradient id="mD-xlit" gradientUnits="userSpaceOnUse" x1="50" y1="190" x2="560" y2="660">
+        <stop offset="0" stop-color="#7A0212"></stop>
+        <stop offset="0.5" stop-color="#33020C"></stop>
+        <stop offset="1" stop-color="#0C0316"></stop>
+      </linearGradient>
+      <linearGradient id="mD-tside" gradientUnits="userSpaceOnUse" x1="50" y1="40" x2="560" y2="660">
+        <stop offset="0" stop-color="#1A1822"></stop>
+        <stop offset="0.35" stop-color="#08080C"></stop>
+        <stop offset="0.7" stop-color="#0E0409"></stop>
+        <stop offset="1" stop-color="#05030C"></stop>
+      </linearGradient>
+      <linearGradient id="mD-tlit" gradientUnits="userSpaceOnUse" x1="240" y1="40" x2="600" y2="640">
+        <stop offset="0" stop-color="#332F3E"></stop>
+        <stop offset="0.5" stop-color="#131219"></stop>
+        <stop offset="1" stop-color="#0A0614"></stop>
+      </linearGradient>
+      <linearGradient id="mD-f1" x1="0" y1="0" x2="0.8" y2="1">
+        <stop offset="0" stop-color="#FF6B60"></stop>
+        <stop offset="0.35" stop-color="#FF1408"></stop>
+        <stop offset="1" stop-color="#C10010"></stop>
+      </linearGradient>
+      <linearGradient id="mD-f2" x1="1" y1="0" x2="0.15" y2="1">
+        <stop offset="0" stop-color="#FF2A18"></stop>
+        <stop offset="0.5" stop-color="#E00020"></stop>
+        <stop offset="1" stop-color="#5E0A78"></stop>
+      </linearGradient>
+      <linearGradient id="mD-f3" x1="0" y1="1" x2="0.9" y2="0">
+        <stop offset="0" stop-color="#4E0C74"></stop>
+        <stop offset="0.42" stop-color="#D60024"></stop>
+        <stop offset="1" stop-color="#FF1A10"></stop>
+      </linearGradient>
+      <linearGradient id="mD-f4" x1="1" y1="1" x2="0.1" y2="0">
+        <stop offset="0" stop-color="#0B0212"></stop>
+        <stop offset="0.5" stop-color="#340863"></stop>
+        <stop offset="1" stop-color="#A00030"></stop>
+      </linearGradient>
+      <linearGradient id="mD-side" x1="0" y1="0" x2="0.4" y2="1">
+        <stop offset="0" stop-color="#3C0617"></stop>
+        <stop offset="0.5" stop-color="#2A0520"></stop>
+        <stop offset="1" stop-color="#170436"></stop>
+      </linearGradient>
+      <linearGradient id="mD-metalH" x1="0" y1="0" x2="1" y2="0.35">
+        <stop offset="0" stop-color="#050508"></stop>
+        <stop offset="0.08" stop-color="#232230"></stop>
+        <stop offset="0.16" stop-color="#63606F"></stop>
+        <stop offset="0.22" stop-color="#ADA9BB"></stop>
+        <stop offset="0.29" stop-color="#242330"></stop>
+        <stop offset="0.46" stop-color="#050509"></stop>
+        <stop offset="0.58" stop-color="#16151D"></stop>
+        <stop offset="0.68" stop-color="#8E0010"></stop>
+        <stop offset="0.75" stop-color="#FF1408"></stop>
+        <stop offset="0.83" stop-color="#5E0416"></stop>
+        <stop offset="0.91" stop-color="#160830"></stop>
+        <stop offset="1" stop-color="#040407"></stop>
+      </linearGradient>
+      <linearGradient id="mD-metalV" x1="0.1" y1="0" x2="0.9" y2="1">
+        <stop offset="0" stop-color="#302E3C"></stop>
+        <stop offset="0.1" stop-color="#9C98AC"></stop>
+        <stop offset="0.19" stop-color="#201F2A"></stop>
+        <stop offset="0.44" stop-color="#050508"></stop>
+        <stop offset="0.62" stop-color="#48000F"></stop>
+        <stop offset="0.78" stop-color="#F00A18"></stop>
+        <stop offset="0.9" stop-color="#2E0850"></stop>
+        <stop offset="1" stop-color="#0C0322"></stop>
+      </linearGradient>
+      <linearGradient id="mD-edge" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FFD2D8" stop-opacity="0.95"></stop>
+        <stop offset="0.5" stop-color="#FF8494" stop-opacity="0.4"></stop>
+        <stop offset="1" stop-color="#C9A2FF" stop-opacity="0.85"></stop>
+      </linearGradient>
+      <filter id="mD-glow" x="-45%" y="-45%" width="190%" height="190%">
+        <feGaussianBlur stdDeviation="30"></feGaussianBlur>
+      </filter>
+      <filter id="mD-soft" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="13"></feGaussianBlur>
+      </filter>
+      <clipPath id="mD-clipT"><use href="#geo-t"></use></clipPath>
+      <clipPath id="mD-clipX"><use href="#geo-x"></use></clipPath>
+    </defs>
+
+    <clipPath id="mD-clipX2"><path d="M60 206 H150 L540 600 H450 Z M540 206 H450 L60 600 H150 Z"></path></clipPath>
+
+    <ellipse cx="312" cy="664" rx="248" ry="13" fill="#07010B" opacity="0.95" filter="url(#mD-soft)"></ellipse>
+    <path d="M60 206 H150 L540 600 H450 Z M540 206 H450 L60 600 H150 Z" fill="#FF0A2A" opacity="0.5" filter="url(#mD-glow)"></path>
+    <path d="M60 206 H150 L540 600 H450 Z M540 206 H450 L60 600 H150 Z" fill="#6A12E0" opacity="0.26" filter="url(#mD-glow)" transform="translate(18,50)"></path>
+
+    <use href="#mD-xq" fill="url(#mD-xside)"></use>
+    <polygon points="450,600 60,206 76,252 466,646" fill="url(#mD-xlit)" opacity="0.6"></polygon>
+    <polygon points="150,600 540,206 556,252 166,646" fill="#0E0620" opacity="0.5"></polygon>
+    <polygon points="540,600 450,600 466,646 556,646" fill="#0B0418" opacity="0.55"></polygon>
+    <polygon points="60,600 150,600 166,646 76,646" fill="#0B0418" opacity="0.5"></polygon>
+    <path d="M450 600 L60 206 M150 600 L540 206 M60 600 H150 M450 600 H540" fill="none" stroke="#0A0414" stroke-width="1.5" opacity="0.5"></path>
+
+    <polygon points="60,206 150,206 345,403 255,403" fill="url(#mD-f1)"></polygon>
+    <polygon points="450,206 540,206 345,403 255,403" fill="url(#mD-f2)"></polygon>
+    <polygon points="255,403 345,403 150,600 60,600" fill="url(#mD-f3)"></polygon>
+    <polygon points="255,403 345,403 540,600 450,600" fill="url(#mD-f4)"></polygon>
+
+    <g clip-path="url(#mD-clipX2)">
+      <polygon points="60,206 150,206 172,232 82,232" fill="#FFFFFF" opacity="0.2"></polygon>
+      <polygon points="450,206 540,206 518,232 428,232" fill="#FFFFFF" opacity="0.15"></polygon>
+      <polygon points="60,206 78,206 468,600 450,600" fill="#FFD4DA" opacity="0.2"></polygon>
+      <polygon points="150,206 132,206 522,600 540,600" fill="#0B0316" opacity="0.28"></polygon>
+      <polygon points="540,206 522,206 132,600 150,600" fill="#E9B6FF" opacity="0.14"></polygon>
+      <polygon points="450,206 468,206 78,600 60,600" fill="#0B0316" opacity="0.3"></polygon>
+      <polygon points="60,600 150,600 172,574 82,574" fill="#0B0316" opacity="0.3"></polygon>
+      <polygon points="450,600 540,600 518,574 428,574" fill="#0B0316" opacity="0.34"></polygon>
+      <path d="M60 40 H540 V140 H345 V600 H255 V140 H60 Z" fill="#08010F" opacity="0.75" filter="url(#mD-soft)" transform="translate(16,46)"></path>
+    </g>
+
+    <path d="M60 206 H150 L540 600 H450 Z M540 206 H450 L60 600 H150 Z" fill="none" stroke="url(#mD-edge)" stroke-width="3.5"></path>
+    <path d="M62 208 H148 M452 208 H538" fill="none" stroke="#FFE3E7" stroke-width="5" opacity="0.85"></path>
+    <path d="M62 209 L448 599 M538 209 L152 599" fill="none" stroke="#FFC4CE" stroke-width="2" opacity="0.3"></path>
+
+    <use href="#mD-tq" fill="#06050B" stroke="#06050B" stroke-width="26" stroke-linejoin="miter"></use>
+    <use href="#geo-t" fill="#06050B" stroke="#06050B" stroke-width="26" stroke-linejoin="miter"></use>
+
+    <use href="#mD-tq" fill="url(#mD-tside)"></use>
+    <polygon points="540,40 540,140 556,186 556,86" fill="url(#mD-tlit)"></polygon>
+    <polygon points="345,140 345,600 361,646 361,186" fill="url(#mD-tlit)"></polygon>
+    <polygon points="540,140 345,140 361,186 556,186" fill="#090810" opacity="0.55"></polygon>
+    <polygon points="255,140 60,140 76,186 271,186" fill="#090810" opacity="0.62"></polygon>
+    <polygon points="345,600 255,600 271,646 361,646" fill="#090810" opacity="0.5"></polygon>
+    <polygon points="60,140 60,40 76,86 76,186" fill="#050409" opacity="0.55"></polygon>
+
+    <g clip-path="url(#mD-clipT)">
+      <rect x="0" y="0" width="600" height="145" fill="url(#mD-metalH)"></rect>
+      <rect x="0" y="140" width="600" height="470" fill="url(#mD-metalV)"></rect>
+      <polygon points="60,40 540,40 512,70 88,70" fill="#FFFFFF" opacity="0.24"></polygon>
+      <polygon points="60,40 88,70 88,140 60,140" fill="#FFFFFF" opacity="0.13"></polygon>
+      <polygon points="255,140 283,140 283,600 255,600" fill="#FFFFFF" opacity="0.12"></polygon>
+      <polygon points="324,140 345,140 345,600 324,600" fill="#0A0316" opacity="0.45"></polygon>
+      <polygon points="255,548 345,548 345,600 255,600" fill="#9A4DFF" opacity="0.24"></polygon>
+      <polygon points="440,40 540,40 540,140 500,140" fill="#0A0316" opacity="0.32"></polygon>
+      <polygon points="88,86 512,86 508,98 92,98" fill="#FFFFFF" opacity="0.18"></polygon>
+      <polygon points="255,300 345,300 345,318 255,318" fill="#FF9AA6" opacity="0.16"></polygon>
+    </g>
+
+    <path d="M62 42 H538" fill="none" stroke="#E6E2F0" stroke-width="4.5" opacity="0.95"></path>
+    <path d="M62 42 V138 M538 42 V138" fill="none" stroke="#FFC2CB" stroke-width="2" opacity="0.35"></path>
+    <path d="M60 40 H540 V140 H345 V600 H255 V140 H60 Z" fill="none" stroke="#FFC6CE" stroke-width="2" opacity="0.42"></path>
+    <path d="M257 598 H343" fill="none" stroke="#C48CFF" stroke-width="3.5" opacity="0.7"></path>
+    <path d="M257 146 V596" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.28"></path>
+  
+</svg>
