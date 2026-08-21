@@ -300,9 +300,9 @@
     .manifesto{min-height:clamp(680px,104vh,980px);justify-content:flex-start;padding-top:clamp(20px,4vh,40px)}
     .manifesto p{margin-top:20px!important}
     .manifesto p.lead{margin-top:26px!important}
-    .manifesto::after{right:auto;left:50%;width:min(560px,100vw);transform:translateX(-58%);
+    .manifesto::after{right:auto;left:50%;width:min(560px,100vw);transform:translate(-58%,7%);
       background:
-        url("assets/tx-flat-dark-bg.svg") 100% 66%/auto 50% no-repeat;
+        url("assets/tx-flat-dark-bg.svg") 100% 42%/auto 50% no-repeat;
       -webkit-mask-image:linear-gradient(180deg,transparent 18%,rgba(0,0,0,.5) 36%,#000 58%,#000 86%,transparent 100%);
       mask-image:linear-gradient(180deg,transparent 18%,rgba(0,0,0,.5) 36%,#000 58%,#000 86%,transparent 100%)}
     .manifesto::before{background:linear-gradient(180deg,var(--bg) 0%,rgba(7,4,6,.88) 30%,rgba(7,4,6,.45) 62%,rgba(7,4,6,.75) 88%,var(--bg) 100%)}
@@ -1907,7 +1907,7 @@
       window.__txGem.cut=cut; window.__txGem.t=tCur;
       var chap=Math.min(Math.max(tCur-6.0,0),1);
       var idle=reduce?0:1;
-      var chatter=idle*spark*(Math.sin(tt*47.0)*0.019+Math.sin(tt*29.3+1.7)*0.012);
+      var chatter=idle*spark*(Math.sin(tt*47.0)*0.012+Math.sin(tt*29.3+1.7)*0.008);
       var ry=tCur*1.05+chap*4.60+mx*0.28+idle*(tt*0.155+Math.sin(tt*0.61)*0.045+Math.sin(tt*0.23)*0.075)+chatter;
       var rx=0.18+Math.min(tCur,7.0)*0.030+chap*0.20+my*0.16+idle*(Math.sin(tt*0.43)*0.055+Math.sin(tt*0.97+2.1)*0.022)+chatter*0.7;
       /* flutuacao: a pedra respira no espaco em vez de ficar pregada no pixel */
