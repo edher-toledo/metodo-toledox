@@ -36,7 +36,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"Serve pra mim?","acceptedAnswer":{"@type":"Answer","text":"Sim. O método é feito pra qualquer pessoa que quer evoluir a própria imagem e confiança, começando do zero — sem depender de genética ou de gastar muito."}},
-{"@type":"Question","name":"Qual a diferença entre o ebook e o método completo?","acceptedAnswer":{"@type":"Answer","text":"O ebook custa R$ 39,90 e traz os 15 capítulos em PDF, direto ao ponto. O método completo está em promoção por R$ 29,90 e traz os mesmos 15 capítulos em vídeo-aula, com plano de 90 dias e atualizações vitalícias."}},
+{"@type":"Question","name":"Qual a diferença entre o ebook e o método completo?","acceptedAnswer":{"@type":"Answer","text":"O ebook custa R$ 39,90 e traz os 15 capítulos em PDF, direto ao ponto. O método completo está em promoção por R$ 29,90 e traz o mesmo conteúdo em 9 aulas de vídeo, uma por tema, com plano de 90 dias e atualizações vitalícias."}},
 {"@type":"Question","name":"Quanto tempo por dia preciso?","acceptedAnswer":{"@type":"Answer","text":"Entre 15 e 30 minutos por dia. O plano de 90 dias é dividido em passos curtos e realistas, pensados pra caber numa rotina cheia."}},
 {"@type":"Question","name":"Por quanto tempo tenho acesso?","acceptedAnswer":{"@type":"Answer","text":"Acesso vitalício, incluindo todas as atualizações futuras do método, sem pagar de novo."}},
 {"@type":"Question","name":"E se eu não gostar?","acceptedAnswer":{"@type":"Answer","text":"Você tem 7 dias de garantia incondicional. Se não for pra você, é só pedir e devolvemos 100% do valor."}}
@@ -284,7 +284,7 @@
   .lead{font-size:clamp(1.05rem,2vw,1.35rem);color:var(--ink-dim);max-width:52ch}
 
   /* ---------- manifesto ---------- */
-  .manifesto{position:relative;z-index:1;isolation:isolate;min-height:clamp(560px,84vh,860px);display:flex;flex-direction:column;justify-content:center;background:var(--bg)}
+  .manifesto{position:relative;z-index:1;isolation:isolate;min-height:clamp(560px,84vh,860px);display:flex;flex-direction:column;justify-content:center}
   .manifesto::after{content:"";position:absolute;top:0;bottom:0;right:0;width:min(880px,84vw);z-index:-2;pointer-events:none;
     background:
       url("assets/tx-flat-dark-bg.svg") 100% 47%/auto 80% no-repeat;
@@ -294,8 +294,8 @@
     -webkit-mask-composite:source-in;mask-composite:intersect}
   .manifesto::before{content:"";position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);width:100vw;z-index:-1;pointer-events:none;
     background:
-      linear-gradient(90deg,var(--bg) 0%,rgba(7,4,6,.94) 30%,rgba(7,4,6,.62) 50%,rgba(7,4,6,.16) 76%,rgba(7,4,6,.05) 100%),
-      linear-gradient(180deg,var(--bg) 0%,rgba(7,4,6,.2) 26%,rgba(7,4,6,.3) 74%,var(--bg) 100%)}
+      linear-gradient(90deg,rgba(7,4,6,.5) 0%,rgba(7,4,6,.28) 34%,rgba(7,4,6,.1) 62%,transparent 100%),
+      linear-gradient(180deg,transparent 0%,rgba(7,4,6,.06) 50%,transparent 100%)}
   @media(max-width:820px){
     .manifesto{min-height:clamp(680px,104vh,980px);justify-content:flex-start;padding-top:clamp(20px,4vh,40px)}
     .manifesto p{margin-top:20px!important}
@@ -305,7 +305,7 @@
         url("assets/tx-flat-dark-bg.svg") 100% 42%/auto 50% no-repeat;
       -webkit-mask-image:linear-gradient(180deg,transparent 18%,rgba(0,0,0,.5) 36%,#000 58%,#000 86%,transparent 100%);
       mask-image:linear-gradient(180deg,transparent 18%,rgba(0,0,0,.5) 36%,#000 58%,#000 86%,transparent 100%)}
-    .manifesto::before{background:linear-gradient(180deg,var(--bg) 0%,rgba(7,4,6,.88) 30%,rgba(7,4,6,.45) 62%,rgba(7,4,6,.75) 88%,var(--bg) 100%)}
+    .manifesto::before{background:linear-gradient(180deg,transparent 0%,rgba(7,4,6,.34) 30%,rgba(7,4,6,.18) 62%,rgba(7,4,6,.3) 88%,transparent 100%)}
   }
   .manifesto p{font-family:var(--font-accent);font-size:clamp(1.55rem,4.6vw,3.1rem);line-height:1.26;max-width:20ch;font-weight:500}
   .manifesto .muted{color:var(--ink-faint)}
@@ -420,6 +420,43 @@
   .stat .n{font-family:var(--font-display);font-weight:700;font-size:clamp(2.4rem,5vw,3.6rem);letter-spacing:-.01em;line-height:1;font-variant-numeric:tabular-nums}
   .stat .n b{background:linear-gradient(120deg,var(--red-hot),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
   .stat .k{margin-top:12px;color:var(--ink-dim);font-size:.9rem}
+
+  /* ---------- módulos em vídeo ---------- */
+  .mod-lead{max-width:58ch;margin-top:-6px;margin-bottom:clamp(28px,5vw,48px)}
+  .modgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(13px,1.5vw,20px)}
+  @media(max-width:900px){.modgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:540px){.modgrid{grid-template-columns:1fr}}
+  .mod-card{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:clamp(20px,2.4vw,28px);border-radius:20px;border:1px solid var(--line);
+    background:linear-gradient(165deg,rgba(34,14,18,.6),rgba(10,6,8,.5));
+    transition:opacity .8s cubic-bezier(.16,1,.3,1) var(--rd,0s),transform .8s cubic-bezier(.16,1,.3,1) var(--rd,0s),border-color .4s ease,box-shadow .45s ease}
+  .mod-card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .5s ease;
+    background:radial-gradient(130% 90% at 14% -8%,rgba(255,35,51,.16),transparent 56%)}
+  .mod-card::after{content:"";position:absolute;left:16px;right:16px;top:0;height:2px;pointer-events:none;opacity:0;transition:opacity .5s ease;
+    background:linear-gradient(90deg,transparent,var(--red),var(--violet),transparent)}
+  .mod-num{position:absolute;top:16px;right:18px;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.16em;color:var(--ink-faint);opacity:.65}
+  .mod-ic{display:inline-flex;width:52px;height:52px;border-radius:15px;align-items:center;justify-content:center;color:var(--ink);
+    border:1px solid var(--line-strong);background:linear-gradient(150deg,rgba(255,35,51,.15),rgba(157,0,255,.1));
+    transition:color .4s ease,border-color .4s ease,transform .4s cubic-bezier(.16,1,.3,1)}
+  .mod-ic svg{width:26px;height:26px}
+  .mod-t{font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.004em;font-size:1.1rem;margin:18px 0 8px;color:var(--ink)}
+  .mod-d{color:var(--ink-dim);font-size:.92rem;line-height:1.56;max-width:34ch}
+  .mod-play{margin-top:auto;padding-top:16px;display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);
+    font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);opacity:.6;transition:opacity .4s ease,color .4s ease}
+  .mod-play svg{width:14px;height:14px}
+  @media(hover:hover){
+    .mod-card:hover{border-color:var(--line-strong);box-shadow:0 34px 70px -38px rgba(255,35,51,.5),0 18px 46px -30px rgba(0,0,0,.85)}
+    .mod-card:hover::before,.mod-card:hover::after{opacity:1}
+    .mod-card:hover .mod-ic{color:var(--red-soft);border-color:rgba(255,35,51,.5);transform:translateY(-3px) rotate(-3deg)}
+    .mod-card:hover .mod-play{opacity:.95;color:var(--red-soft)}
+  }
+  .modgrid .mod-card:nth-child(2){--rd:.05s}
+  .modgrid .mod-card:nth-child(3){--rd:.10s}
+  .modgrid .mod-card:nth-child(4){--rd:.15s}
+  .modgrid .mod-card:nth-child(5){--rd:.20s}
+  .modgrid .mod-card:nth-child(6){--rd:.25s}
+  .modgrid .mod-card:nth-child(7){--rd:.30s}
+  .modgrid .mod-card:nth-child(8){--rd:.35s}
+  .modgrid .mod-card:nth-child(9){--rd:.40s}
 
   /* ---------- oferta ---------- */
   .offer-head{max-width:640px}
@@ -949,6 +986,89 @@
     </div>
   </section>
 
+  <!-- MÓDULOS EM VÍDEO -->
+  <section class="wrap" id="modulos">
+    <div class="shead" data-reveal>
+      <span class="eyebrow">Dentro do método · vídeo</span>
+      <h2>9 aulas. Um vídeo pra cada <em>tema</em>.</h2>
+    </div>
+    <p class="lead mod-lead" data-reveal>No pacote em vídeo, cada tema tem uma aula completa e direta ao ponto — do rosto à mentalidade. É o passo a passo pra aplicar, sem enrolação.</p>
+
+    <div class="modgrid">
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">01</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg></span>
+        <h3 class="mod-t">Olhos</h3>
+        <p class="mod-d">Olhar mais aberto e magnético: contorno, canto dos olhos e a moldura que valoriza o rosto.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">02</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M20 8V6a2 2 0 0 0-2-2h-2M4 16v2a2 2 0 0 0 2 2h2M20 16v2a2 2 0 0 1-2 2h-2"/><path d="M9 11v2a3 3 0 0 0 6 0v-2"/></svg></span>
+        <h3 class="mod-t">Mandíbula e maxilar</h3>
+        <p class="mod-d">Linha da mandíbula mais marcada com postura, mastigação e os hábitos certos no dia a dia.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">03</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l3 5.5-9 12.5L3 8.5 6 3Z"/><path d="M3 8.5h18M9 3 6 8.5l6 12.5 6-12.5L15 3"/></svg></span>
+        <h3 class="mod-t">Definição facial</h3>
+        <p class="mod-d">Menos inchaço, mais contorno: o que realmente esculpe e afina os traços do rosto.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">04</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2s6 6.4 6 10.3A6 6 0 0 1 6 13.5C6 9.6 12 3.2 12 3.2Z"/><path d="M9.7 13.6a2.4 2.4 0 0 0 2.3 2.2"/></svg></span>
+        <h3 class="mod-t">Pele limpa</h3>
+        <p class="mod-d">Uma rotina simples e realista pra uma pele lisa, uniforme e com viço.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">05</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8.5 8 5 12l3.5 4M15.5 8 19 12l-3.5 4"/></svg></span>
+        <h3 class="mod-t">Simetria facial</h3>
+        <p class="mod-d">Equilíbrio entre os dois lados: hábitos e técnicas que harmonizam o rosto.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">06</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M8.2 7.6 20 17M8.2 16.4 20 7"/></svg></span>
+        <h3 class="mod-t">Cabelo e penteado</h3>
+        <p class="mod-d">O corte e o penteado certos pro seu formato de rosto — e como manter todos os dias.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">07</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 18h5M10.5 21h3"/><path d="M12 3a6 6 0 0 0-3.8 10.6c.7.6 1.1 1.2 1.2 2.4h5.2c.1-1.2.5-1.8 1.2-2.4A6 6 0 0 0 12 3Z"/></svg></span>
+        <h3 class="mod-t">Mentalidade</h3>
+        <p class="mod-d">A base de tudo: autoimagem, disciplina e a constância que sustenta o glow up.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">08</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5S3.8 15.6 3.8 9.9A4.6 4.6 0 0 1 12 7a4.6 4.6 0 0 1 8.2 2.9C20.2 15.6 12 20.5 12 20.5Z"/></svg></span>
+        <h3 class="mod-t">Mulheres</h3>
+        <p class="mod-d">Presença, linguagem corporal e atração: o efeito prático da nova versão de você.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+
+      <article class="mod-card" data-reveal>
+        <span class="mod-num">09</span>
+        <span class="mod-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v6a4 4 0 0 0 4 4h.3c1.6 0 2.7 1 2.7 2.6V18a3 3 0 0 1-3 3H7"/></svg></span>
+        <h3 class="mod-t">Pescoço e papada</h3>
+        <p class="mod-d">Postura e definição pra um perfil limpo e alinhado, do queixo ao pescoço.</p>
+        <span class="mod-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>1 aula em vídeo</span>
+      </article>
+    </div>
+  </section>
+
   <!-- OFERTA -->
   <section class="wrap" id="oferta">
     <div class="offer-head" data-reveal>
@@ -989,7 +1109,7 @@
             </div>
 
             <ul class="plist">
-              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Os 15 capítulos em vídeo-aula</li>
+              <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>9 aulas em vídeo, uma para cada tema</li>
               <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Plano de 90 dias passo a passo</li>
               <li><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Atualizações vitalícias</li>
             </ul>
@@ -1049,7 +1169,7 @@
     </div>
     <div class="faq">
       <details data-reveal open><summary>Serve pra mim? <span class="pm">+</span></summary><p>Sim. O método é feito pra qualquer pessoa que quer evoluir a própria imagem e confiança, começando do zero — sem depender de genética ou de gastar muito.</p></details>
-      <details data-reveal><summary>Qual a diferença entre o ebook e o método completo? <span class="pm">+</span></summary><p>O ebook custa R$ 39,90 e traz os 15 capítulos em PDF, direto ao ponto. O método completo está em promoção por R$ 29,90 e traz os mesmos 15 capítulos em vídeo-aula, com plano de 90 dias e atualizações vitalícias.</p></details>
+      <details data-reveal><summary>Qual a diferença entre o ebook e o método completo? <span class="pm">+</span></summary><p>O ebook custa R$ 39,90 e traz os 15 capítulos em PDF, direto ao ponto. O método completo está em promoção por R$ 29,90 e traz o mesmo conteúdo em 9 aulas de vídeo, uma por tema, com plano de 90 dias e atualizações vitalícias.</p></details>
       <details data-reveal><summary>Quanto tempo por dia preciso? <span class="pm">+</span></summary><p>Entre 15 e 30 minutos por dia. O plano de 90 dias é dividido em passos curtos e realistas, pensados pra caber numa rotina cheia.</p></details>
       <details data-reveal><summary>Por quanto tempo tenho acesso? <span class="pm">+</span></summary><p>Acesso vitalício, incluindo todas as atualizações futuras do método, sem pagar de novo.</p></details>
       <details data-reveal><summary>E se eu não gostar? <span class="pm">+</span></summary><p>Você tem 7 dias de garantia incondicional. Se não for pra você, é só pedir e devolvemos 100% do valor.</p></details>
@@ -2366,12 +2486,27 @@
         fb.addEventListener("click",function(e){ e.stopPropagation(); openFull(v); });
         ph.appendChild(mb); ph.appendChild(fb);
       }
+      /* card recem-criado que nao vai tocar agora: aquece a capa pra nao cair no gradiente vermelho */
+      if(!card.classList.contains("is-active")) warmFrame(v,card);
       card.__v=v; return v;
     }
     /* som dos vídeos: começa mudo (autoplay exige mudo); usuário ativa no botão. Fallback re-muta se o browser bloquear */
     var vidSound=false;
     function curVideo(){ var a=cards[idx]; return a?a.querySelector("video"):null; }
     function playCard(v){ if(!v) return; v.muted=!vidSound; var p=v.play(); if(p&&p.catch) p.catch(function(){ v.muted=true; v.play().catch(function(){}); }); }
+    /* aquece a capa do card vizinho: iOS adia o preload e nao pinta frame de video pausado, entao damos um
+       play mudo (permitido por ser muted+inline) so pra decodificar o 1o frame e pausamos assim que ele aparece.
+       __warming impede que o loop de layout pause o video antes do frame pintar. Se o play for bloqueado,
+       cai no seek como ultimo recurso. */
+    function warmFrame(v,card){
+      if(v.__warmed||v.__warming) return; v.__warming=true;
+      var settle=function(){ if(v.__warmed) return; v.__warmed=true; v.__warming=false;
+        v.removeEventListener("playing",settle); v.removeEventListener("loadeddata",settle);
+        if(!card.classList.contains("is-active")) v.pause(); };
+      v.addEventListener("playing",settle); v.addEventListener("loadeddata",settle);
+      var p=v.play();
+      if(p&&p.catch) p.catch(function(){ v.__warming=false; try{ v.currentTime=Math.min(0.1,(v.duration||1)*0.05); }catch(_){ } });
+    }
     function toggleSound(){ vidSound=!vidSound; stage.classList.toggle("snd-on",vidSound);
       var v=curVideo(); if(v){ v.muted=!vidSound; if(vidSound){ var p=v.play(); if(p&&p.catch) p.catch(function(){}); } } }
     function openFull(v){ if(!v) return; vidSound=true; stage.classList.add("snd-on"); v.muted=false; var p=v.play(); if(p&&p.catch) p.catch(function(){});
@@ -2410,7 +2545,7 @@
       /* vídeo vivo: cria sob demanda no card ativo; som conforme vidSound; pausa inativos/fora de vista */
       cards.forEach(function(c){
         if(c.classList.contains("is-active")){ var v=ensureVideo(c); if(v && inView) playCard(v); }
-        else { var ev=c.querySelector("video"); if(ev) ev.pause(); }
+        else { var ev=c.querySelector("video"); if(ev && !ev.__warming) ev.pause(); }
       });
       /* pré-carrega vizinhos com vídeo real → troca sem flash de gradiente */
       if(cards.length>1){ [cards[(idx+1)%cards.length], cards[(idx-1+cards.length)%cards.length]].forEach(function(nc){ if(nc && nc.getAttribute("data-video") && nc.__v===undefined) ensureVideo(nc); }); }
