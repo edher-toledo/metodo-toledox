@@ -152,15 +152,6 @@
   .brand b{color:var(--red)}
   .proto{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);border-radius:999px;padding:5px 11px}
   @media(max-width:520px){.proto{display:none}}
-  .sound-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--ink-dim);cursor:pointer;transition:color .25s,border-color .25s,background .25s;-webkit-appearance:none;appearance:none}
-  .sound-toggle:hover{color:var(--ink);border-color:var(--line-strong)}
-  .sound-toggle.on{color:var(--red-soft);border-color:rgba(255,35,51,.4)}
-  .sound-toggle svg{width:18px;height:18px}
-  .sound-toggle .wave{opacity:0;transition:opacity .25s}
-  .sound-toggle.on .wave{opacity:1}
-  .sound-toggle .slash{opacity:1;transition:opacity .25s}
-  .sound-toggle.on .slash{opacity:0}
-  .sound-toggle:focus-visible{outline:2px solid var(--red);outline-offset:3px}
 
   /* ---------- chapter rail ---------- */
   .rail{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:30;display:flex;flex-direction:column;gap:16px;align-items:flex-end}
@@ -881,6 +872,43 @@
       @keyframes sdProg{from{transform:scaleX(0)}to{transform:scaleX(1)}}
     }
   }
+
+  /* ===== perf-lite: desktop de GPU fraca =====
+     A medição fechou o caso. Nesta máquina (Intel HD 5500): js 1.7ms, gpu 0, frame 52ms,
+     longtask de 164ms. O 3D custava 3% do frame e a GPU estava OCIOSA — os outros 50ms eram
+     do navegador, gastos em efeitos CSS que obrigam a re-renderizar uma região inteira a
+     cada frame enquanto a página rola:
+
+       · sdReveal anima filter:blur(7px→0) em TODO [data-reveal], scrubbado pelo scroll —
+         cada elemento revelando vira textura e passa por um gaussiano, todo frame;
+       · sdQuote anima padding-left, que é propriedade de LAYOUT: reflow por frame;
+       · .who-ph/.who-img têm blur dirigido por --foc, que o JS atualiza a cada scroll;
+       · ~12 elementos com backdrop-filter sobre um fundo animado em tela cheia — cada um
+         re-borra a sua região do fundo a cada frame que o fundo muda, e o fundo é WebGL.
+
+     Aqui tudo isso cai. Opacidade, transform e clip-path ficam: essas o compositor resolve
+     sem repintar, então a coreografia continua idêntica — some o vidro, não o movimento.
+     Ativado por MEDIÇÃO (ver goLite no JS) e nunca no mobile, onde a GPU dá conta. */
+  html.perf-lite [data-reveal]{animation-name:sdRevealLite}
+  html.perf-lite .who-quote{animation-name:sdQuoteLite}
+  @keyframes sdRevealLite{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+  @keyframes sdQuoteLite{from{opacity:.2;transform:translateX(20px)}to{opacity:1;transform:none}}
+  html.perf-lite .who-ph,html.perf-lite .who-img{filter:none}
+  html.perf-lite .vcard:not(.is-active) .vfeed{filter:brightness(.7)}
+  html.perf-lite .topbar.solid,html.perf-lite .stat-pill,html.perf-lite .qa-card,
+  html.perf-lite .pillar,html.perf-lite .ba-handle::after,html.perf-lite .price-card .ribbon,
+  html.perf-lite .socialrail a,html.perf-lite .dockcta,html.perf-lite .vplay,
+  html.perf-lite .vlabel,html.perf-lite .vnav,html.perf-lite .vc{
+    -webkit-backdrop-filter:none;backdrop-filter:none}
+
+  /* ===== perf-lite-bg: segundo degrau, e só se o primeiro não bastar =====
+     Estes dois são os efeitos mais caros da página — filter:blur() e mix-blend-mode em
+     elementos de TELA CHEIA cujo conteúdo muda todo frame: um gaussiano sobre 866 mil
+     pixels 60× por segundo, e um blend que obriga o compositor a reler o fundo inteiro.
+     Mas são também a estética do hero, ajustada a dedo. Então ficam num degrau separado:
+     a máquina só perde o hero se perder o resto não tiver bastado. */
+  html.perf-lite-bg #hero3dBloom,html.perf-lite-bg #hero3dFlare{filter:none}
+  html.perf-lite-bg .grain{display:none}
 </style>
 <canvas id="aura" aria-hidden="true"></canvas>
 <canvas id="embers" aria-hidden="true"></canvas>
@@ -896,9 +924,6 @@
 
 <header class="topbar" id="topbar">
   <div class="brand">MÉTODO <b>TOLEDOX</b></div>
-  <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" aria-label="Ativar som ambiente" title="Som">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><g class="wave"><path d="M16 9.2a4 4 0 0 1 0 5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M18.6 7a7 7 0 0 1 0 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></g><line class="slash" x1="3.5" y1="20.5" x2="20.5" y2="3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-  </button>
 </header>
 
 <nav class="rail" id="rail" aria-label="Capítulos">
@@ -1418,33 +1443,6 @@
     });
   })();
 
-  /* ---------------- som opt-in (WebAudio, sons gerados) ---------------- */
-  var Sound=(function(){
-    var ctx=null, master=null, on=false;
-    function ensure(){ if(ctx) return; try{ var AC=window.AudioContext||window.webkitAudioContext; ctx=new AC(); master=ctx.createGain(); master.gain.value=0.5; master.connect(ctx.destination); }catch(e){ ctx=null; } }
-    function resume(){ if(ctx && ctx.state==="suspended"){ ctx.resume(); } }
-    function setOn(v){ on=v; if(on){ ensure(); resume(); } try{ localStorage.setItem("tx_sound", on?"1":"0"); }catch(e){} }
-    function whoosh(){ if(!on){ return; } ensure(); resume(); if(!ctx){ return; } var t=ctx.currentTime;
-      var len=Math.floor(ctx.sampleRate*0.5), b=ctx.createBuffer(1,len,ctx.sampleRate), d=b.getChannelData(0);
-      for(var i=0;i<len;i++){ d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2); }
-      var src=ctx.createBufferSource(); src.buffer=b;
-      var f=ctx.createBiquadFilter(); f.type="bandpass"; f.Q.value=0.8; f.frequency.setValueAtTime(360,t); f.frequency.exponentialRampToValueAtTime(1500,t+0.34);
-      var g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.2,t+0.06); g.gain.exponentialRampToValueAtTime(0.0001,t+0.46);
-      src.connect(f); f.connect(g); g.connect(master); src.start(t); src.stop(t+0.5); }
-    function tick(){ if(!on){ return; } ensure(); resume(); if(!ctx){ return; } var t=ctx.currentTime;
-      var o=ctx.createOscillator(); o.type="triangle"; o.frequency.setValueAtTime(520,t); o.frequency.exponentialRampToValueAtTime(190,t+0.08);
-      var g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.1,t+0.008); g.gain.exponentialRampToValueAtTime(0.0001,t+0.12);
-      o.connect(g); g.connect(master); o.start(t); o.stop(t+0.13); }
-    return { setOn:setOn, isOn:function(){ return on; }, whoosh:whoosh, tick:tick };
-  })();
-  (function(){
-    var btn=document.getElementById("soundToggle"); if(!btn) return;
-    function reflect(){ btn.classList.toggle("on",Sound.isOn()); btn.setAttribute("aria-pressed",String(Sound.isOn())); btn.setAttribute("aria-label",Sound.isOn()?"Desativar som ambiente":"Ativar som ambiente"); }
-    try{ if(localStorage.getItem("tx_sound")==="1"){ Sound.setOn(true); reflect();
-      window.addEventListener("pointerdown",function once(){ Sound.setOn(true); window.removeEventListener("pointerdown",once); },{once:true}); } }catch(e){}
-    btn.addEventListener("click",function(){ Sound.setOn(!Sound.isOn()); reflect(); Sound.tick(); });
-  })();
-
   /* Encaixa um deslocamento no grid de pixels FÍSICOS. Camada composta (will-change /
      translate3d) com offset fracionário é reamostrada bilinearmente pelo compositor — o
      texto dentro dela fica permanentemente meio fora de foco. Num desktop dpr=1 isso vira
@@ -1452,6 +1450,23 @@
      1/3 de px CSS, então o movimento segue tão suave quanto era e ainda assim cai em cima
      do grid. Ler o dpr a cada chamada cobre zoom e troca de monitor. */
   function snap(v){ var d=window.devicePixelRatio||1; return Math.round(v*d)/d; }
+
+  /* ---------------- perf-lite (ver os dois blocos no <style>) ----------------
+     Nível 0 = tudo ligado. 1 = cai o CSS caro do corpo da página (blur animado nos reveals,
+     padding animado, backdrop-filter). 2 = cai também o do hero (filtro de tela cheia no
+     bloom/risco e o grain). Quem decide o nível é a MEDIÇÃO, no adaptativo da gema.
+     Guarda !isTouch em todo caminho: no mobile isto não liga em hipótese nenhuma. */
+  var liteOn=false, liteBg=false;
+  function applyLite(n){ if(isTouch) return;
+    liteOn=n>=1; liteBg=n>=2;
+    var d=document.documentElement;
+    d.classList.toggle("perf-lite",liteOn);
+    d.classList.toggle("perf-lite-bg",liteBg); }
+  /* lembra o nível medido: sem isso a mesma máquina paga meio segundo de travamento em
+     TODA visita, até o adaptativo redescobrir o que já sabia na visita anterior */
+  function autoLite(n){ applyLite(n); try{ localStorage.setItem("tx_lite",String(n)); }catch(e){} }
+  if(!isTouch){ try{ var svLite=parseInt(localStorage.getItem("tx_lite")||"0",10);
+    if(svLite>0) applyLite(svLite); }catch(e){} }
 
   /* ---------------- WebGL aura ---------------- */
   var canvas=document.getElementById("aura"), gl=null;
@@ -1573,7 +1588,30 @@
   (function(){ var m=document.getElementById("numeros"); if(!m||!("IntersectionObserver" in window)) return;
     new IntersectionObserver(function(es){ es.forEach(function(en){ metTarget=en.isIntersecting?1:0; }); },{threshold:0.001,rootMargin:"-30% 0px -30% 0px"}).observe(m);
   })();
-  function scrollProg(){ var h=document.documentElement.scrollHeight-window.innerHeight; return h>0?Math.min(Math.max(window.scrollY/h,0),1):0; }
+  /* ---------------- cache de geometria de página ----------------
+     Ler scrollHeight ou getBoundingClientRect obriga o navegador a recalcular o layout ALI,
+     de forma síncrona. Se alguém escreveu um style antes (e o parallax do hero escreve um
+     transform todo frame), o custo é um reflow inteiro por leitura. Era isso que travava a
+     rolagem: leitura → escrita → leitura → escrita, várias vezes por frame, espalhado por
+     handlers independentes que não sabem uns dos outros.
+     A saída é que nenhuma dessas medidas muda com o scroll — só com redimensionamento ou
+     mudança de conteúdo. Então mede-se uma vez, guarda-se, e durante a rolagem sobra
+     aritmética com window.scrollY (que não força layout).
+     invalidateGeom limpa tudo; quem tem cache se registra em onGeomChange. */
+  var geomFns=[];
+  function onGeomChange(fn){ geomFns.push(fn); }
+  function invalidateGeom(){ for(var i=0;i<geomFns.length;i++) geomFns[i](); }
+  window.addEventListener("resize",invalidateGeom);
+  window.addEventListener("load",invalidateGeom);
+  /* pega o que resize não pega: imagens carregando, FAQ abrindo, carrossel mudando de altura.
+     Não dispara durante o scroll — o body não muda de tamanho ao rolar. */
+  if(window.ResizeObserver){ try{ new ResizeObserver(invalidateGeom).observe(document.body); }catch(e){} }
+
+  var docH=0;
+  onGeomChange(function(){ docH=0; });
+  function scrollProg(){
+    if(!docH) docH=document.documentElement.scrollHeight;
+    var h=docH-window.innerHeight; return h>0?Math.min(Math.max(window.scrollY/h,0),1):0; }
   window.addEventListener("scroll",function(){ progTarget=scrollProg(); },{passive:true});
   /* progresso 0..1 de uma seção pinada (position:sticky): 0 quando ela começa a prender, 1 quando solta */
   function pinProgress(el){ var r=el.getBoundingClientRect(), total=r.height-window.innerHeight;
@@ -2367,50 +2405,151 @@
     }
     gres(); window.addEventListener("resize",gres);
 
-    /* HUD de diagnóstico — só existe se a URL terminar em #debug. Serve para ler de fora
-       (print de tela) o que antes só o console mostrava: se a nitidez está no nativo, o
-       piso vigente, e quais alavancas o adaptativo já gastou. */
-    if(location.hash.indexOf("debug")>-1){
+    /* ---------------- profiler (#debug) ----------------
+       Duas perguntas que a média de FPS não responde:
+       1) o travamento é FPS baixo e constante, ou são frames longos isolados? Uma EMA de
+          48ms tanto pode ser 20fps parelho quanto 60fps com um engasgo de 300ms por segundo
+          — e são problemas completamente diferentes. Daí "pior" e "longos".
+       2) o custo é CPU ou GPU? drawArrays é assíncrono, então cronometrá-lo não diz nada;
+          quem paga a conta da GPU é a primeira operação que precisa do resultado — no caso,
+          o drawImage do bloom. Por isso o modo debug insere um g.finish() explícito depois
+          dos draws: ele bloqueia até a GPU terminar, e o tempo dele É o tempo de GPU. O que
+          vier depois é custo real de cópia.
+       g.finish() é uma barreira: o próprio debug fica mais lento que o site normal. Vale a
+       troca pela atribuição exata — e [4] desliga para comparar. */
+    var DBG=location.hash.indexOf("debug")>-1;
+    var dbg={math:0,draw:0,gpu:0,bloom:0,flare:0,
+             max:0,long:0,win:0,maxS:0,longS:0,
+             offGem:false,offDust:false,fin:true};
+    function dnow(){ return DBG?performance.now():0; }
+
+    /* perf-lite (ver o bloco no <style>): cortar o CSS caro é a PRIMEIRA alavanca, não a
+       última. A ordem antiga presumia que um frame ruim era culpa do 3D e começava
+       degradando a gema — nesta máquina isso nunca ia resolver, porque a gema custava 3% do
+       frame. Cortar blur animado e backdrop-filter é, além de mais eficaz, mais barato
+       visualmente: ninguém repara que o vidro virou fosco; todo mundo repara em 19fps.
+       Guarda !isTouch explícita: no mobile isto não liga em hipótese nenhuma. */
+    /* liteLock: o [7] do debug tem que VENCER o auto-detect. Sem isso o adaptativo religa o
+       perf-lite na janela seguinte (o frame continua ruim, que é justamente o que estamos
+       tentando medir) e o A/B fica impossível — desliga e volta sozinho em ~1,5s. */
+    var liteLock=false;
+
+    if(DBG){
       var hud=document.createElement("div");
-      hud.style.cssText="position:fixed;left:8px;bottom:8px;z-index:99999;font:11px/1.55 ui-monospace,Consolas,monospace;color:#6f6;background:rgba(0,0,0,.85);padding:7px 10px;border:1px solid rgba(110,255,110,.3);border-radius:6px;white-space:pre;pointer-events:none";
+      hud.style.cssText="position:fixed;left:8px;bottom:8px;z-index:99999;font:11px/1.5 ui-monospace,Consolas,monospace;color:#6f6;background:rgba(0,0,0,.88);padding:7px 10px;border:1px solid rgba(110,255,110,.3);border-radius:6px;white-space:pre;user-select:text";
       document.body.appendChild(hud);
-      /* Isolamento das camadas de pós: B desliga o bloom, F desliga o risco, G esconde as
-         duas e deixa só o shader. Serve para responder em um print QUAL camada está
-         produzindo um artefato, em vez de ajustar as duas no escuro. */
-      var lyB=true, lyF=true;
+
+      /* longtask: tarefas de main thread acima de 50ms, reportadas pelo próprio navegador.
+         Se houver longtask mas o js do gframe for pequeno, quem bloqueia não é a gema — é
+         layout, GC ou outro handler. Isso separa "a gema está pesada" de "a página está
+         travando a gema". */
+      /* QUAL GPU está de fato desenhando. Se vier "SwiftShader" ou "Software", o Chrome
+         desistiu do driver e está rasterizando na CPU — e aí nenhum ajuste de shader salva:
+         a resposta seria outra (checar chrome://gpu / atualizar driver). Vale checar antes
+         de continuar otimizando contra um moinho de vento. */
+      var rend="?"; try{ var dbi=g.getExtension("WEBGL_debug_renderer_info");
+        if(dbi) rend=String(g.getParameter(dbi.UNMASKED_RENDERER_WEBGL)); }catch(e){}
+      if(rend.length>52) rend=rend.slice(0,52)+"…";
+
+      var ltN=0, ltMax=0;
+      if(window.PerformanceObserver){ try{
+        new PerformanceObserver(function(l){ l.getEntries().forEach(function(en){
+          ltN++; if(en.duration>ltMax) ltMax=Math.round(en.duration); }); })
+        .observe({entryTypes:["longtask"]});
+      }catch(e){} }
+
+      /* Isolamento por passe. A pergunta que cada tecla responde, sozinha:
+         [1] sem a gema, a rolagem fica lisa? -> o custo é o shader da pedra.
+         [2] sem a poeira? -> é o passe de tela cheia.
+         [3] sem aura/brasas? -> é o outro loop de rAF, não a gema.
+         [b][f] sem bloom/risco? -> são as cópias do canvas WebGL para canvas 2D.
+         Se NADA disso resolver, o travamento não está no 3D e sim na página. */
+      /* [8] testa a hipótese que sobra: excesso de CAMADAS de tela cheia. Esta página compõe
+         cinco canvas sobrepostos — aura, gema, bloom, risco, brasas — mais o .grain em
+         mix-blend-mode. Cada canvas que muda precisa ser enviado ao compositor todo frame:
+         só aura + gema + brasas são 3 × 1351×641×4 ≈ 10 MB por frame. Numa HD 5500, que
+         divide a banda de memória com a CPU, isso satura o barramento sem aparecer em lugar
+         nenhum do nosso perfil — combina com gpu 0 e js 1.7ms num frame de 52ms. */
+      var lyB=true, lyF=true, lyA=true, lyL=true;
+      var grainEl=document.querySelector(".grain");
+      function paint(){ if(bc) bc.style.display=lyB?"block":"none";
+                        if(fc) fc.style.display=lyF?"block":"none";
+                        if(canvas) canvas.style.display=lyL?"block":"none";
+                        if(ec) ec.style.display=lyL?"block":"none";
+                        if(grainEl) grainEl.style.display=lyL?"":"none"; }
       window.addEventListener("keydown",function(e){
         if(e.ctrlKey||e.altKey||e.metaKey) return;
         var k=(e.key||"").toLowerCase();
-        if(k==="b"&&bc){ lyB=!lyB; bc.style.display=lyB?"block":"none"; }
-        else if(k==="f"&&fc){ lyF=!lyF; fc.style.display=lyF?"block":"none"; }
-        else if(k==="g"){ lyB=lyF=!(lyB||lyF);
-          if(bc) bc.style.display=lyB?"block":"none";
-          if(fc) fc.style.display=lyF?"block":"none"; }
+        if(k==="b"&&bc){ lyB=!lyB; paint(); }
+        else if(k==="f"&&fc){ lyF=!lyF; paint(); }
+        else if(k==="g"){ lyB=lyF=!(lyB||lyF); paint(); }
+        else if(k==="1"){ dbg.offGem=!dbg.offGem; }
+        else if(k==="2"){ dbg.offDust=!dbg.offDust; }
+        else if(k==="3"){ lyA=!lyA; if(lyA){ heroAwake=true; heroWake(); } else { heroAwake=false; } }
+        else if(k==="4"){ dbg.fin=!dbg.fin; }
+        /* cicla 0 -> 1 -> 2 -> 0, para dar para achar o degrau MÍNIMO que resolve */
+        else if(k==="7"){ liteLock=true; applyLite(liteBg?0:(liteOn?2:1)); }
+        else if(k==="8"){ lyL=!lyL; paint(); }
+        else if(k==="0"){ lyB=lyF=lyA=lyL=true; dbg.offGem=dbg.offDust=false; dbg.fin=true;
+                          liteLock=false; applyLite(0);
+                          paint(); heroAwake=true; heroWake(); ltN=0; ltMax=0;
+                          dbg.maxS=dbg.longS=dbg.max=dbg.long=dbg.win=0; }
       });
+
+      function n1(v){ return (Math.round(v*10)/10); }
       setInterval(function(){ var d=window.__txGem||{};
         hud.textContent=
-          "fps "+d.fps+"   escala "+d.scale+"   piso "+d.floor+"\n"+
-          "faisca "+d.spark+"/"+SPARKMAX+"   reflexao "+d.bounce+"/"+BOUNCEMAX+"\n"+
-          "gema  "+d.px+"  (css "+d.css+")\n"+
-          "aura  "+canvas.width+"x"+canvas.height+"\n"+
-          "dpr "+(window.devicePixelRatio||1)+"  gdpr "+gdpr+"  lowGpu "+(lowGpu?"sim":"nao")+"\n"+
-          "hc "+navigator.hardwareConcurrency+"  mem "+navigator.deviceMemory+"\n"+
-          "[b] bloom "+(lyB?"on ":"OFF")+"   [f] risco "+(lyF?"on ":"OFF")+"   [g] ambos";
+          "fps "+d.fps+"    frame "+d.ms+"ms    pior "+dbg.maxS+"ms    longos "+dbg.longS+"/60\n"+
+          "js "+d.js+"ms = math "+n1(dbg.math)+" + draw "+n1(dbg.draw)+" + gpu "+n1(dbg.gpu)+
+            " + bloom "+n1(dbg.bloom)+" + risco "+n1(dbg.flare)+"\n"+
+          "longtask "+ltN+"   pior "+ltMax+"ms\n"+
+          "gpu "+rend+"\n"+
+          "escala "+d.scale+"  piso "+d.floor+"   faisca "+d.spark+"/"+SPARKMAX+
+            "   reflexao "+d.bounce+"/"+BOUNCEMAX+"\n"+
+          "gema "+d.px+" (css "+d.css+")   aura "+canvas.width+"x"+canvas.height+"\n"+
+          "dpr "+(window.devicePixelRatio||1)+"  gdpr "+gdpr+"  lowGpu "+(lowGpu?"sim":"nao")+
+            "  hc "+navigator.hardwareConcurrency+"  mem "+navigator.deviceMemory+"\n"+
+          "[1]gema "+(dbg.offGem?"OFF":"on ")+" [2]poeira "+(dbg.offDust?"OFF":"on ")+
+            " [3]aura "+(lyA?"on ":"OFF")+" [4]finish "+(dbg.fin?"on ":"OFF")+
+            "  [7]lite "+(liteBg?"2 pagina+hero":(liteOn?"1 pagina":"0 nada"))+
+            (liteLock?" fixo":" auto")+"\n"+
+          "[b]bloom "+(lyB?"on ":"OFF")+" [f]risco "+(lyF?"on ":"OFF")+" [g]ambos"+
+            "  [8]camadas "+(lyL?"on ":"OFF")+"  [0]tudo on";
       },500);
     }
 
     /* ---- timeline: indice da secao + progresso local (robusto a alturas e viewports diferentes) ---- */
     var SECS=["hero","manifesto","autoridade","videos","antesdepois","numeros","gema","capa","oferta","faq","final"];
     var secEls=SECS.map(function(id){ return document.getElementById(id); });
+    /* Isto rodava 11 getBoundingClientRect POR FRAME, dentro do gframe, logo depois de o
+       loop do hero ter escrito um transform em .hero-inner. Cada leitura depois de uma
+       escrita força um reflow síncrono do documento inteiro — e este documento é grande.
+       Era a maior fonte isolada do travamento ao rolar.
+       Mas a posição das seções no DOCUMENTO não muda com o scroll: só com resize ou
+       mudança de conteúdo. Então mede-se uma vez (secGeom, em coordenadas de documento) e
+       a cada frame sobra subtrair window.scrollY. Zero layout no caminho quente.
+       Seguro contra transform: nenhuma das SECS é transformada — o parallax mexe no h2
+       dentro delas, e transform de filho não altera a caixa de layout do pai. */
+    var secGeom=null;
+    onGeomChange(function(){ secGeom=null; });
+    function measureSecs(){
+      var sy=window.scrollY||window.pageYOffset||0;
+      secGeom=secEls.map(function(sEl){
+        if(!sEl) return null;
+        var r=sEl.getBoundingClientRect();
+        return r.height>0?{top:r.top+sy,h:r.height}:null;
+      });
+    }
     function timelineT(){
-      var ref=window.innerHeight*0.5, first=-1;
-      for(var i=0;i<secEls.length;i++){
-        var sEl=secEls[i]; if(!sEl) continue;
-        var r=sEl.getBoundingClientRect(); if(r.height<=0) continue;
-        if(r.top<=ref && r.bottom>ref) return i+Math.min(Math.max((ref-r.top)/r.height,0),1);
-        if(r.top>ref && first<0) first=i;
+      if(!secGeom) measureSecs();
+      var ref=window.innerHeight*0.5, sy=window.scrollY||window.pageYOffset||0, first=-1;
+      for(var i=0;i<secGeom.length;i++){
+        var gm=secGeom[i]; if(!gm) continue;
+        var top=gm.top-sy, bot=top+gm.h;
+        if(top<=ref && bot>ref) return i+Math.min(Math.max((ref-top)/gm.h,0),1);
+        if(top>ref && first<0) first=i;
       }
-      return first>=0?Math.max(0,first-0.02):(secEls.length-1);
+      return first>=0?Math.max(0,first-0.02):(secGeom.length-1);
     }
     /* [t, corte, explosao, centro x, centro y, tamanho(maior = gema menor), camera z, opacidade, poeira, fogo] */
     var KF=[
@@ -2460,12 +2599,17 @@
       if(isTouch){ S[2]*=0.45; S[3]*=0.55; S[4]=S[4]*1.18+0.08; S[6]*=0.85; }
     }
 
-    var t0s=performance.now(), tCur=null, awake=true, ema=16, fcount=0, prev=0;
+    /* jsEma = tempo gasto DENTRO do gframe. Comparado com ema (intervalo real entre frames)
+       separa as duas causas possíveis de travamento: se js for uma fração pequena de ema, o
+       gargalo é GPU (o shader); se for grande, é CPU — layout forçado ou as cópias do canvas
+       WebGL para os canvas 2D, que bloqueiam esperando a GPU. */
+    var t0s=performance.now(), tCur=null, awake=true, ema=16, jsEma=0, fcount=0, prev=0;
     window.__txGem={cut:0,t:0,fps:0,scale:gscale};
     function gframe(now){
       /* zera gRaf ao sair: sem isso a flag ficaria travada num ID de frame morto e
          gwake() nunca mais religaria o loop após uma perda de contexto */
       if(!glok){ gRaf=0; return; }
+      var jsT0=performance.now();
       var tt=reduce?0.6:(now-t0s)/1000;
       var tg=timelineT();
       var fdt=prev?Math.min(Math.max(now-prev,4),100):16.7;
@@ -2500,11 +2644,12 @@
       /* transposta = leva direcao do espaco da pedra para o espaco da camera: prega as luzes no estudio */
       var MT=new Float32Array([cb,0,-sb,sb*sa,ca,cb*sa,sb*ca,-sa,cb*ca]);
       if(!reduce){ camz*=1.0+Math.sin(tt*0.196)*0.016+Math.sin(tt*0.083+1.3)*0.010; }
+      var pMath=dnow();
       var W=c.width,H=c.height;
       g.viewport(0,0,W,H);
       g.disable(g.BLEND);
       g.clear(g.COLOR_BUFFER_BIT);
-      if(dust>0.01){
+      if(dust>0.01 && !dbg.offDust){
         bindQuad(Pd);
         g.uniform2f(Pd.U.uRes,W,H);
         g.uniform2f(Pd.U.uDrift,tt*0.10+tCur*0.35,-tCur*1.10);
@@ -2512,7 +2657,7 @@
         g.drawArrays(g.TRIANGLES,0,3);
       }
       gemBox=null;
-      if(alpha>0.004){
+      if(alpha>0.004 && !dbg.offGem){
         /* bounding box da gema em pixels: so esses fragmentos pagam o ray-trace (com folga extra p/ as faiscas) */
         var Rb=1.30+ex*0.9+spark*0.62+caus*0.55, qm=Rb/Math.sqrt(Math.max(camz*camz-Rb*Rb,0.04));
         var half=(qm/size)*H*1.06;
@@ -2546,14 +2691,28 @@
           g.disable(g.BLEND);
         }
       }
+      /* barreira explícita: só em debug, e é o que transforma "GPU assíncrona" em número */
+      var pDraw=dnow(); if(DBG&&dbg.fin){ g.finish(); } var pGpu=dnow();
       if(bx){ bx.clearRect(0,0,bc.width,bc.height);
         if(BCUT) bx.filter=BCUT;
         try{ bx.drawImage(c,0,0,bc.width,bc.height); }catch(_){}
         if(BCUT) bx.filter="none"; }
+      var pBloom=dnow();
       /* sem pedra em quadro nao ha glint pra virar estrela — pula o pass inteiro */
       if(fx && alpha>0.02){ flare(); } else if(fx){ fx.clearRect(0,0,fc.width,fc.height); }
+      if(DBG){ var pFlare=dnow();
+        dbg.math =dbg.math *0.9+(pMath -jsT0  )*0.1;
+        dbg.draw =dbg.draw *0.9+(pDraw -pMath )*0.1;
+        dbg.gpu  =dbg.gpu  *0.9+(pGpu  -pDraw )*0.1;
+        dbg.bloom=dbg.bloom*0.9+(pBloom-pGpu  )*0.1;
+        dbg.flare=dbg.flare*0.9+(pFlare-pBloom)*0.1; }
       /* auto-tuning: mede o intervalo REAL entre frames (o custo e de GPU, nao de JS) e ajusta a resolucao */
-      if(prev){ var dt=now-prev; if(dt<400) ema=ema*0.85+dt*0.15; }
+      if(prev){ var dt=now-prev; if(dt<400) ema=ema*0.85+dt*0.15;
+        /* pior caso e contagem de frames longos numa janela de 60: é isto que distingue
+           "20fps parelho" de "60fps com engasgo", que a EMA achata e esconde */
+        if(DBG&&dt<2000){ if(dt>dbg.max) dbg.max=dt; if(dt>50) dbg.long++; dbg.win++;
+          if(dbg.win>=60){ dbg.maxS=Math.round(dbg.max); dbg.longS=dbg.long;
+                           dbg.max=0; dbg.long=0; dbg.win=0; } } }
       prev=now; fcount++;
       /* Reage rápido quando está ruim, sobe devagar quando está bom. Com janela fixa de
          30 frames, sair de uma sobrecarga levava vários segundos — tempo em que o
@@ -2563,12 +2722,16 @@
       var win=ema>40?12:30;
       if(fcount>win){ fcount=0; window.__txGem.fps=Math.round(1000/Math.max(ema,1));
         window.__txGem.scale=Math.round(gscale*100)/100; window.__txGem.spark=sparkN;
+        window.__txGem.ms=Math.round(ema*10)/10; window.__txGem.js=Math.round(jsEma*10)/10;
         window.__txGem.bounce=bounceN; window.__txGem.px=c.width+"x"+c.height;
         window.__txGem.css=c.clientWidth+"x"+c.clientHeight; window.__txGem.floor=MINS;
         if(ema>28){
-          /* Ordem de sacrifício: tudo que não borra primeiro — faísca, supersampling,
-             reflexões internas — e só então a nitidez nativa. */
-          if(sparkN>SPARKMIN){ sparkN=Math.max(SPARKMIN,Math.round(sparkN*(ema>40?0.6:0.8))); }
+          /* Ordem de sacrifício: primeiro o CSS caro (que não é nosso e custa mais), depois
+             tudo que não borra — faísca, supersampling, reflexões — e só então a nitidez. */
+          /* dois degraus, o do hero por último — ver os blocos perf-lite no <style> */
+          if(!liteOn && !liteLock && !isTouch){ autoLite(1); }
+          else if(!liteBg && !liteLock && !isTouch){ autoLite(2); }
+          else if(sparkN>SPARKMIN){ sparkN=Math.max(SPARKMIN,Math.round(sparkN*(ema>40?0.6:0.8))); }
           else if(gscale>NICE){ gscale=Math.max(NICE,gscale*0.88); gres(); }
           else if(bounceN>BOUNCEMIN){ bounceN--; }
           /* Descer ABAIXO do nativo é o último recurso e exige estar realmente ruim (>34ms
@@ -2590,6 +2753,7 @@
           else if(sparkN<SPARKMAX){ sparkN=Math.min(SPARKMAX,sparkN+3); }
           else if(gscale<MAXS){ gscale=Math.min(MAXS,gscale*1.05); gres(); }
         } }
+      jsEma=jsEma*0.85+(performance.now()-jsT0)*0.15;
       gRaf=awake?requestAnimationFrame(gframe):0;
     }
     /* a gema só dormia ao trocar de aba; fora da viewport seguia renderizando a full
@@ -3270,36 +3434,52 @@
      seções pinadas (who-pin, capa-pin) ficam bem mais altas que 1x viewport e nunca cruzariam um threshold fixo */
   var railIds=["hero","manifesto","autoridade","videos","antesdepois","numeros","gema","oferta","faq"];
   var railSecs=railIds.map(function(id){ return document.getElementById(id); });
+  /* Mesmo cache do secGeom: rodapé, CTAs e seções do rail em coordenadas de DOCUMENTO.
+     updateRail lia até 9 retângulos por chamada, e era chamada uma vez por frame durante a
+     rolagem — logo depois de o próprio handler ter escrito classes e a largura da barra de
+     progresso. Ler layout depois de escrever style força reflow síncrono; era a segunda
+     maior fonte do travamento, junto com o timelineT. */
+  var chromeGeom=null;
+  function geomBox(el){ if(!el) return null;
+    var sy=window.scrollY||window.pageYOffset||0, r=el.getBoundingClientRect();
+    return {top:r.top+sy, bot:r.bottom+sy}; }
+  function measureChrome(){
+    chromeGeom={ foot:geomBox(footer), offer:geomBox(offerSec), final:geomBox(finalSec),
+                 rail:railSecs.map(geomBox) }; }
+  onGeomChange(function(){ chromeGeom=null; });
   function updateRail(){
+    if(!chromeGeom) measureChrome();
+    var sy=window.scrollY||window.pageYOffset||0;
     var cy=window.innerHeight*0.5, id=null;
-    for(var i=0;i<railSecs.length;i++){ var s=railSecs[i]; if(!s) continue; var r=s.getBoundingClientRect();
-      if(r.top<=cy && r.bottom>=cy){ id=railIds[i]; break; } }
+    for(var i=0;i<chromeGeom.rail.length;i++){ var b=chromeGeom.rail[i]; if(!b) continue;
+      if((b.top-sy)<=cy && (b.bot-sy)>=cy){ id=railIds[i]; break; } }
     if(!id || id===lastRail) return;
     document.querySelectorAll(".rail a").forEach(function(a){ a.classList.toggle("active",a.getAttribute("data-rail")===id); });
-    if(lastRail!==null) Sound.whoosh(); lastRail=id;
+    lastRail=id;
   }
-
-  /* tick sutil em cliques interativos (só quando o som está ligado) */
-  document.addEventListener("click",function(e){ if(!Sound.isOn()) return;
-    if(e.target && e.target.closest && e.target.closest("button,.ba-tag,.rail a,[data-goto]")) Sound.tick(); },true);
 
   var topbar=document.getElementById("topbar"), dock=document.getElementById("dock"), footer=document.querySelector("footer"), progressBar=document.getElementById("progress");
   var offerSec=document.getElementById("oferta"), finalSec=document.getElementById("final");
-  function ctaInView(el){ if(!el)return false; var r=el.getBoundingClientRect(); return r.top<window.innerHeight*0.72 && r.bottom>window.innerHeight*0.32; }
-  /* Este handler lê a posição do rodapé (e ctaInView lê mais retângulos) e logo em
-     seguida escreve classes e largura da barra — reflow síncrono a cada evento de
-     scroll, que é o que deixava a rolagem engasgada no desktop. O trabalho passa a
-     acontecer no máximo uma vez por frame. */
+  function ctaInView(b){ if(!b)return false;
+    var sy=window.scrollY||window.pageYOffset||0, vh=window.innerHeight;
+    return (b.top-sy)<vh*0.72 && (b.bot-sy)>vh*0.32; }
+  /* Uma vez por frame já era; o que faltava era a ORDEM. Aqui se escrevia classe e largura
+     da barra e só então se lia o retângulo do rodapé e os dos CTAs — cada leitura depois de
+     escrita obriga o navegador a refazer o layout na hora. Agora decide-se tudo primeiro
+     (aritmética sobre scrollY, sem tocar em layout) e só no fim se escreve. */
   var chromeTick=false;
   window.addEventListener("scroll",function(){
     if(chromeTick) return; chromeTick=true;
     requestAnimationFrame(function(){
       chromeTick=false;
-      topbar.classList.toggle("solid",window.scrollY>40);
-      progressBar.style.width=(scrollProg()*100)+"%";
-      var pastHero=window.scrollY>window.innerHeight*0.85;
-      var footTop=footer.getBoundingClientRect().top;
-      dock.classList.toggle("show",pastHero && footTop>window.innerHeight && !ctaInView(offerSec) && !ctaInView(finalSec));
+      if(!chromeGeom) measureChrome();
+      var sy=window.scrollY||window.pageYOffset||0, vh=window.innerHeight;
+      var solid=sy>40, prog=scrollProg()*100;
+      var showDock=(sy>vh*0.85) && !!chromeGeom.foot && (chromeGeom.foot.top-sy)>vh
+                   && !ctaInView(chromeGeom.offer) && !ctaInView(chromeGeom.final);
+      topbar.classList.toggle("solid",solid);
+      progressBar.style.width=prog+"%";
+      dock.classList.toggle("show",showDock);
       updateRail();
     });
   },{passive:true});
@@ -3330,7 +3510,6 @@
   document.querySelectorAll("[data-buy]").forEach(function(a){ a.addEventListener("click",function(){
     try{ if(window.fbq) fbq("track","InitiateCheckout"); }catch(e){}
     try{ if(window.ttq) ttq.track("InitiateCheckout"); }catch(e){}
-    try{ Sound.tick(); }catch(e){}
   }); });
 
 })();
