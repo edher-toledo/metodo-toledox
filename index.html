@@ -1467,6 +1467,13 @@
      animando ao rolar, o arrasto de janela no desktop — vira no máximo uma execução por
      frame. Sozinho isso já corta a maior parte do estrago; junto com as guardas de "não
      mudou" em cada handler, a barra do iOS deixa de recriar buffers por completo. */
+  /* Forense do piscar. Duas causas possíveis, indistinguíveis a olho nu:
+       · realocação de canvas (gres) — zera o drawing buffer por um frame;
+       · perda de contexto WebGL — o iOS derruba contextos sob pressão de memória; aí o
+         fundo cai para o gradiente CSS e a gema some até restaurar.
+     Estes contadores dizem qual das duas, sem adivinhação. Aparecem no HUD do #debug. */
+  var glLost={aura:0,gem:0,resize:0};
+
   function onResize(fn){
     var raf=0;
     window.addEventListener("resize",function(){ if(raf) return;
@@ -1571,7 +1578,7 @@
   ok=buildAura();
   if(!ok){ auraFallback(true); }
   if(gl){
-    canvas.addEventListener("webglcontextlost",function(e){ e.preventDefault(); ok=false; auraFallback(true); },false);
+    canvas.addEventListener("webglcontextlost",function(e){ e.preventDefault(); glLost.aura++; ok=false; auraFallback(true); },false);
     canvas.addEventListener("webglcontextrestored",function(){ ok=buildAura(); if(ok){ auraFallback(false); resize(); } },false);
   }
 
@@ -2417,10 +2424,19 @@
     /* segunda alavanca sem borrão: reflexões internas (3 → 2). Ver o comentário no laço. */
     var BOUNCEMAX=3, BOUNCEMIN=2, bounceN=3;
     var gdpr=Math.min(window.devicePixelRatio||1,isTouch?2:1.5);
-    /* NICE é a resolução nativa (gscale=1 ⇒ 1 pixel do canvas por pixel da tela).
-       Abaixo disso a gema é ampliada e SEMPRE parece borrada, por melhor que esteja o
-       FPS — por isso o adaptativo persegue este alvo antes de qualquer outra coisa. */
-    var NICE=1.0;
+    /* NICE é o alvo de nitidez: a escala abaixo da qual a imagem começa a parecer borrada
+       NAQUELA tela. O adaptativo persegue este valor antes de qualquer outra coisa.
+       Ele NÃO é 1.0 universal, e tratá-lo como universal causou o piscar no celular. No
+       desktop 1.0 é mesmo o alvo (gdpr=1, então gscale É a resolução). No celular gdpr já
+       vale 2, e 0.62 de escala entrega 1,24 pixel de canvas por pixel de CSS — ou seja, o
+       mobile JÁ nasce acima do nativo. Com NICE fixo em 1.0, `gscale<NICE` era eternamente
+       verdadeiro lá: a cada janela do adaptativo o ramo de recuperação subia a escala e
+       chamava gres(). E redimensionar um canvas WebGL zera o drawing buffer — com
+       preserveDrawingBuffer:true, o compositor podia exibir esse buffer vazio antes do
+       próximo rAF pintar. Era esse o piscar, a cada ~30 frames, com a página parada.
+       Pior: a subida ignorava MAXS (0.8) e ia até 1.0, ficava cara demais, caía e subia de
+       novo — oscilação sustentada, mais pixels e mais calor do que o previsto. */
+    var NICE=isTouch?0.62:1.0;
     /* Por que o mobile está nítido e o desktop não, com o MESMO código: é densidade, não
        resolução. O iPhone renderiza ~487px de canvas (393 CSS × gdpr 2 × 0.62) sobre 1179
        pixels FÍSICOS — upscale de 2,4×, e ninguém vê, porque são ~460 PPI. O notebook a
@@ -2451,6 +2467,7 @@
       /* o handler mais caro dos cinco: realoca QUATRO buffers, e o da gema é WebGL. Mesma
          guarda da aura — sem ela, cada transição da barra do Safari recriava todos. */
       if(c.width===w && c.height===h) return;
+      glLost.resize++;
       c.width=w; c.height=h;
       if(bx){ bc.width=Math.max(1,Math.round(w*BSC)); bc.height=Math.max(1,Math.round(h*BSC)); }
       if(fx){ var fw=Math.max(1,Math.round(w*FSC)), fh=Math.max(1,Math.round(h*FSC));
@@ -2556,6 +2573,7 @@
           "js "+d.js+"ms = math "+n1(dbg.math)+" + draw "+n1(dbg.draw)+" + gpu "+n1(dbg.gpu)+
             " + bloom "+n1(dbg.bloom)+" + risco "+n1(dbg.flare)+"\n"+
           "longtask "+ltN+"   pior "+ltMax+"ms\n"+
+          "piscar: realoc "+glLost.resize+"   ctx perdido aura "+glLost.aura+" gema "+glLost.gem+"\n"+
           "gpu "+rend+"\n"+
           "escala "+d.scale+"  piso "+d.floor+"   faisca "+d.spark+"/"+SPARKMAX+
             "   reflexao "+d.bounce+"/"+BOUNCEMAX+"\n"+
@@ -2800,8 +2818,13 @@
              faixa morta de 6ms que absorve o custo do próprio passo, então ele converge na
              maior escala que a máquina sustenta em vez de oscilar em volta dela. */
           gscale=Math.min(NICE,gscale*1.06); gres();
-        } else if(ema<22){
-          /* Já nativo e com folga: devolve reflexão, depois faísca, supersampling por último. */
+        } else if(ema<(isTouch?17:22)){
+          /* Já no alvo e com folga: devolve reflexão, depois faísca, supersampling por último.
+             Limiar mais exigente no celular (17ms ≈ 59fps, como era antes de tudo isto): ali
+             cada passo de escala custa um gres(), e gres() zera o drawing buffer. Exigir
+             folga real para subir mantém a distância até o limiar de queda (28ms) grande o
+             bastante para o adaptativo assentar em vez de ficar subindo e descendo — o que
+             no celular não custa só desempenho, custa um piscar visível a cada passo. */
           if(bounceN<BOUNCEMAX){ bounceN++; }
           else if(sparkN<SPARKMAX){ sparkN=Math.min(SPARKMAX,sparkN+3); }
           else if(gscale<MAXS){ gscale=Math.min(MAXS,gscale*1.05); gres(); }
@@ -2822,7 +2845,7 @@
        callback chegasse com a aba oculta. A economia já veio de onde importa — contagem
        de faíscas e resolução adaptativas. Resta pausar com a aba oculta. */
     document.addEventListener("visibilitychange",function(){ awake=!document.hidden&&glok; gwake(); });
-    c.addEventListener("webglcontextlost",function(e){ e.preventDefault(); glok=false; awake=false; gRaf=0; },false);
+    c.addEventListener("webglcontextlost",function(e){ e.preventDefault(); glLost.gem++; glok=false; awake=false; gRaf=0; },false);
     c.addEventListener("webglcontextrestored",function(){ glok=build(); if(glok){ gres(); awake=!document.hidden; gwake(); } },false);
     gwake();
   })();
