@@ -1463,6 +1463,16 @@
      cancel() para quando o ponteiro sai (senão um frame pendente reaplicaria o tilt depois
      do pointerleave e o card ficaria torto); flush() para quando um arrasto termina e os
      últimos pixels ainda precisam ser aplicados. */
+  /* Registra um handler de resize coalescido: um BURST de eventos — a barra do Safari no iOS
+     animando ao rolar, o arrasto de janela no desktop — vira no máximo uma execução por
+     frame. Sozinho isso já corta a maior parte do estrago; junto com as guardas de "não
+     mudou" em cada handler, a barra do iOS deixa de recriar buffers por completo. */
+  function onResize(fn){
+    var raf=0;
+    window.addEventListener("resize",function(){ if(raf) return;
+      raf=requestAnimationFrame(function(){ raf=0; fn(); }); },{passive:true});
+  }
+
   function rafPointer(fn){
     var last=null, raf=0;
     function run(){ raf=0; var p=last; last=null; if(p) fn(p); }
@@ -1582,20 +1592,37 @@
      reamostragem de 0,989×, não-inteira, na camada que cobre a página inteira. Sutil e
      constante, e sobreviveu a todas as correções de escala porque não era escala nenhuma.
      O gres() da gema já media certo (c.clientWidth) — era só a aura e as brasas. */
+  /* Atribuir a canvas.width realoca o bitmap MESMO quando o valor é idêntico — é o idioma
+     padrão para limpar um canvas, não uma otimização que o navegador faça por conta. No iOS
+     a barra do Safari aparecendo e sumindo dispara resize a cada rolagem rápida, e sem esta
+     guarda cada evento recriava todos os buffers da página (~7,5 MB, vários com respaldo em
+     GPU). O WebKit não libera memória de canvas de forma síncrona: rolando rápido de
+     propósito, a fila de liberação cresce mais rápido que a coleta e o iOS mata a aba. */
   function resize(){ if(!ok) return;
     var cw=canvas.clientWidth||window.innerWidth, ch=canvas.clientHeight||window.innerHeight;
     var w=Math.floor(cw*dpr*scale), h=Math.floor(ch*dpr*scale);
-    canvas.width=w; canvas.height=h; gl.viewport(0,0,w,h);
+    if(canvas.width!==w || canvas.height!==h){ canvas.width=w; canvas.height=h; }
+    /* viewport FORA da guarda: depois de webglcontextrestored as dimensões podem estar
+       iguais e, ainda assim, o viewport do contexto novo precisa ser reposto. */
+    gl.viewport(0,0,w,h);
   }
-  resize(); window.addEventListener("resize",resize);
+  resize(); onResize(resize);
 
   /* ---------------- embers (2D) ---------------- */
   var ec=document.getElementById("embers"), ex=ec.getContext("2d");
   var eparts=[], ew=0, eh=0, edpr=Math.min(window.devicePixelRatio||1,1.5);
   /* mesma correção da aura: #embers também é fixed/inset:0, então a largura certa é a do
      elemento, não a do viewport com barra de rolagem — senão cada brasa é reamostrada */
-  function eresize(){ ew=ec.clientWidth||window.innerWidth; eh=ec.clientHeight||window.innerHeight;
-    ec.width=Math.round(ew*edpr); ec.height=Math.round(eh*edpr); ex.setTransform(edpr,0,0,edpr,0,0);
+  var eInit=false;
+  function eresize(){
+    var nw=ec.clientWidth||window.innerWidth, nh=ec.clientHeight||window.innerHeight;
+    var bw=Math.round(nw*edpr), bh=Math.round(nh*edpr);
+    /* Além de realocar o bitmap, isto recriava TODAS as partículas a cada evento de resize.
+       No iOS, onde a barra do Safari dispara resize a cada rolagem, as brasas se
+       teleportavam a cada transição — a guarda corrige um defeito visual, não introduz um. */
+    if(eInit && ec.width===bw && ec.height===bh) return;
+    eInit=true; ew=nw; eh=nh;
+    ec.width=bw; ec.height=bh; ex.setTransform(edpr,0,0,edpr,0,0);
     var count=reduce?0:(isTouch?26:60); eparts=[];
     for(var i=0;i<count;i++) eparts.push(mkPart(true));
   }
@@ -1604,7 +1631,7 @@
     r:Math.random()*2.2+0.6, vy:Math.random()*0.6+0.25,
     drift:(Math.random()-0.5)*0.4, a:Math.random()*0.5+0.2,
     depth:Math.random()*0.7+0.3, tw:Math.random()*6.28, violet:Math.random()<0.16 }; }
-  eresize(); window.addEventListener("resize",eresize);
+  eresize(); onResize(eresize);
 
   /* ---------------- pointer / tilt ---------------- */
   var progCur=0,progTarget=0, mx=0,my=0, mtx=0,mty=0, vmx=0,vmy=0, metTarget=0, metCur=0;
@@ -2421,12 +2448,15 @@
       var nat=Math.round(c.clientWidth*c.clientHeight*gdpr*gdpr);
       var cap=Math.max(isTouch?1300000:(lowGpu?1600000:2200000),nat), px=w*h;
       if(px>cap){ var f=Math.sqrt(cap/px); w=Math.max(1,Math.floor(w*f)); h=Math.max(1,Math.floor(h*f)); }
+      /* o handler mais caro dos cinco: realoca QUATRO buffers, e o da gema é WebGL. Mesma
+         guarda da aura — sem ela, cada transição da barra do Safari recriava todos. */
+      if(c.width===w && c.height===h) return;
       c.width=w; c.height=h;
       if(bx){ bc.width=Math.max(1,Math.round(w*BSC)); bc.height=Math.max(1,Math.round(h*BSC)); }
       if(fx){ var fw=Math.max(1,Math.round(w*FSC)), fh=Math.max(1,Math.round(h*FSC));
         fc.width=fw; fc.height=fh; sCan.width=fw; sCan.height=fh; }
     }
-    gres(); window.addEventListener("resize",gres);
+    gres(); onResize(gres);
 
     /* ---------------- profiler (#debug) ----------------
        Duas perguntas que a média de FPS não responde:
@@ -2895,7 +2925,9 @@
           el.style.transform="translate3d(0,"+snap(off*-20)+"px,0)"; });
         plxTick=false; }
       window.addEventListener("scroll",function(){ if(!plxTick){ plxTick=true; requestAnimationFrame(plxUpdate); } },{passive:true});
-      window.addEventListener("resize",plxUpdate); plxUpdate();
+      /* não aloca, mas lê o retângulo de cada .shead h2 e escreve transform em seguida —
+         numa rajada de resize do iOS isso é reflow forçado por evento */
+      onResize(plxUpdate); plxUpdate();
     }
   }
 
@@ -3013,8 +3045,17 @@
       /* fagulhas (embers) atrás do card */
       var ec=embersId?document.getElementById(embersId):null, ex=ec&&ec.getContext?ec.getContext("2d"):null;
       var ew=0, eh=0, edpr=Math.min(window.devicePixelRatio||1,1.5), eparts=[], EMAX=isTouch?18:34;
-      function esize(){ if(!ex)return; var r=stage.getBoundingClientRect(); ew=r.width*1.24; eh=r.height*1.30;
-        ec.width=Math.max(1,Math.round(ew*edpr)); ec.height=Math.max(1,Math.round(eh*edpr)); ex.setTransform(edpr,0,0,edpr,0,0); }
+      /* mesma guarda dos outros: esize() é chamado no resize E toda vez que a seção entra na
+         viewport, então sem ela o canvas era recriado a cada passagem pela oferta */
+      var eSized=false;
+      function esize(){ if(!ex)return; var r=stage.getBoundingClientRect();
+        var nw=r.width*1.24, nh=r.height*1.30;
+        var bw=Math.max(1,Math.round(nw*edpr)), bh=Math.max(1,Math.round(nh*edpr));
+        /* eSized e não só a comparação: um canvas recém-criado nasce 300×150, e se por acaso
+           for essa a medida calculada, ew/eh ficariam em zero e as fagulhas sumiriam */
+        if(eSized && ec.width===bw && ec.height===bh) return;
+        eSized=true; ew=nw; eh=nh;
+        ec.width=bw; ec.height=bh; ex.setTransform(edpr,0,0,edpr,0,0); }
       function espawn(){ return {x:Math.random()*ew, y:eh+8, vy:-(0.18+Math.random()*0.5), vx:(Math.random()-0.5)*0.22,
         r:0.6+Math.random()*1.7, life:0, max:150+Math.random()*180, warm:Math.random()<0.5, violet:Math.random()<0.15}; }
       function edraw(){ if(!ex)return; ex.clearRect(0,0,ew,eh); ex.globalCompositeOperation="lighter";
@@ -3056,7 +3097,7 @@
       var did=false;
       function reveal(){ if(did)return; did=true; if(onReveal) onReveal(card); }
 
-      esize(); window.addEventListener("resize",esize,{passive:true});
+      esize(); onResize(esize);
       new IntersectionObserver(function(es){ es.forEach(function(en){ inView=en.isIntersecting;
         if(inView){ reveal(); esize(); start(); } else { stop(); } }); },{threshold:0.32}).observe(stage);
       document.addEventListener("visibilitychange",function(){ if(document.hidden){ stop(); } else if(inView){ start(); } });
@@ -3479,7 +3520,7 @@
        seek liga has-video sem que nada esteja tocando — travaria no primeiro card. */
     if(!reduce){ setInterval(function(){ if(userTook||!inView||hover||dragging||vidSound) return; var a=cards[idx]; if(a && a.classList.contains(tapToPlay?"is-playing":"has-video")) return; next(); },6000); }
 
-    window.addEventListener("resize",layout);
+    onResize(layout);
     buildDots(); layout();
   })();
 
