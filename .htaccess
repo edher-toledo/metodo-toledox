@@ -1,0 +1,111 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Método TOLEDOX — segurança, canonicalização e limpeza do WordPress residual
+#
+# Motivo: o domínio caiu em blocklist de reputação (interstício do TikTok via
+# tiktoklinksafety.com). Os sinais que causam isso são todos de servidor:
+# instalação WordPress abandonada exposta, ausência de URL canônica e HTTP
+# puro respondendo 200. Este arquivo elimina os três.
+#
+# Local: raiz do public_html, junto do index.html.
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ── Não expor estrutura de diretórios ──────────────────────────────────────
+Options -Indexes
+ServerSignature Off
+
+DirectoryIndex index.html index.htm
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# ── 1. HTTPS obrigatório ───────────────────────────────────────────────────
+# Hoje http://toledox.com.br responde 200 sem redirecionar. Scanner de
+# reputação lê "conteúdo servido em canal inseguro" como sinal de risco.
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://toledox.com.br/$1 [R=301,L]
+
+# ── 2. www → raiz (URL canônica única) ─────────────────────────────────────
+# O alerta do TikTok apontava para www.toledox.com.br. Quatro URLs servindo
+# o mesmo 200 (http/https × www/raiz) é sinal de configuração abandonada.
+RewriteCond %{HTTP_HOST} ^www\.toledox\.com\.br$ [NC]
+RewriteRule ^(.*)$ https://toledox.com.br/$1 [R=301,L]
+
+# ── 3. Bloqueio do WordPress residual ──────────────────────────────────────
+# A landing estática foi colocada por cima do WP antigo, mas a instalação
+# continua ativa e acessível. Isso é o gatilho principal da blocklist:
+#   wp-login.php .......... 200 (tela de login pública)
+#   wp-admin/ ............. 302 para o login
+#   xmlrpc.php ............ 405 (aceita POST: brute-force e amplificação)
+#   wp-json/wp/v2/users ... 200 (vazava o usuário admin "edher")
+#   readme.html ........... 200 (expõe a versão do WordPress)
+#
+# Se a instalação for apagada do public_html (recomendado), estas regras
+# passam a ser inofensivas — apenas mantêm o bloqueio caso algo sobre.
+RewriteRule ^wp-login\.php$                              - [F,L]
+RewriteRule ^wp-admin(/.*)?$                             - [F,L]
+RewriteRule ^wp-includes(/.*)?$                          - [F,L]
+RewriteRule ^wp-content(/.*)?$                           - [F,L]
+RewriteRule ^wp-json(/.*)?$                              - [F,L]
+RewriteRule ^xmlrpc\.php$                                - [F,L]
+RewriteRule ^wp-cron\.php$                               - [F,L]
+RewriteRule ^wp-trackback\.php$                          - [F,L]
+RewriteRule ^wp-signup\.php$                             - [F,L]
+RewriteRule ^(readme\.html|license\.txt)$                - [F,L]
+RewriteRule ^wp-config(-sample)?\.php$                   - [F,L]
+RewriteRule ^author(/.*)?$                               - [F,L]
+RewriteRule ^wp-sitemap.*\.xml$                          - [F,L]
+RewriteRule ^\?author=                                   - [F,L]
+
+# Enumeração de usuário por querystring (?author=1 → nome do admin)
+RewriteCond %{QUERY_STRING} (^|&)author=\d
+RewriteRule ^ - [F,L]
+</IfModule>
+
+# ── 4. Headers de segurança ────────────────────────────────────────────────
+# Scanners de reputação pontuam positivamente a presença destes headers.
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options    "nosniff"
+  Header always set X-Frame-Options           "SAMEORIGIN"
+  Header always set Referrer-Policy           "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy        "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+
+  # CSP: o site é 100% self-contained (fontes em data URI, sem script externo,
+  # sem iframe). 'unsafe-inline' é necessário porque CSS e JS são inline.
+  # Se algo quebrar depois de publicar, basta comentar esta linha.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://pay.hotmart.com; object-src 'none'; upgrade-insecure-requests"
+</IfModule>
+
+# ── 5. Compressão e cache ──────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # HTML com validade zero: o navegador revalida a cada visita e recebe 304 (resposta
+  # vazia, barata) quando nada mudou. Sem isso, uma correção publicada demora até 1h
+  # pra alcançar quem já visitou — inaceitável numa landing em campanha.
+  ExpiresByType text/html                 "access plus 0 seconds"
+  ExpiresByType application/xml           "access plus 0 seconds"
+  ExpiresByType text/plain                "access plus 0 seconds"
+  # Mídia é pesada (2 vídeos de ~15 MB) e o nome do arquivo não muda: cache longo.
+  # Ao TROCAR uma imagem ou vídeo, renomeie o arquivo — senão o navegador de quem
+  # já baixou continuará servindo a versão antiga.
+  ExpiresByType image/jpeg                "access plus 1 year"
+  ExpiresByType image/png                 "access plus 1 year"
+  ExpiresByType image/svg+xml             "access plus 1 year"
+  ExpiresByType video/mp4                 "access plus 1 year"
+  ExpiresByType text/css                  "access plus 1 month"
+</IfModule>
+
+# Reforça a política acima — o mod_expires sozinho não vence o Cache-Control que a
+# camada de cache da hospedagem injeta nas respostas.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|xml|txt)$">
+    Header set Cache-Control "no-cache, must-revalidate, max-age=0"
+  </FilesMatch>
+  <FilesMatch "\.(jpg|jpeg|png|gif|svg|webp|ico|mp4|webm|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000"
+  </FilesMatch>
+</IfModule>

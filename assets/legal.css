@@ -1,0 +1,43 @@
+/* Método TOLEDOX — folha compartilhada das páginas legais (privacidade, termos).
+   Reusa a paleta vermelho/preto do index.html sem carregar a camada WebGL. */
+:root{
+  color-scheme:dark;
+  --bg:#070406; --bg-2:#0c0608;
+  --ink:#f6eeef; --ink-dim:#c6b4b7; --ink-faint:#9a8a8e;
+  --line:rgba(246,238,239,.10); --line-strong:rgba(246,238,239,.20);
+  --red:#ff2333; --red-soft:#ff5a63;
+  --font-display:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
+  --font-body:"Sora",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --font-mono:ui-monospace,"SFMono-Regular","Cascadia Code",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink-dim);
+  font-family:var(--font-body); font-size:1rem; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,35,51,.10),transparent 70%);
+  background-repeat:no-repeat;
+}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+header{border-bottom:1px solid var(--line);padding:26px 0}
+.brand{font-family:var(--font-display);font-weight:600;letter-spacing:.06em;color:var(--ink);font-size:1rem;text-decoration:none;display:inline-block}
+.brand b{color:var(--red)}
+main{padding:52px 0 40px}
+h1{font-family:var(--font-display);font-weight:700;color:var(--ink);font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.15;margin:0 0 10px}
+.upd{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-faint);margin:0 0 40px}
+h2{font-family:var(--font-display);font-weight:600;color:var(--ink);font-size:1.15rem;margin:38px 0 12px;padding-top:22px;border-top:1px solid var(--line)}
+p,li{font-size:.95rem}
+a{color:var(--red-soft);text-decoration:none;border-bottom:1px solid rgba(255,90,99,.35)}
+a:hover{color:var(--red)}
+ul{padding-left:20px}
+li{margin-bottom:9px}
+strong{color:var(--ink);font-weight:600}
+.box{border:1px solid var(--line-strong);border-radius:14px;padding:18px 20px;background:rgba(255,255,255,.02);margin:22px 0}
+.box p:first-child{margin-top:0}
+.box p:last-child{margin-bottom:0}
+footer{border-top:1px solid var(--line);padding:30px 0 46px;margin-top:50px}
+footer p{font-family:var(--font-mono);font-size:.76rem;color:var(--ink-faint);margin:0 0 10px}
+.navlinks{display:flex;gap:18px;flex-wrap:wrap}
+.navlinks a{font-size:.82rem;border:none;min-height:44px;display:inline-flex;align-items:center}
+.back{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-size:.85rem;border:none;min-height:44px}
