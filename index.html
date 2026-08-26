@@ -1451,6 +1451,29 @@
      do grid. Ler o dpr a cada chamada cobre zoom e troca de monitor. */
   function snap(v){ var d=window.devicePixelRatio||1; return Math.round(v*d)/d; }
 
+  /* Agrupa um handler de ponteiro em no MÁXIMO uma execução por frame, guardando o último
+     evento. Os handlers de tilt e magnetismo liam getBoundingClientRect e logo em seguida
+     escreviam um transform — leitura de layout seguida de escrita, uma vez por EVENTO de
+     mouse. Um mouse de 1000Hz gera ~16 desses por frame, e leitura depois de escrita força
+     reflow síncrono: é o mesmo padrão que travava a rolagem, só que no hover.
+     NÃO se guarda o retângulo em cache, de propósito: o elemento medido é o mesmo que o
+     handler transforma, então um retângulo congelado mudaria a realimentação e, com ela, o
+     movimento. Lendo fresco uma vez por frame a matemática é idêntica — e a tela não teria
+     como mostrar mais de um estado por frame de qualquer maneira.
+     cancel() para quando o ponteiro sai (senão um frame pendente reaplicaria o tilt depois
+     do pointerleave e o card ficaria torto); flush() para quando um arrasto termina e os
+     últimos pixels ainda precisam ser aplicados. */
+  function rafPointer(fn){
+    var last=null, raf=0;
+    function run(){ raf=0; var p=last; last=null; if(p) fn(p); }
+    var h=function(e){
+      last={clientX:e.clientX,clientY:e.clientY,target:e.target,pointerType:e.pointerType};
+      if(!raf) raf=requestAnimationFrame(run); };
+    h.cancel=function(){ last=null; if(raf){ cancelAnimationFrame(raf); raf=0; } };
+    h.flush=function(){ if(raf){ cancelAnimationFrame(raf); run(); } };
+    return h;
+  }
+
   /* ---------------- perf-lite (ver os dois blocos no <style>) ----------------
      Nível 0 = tudo ligado. 1 = cai o CSS caro do corpo da página (blur animado nos reveals,
      padding animado, backdrop-filter). 2 = cai também o do hero (filtro de tela cheia no
@@ -2900,10 +2923,33 @@
     var cur=document.createElement("div"); cur.className="cur-ember"; cur.setAttribute("aria-hidden","true"); document.body.appendChild(cur);
     var cxr=window.innerWidth/2, cyr=window.innerHeight/2, cxs=cxr, cys=cyr;
     var curSel="a,button,summary,.vcard,.ba-handle,[data-goto],[data-magnetic]";
-    window.addEventListener("pointermove",function(e){ if(e.pointerType==="touch")return; cxr=e.clientX; cyr=e.clientY; cur.style.opacity="1";
-      cur.classList.toggle("big", !!(e.target && e.target.closest && e.target.closest(curSel))); },{passive:true});
+    var curRaf=0, curBig=false, curShown=false;
+    /* A mola converge sozinha — depois disso o loop reescrevia o MESMO transform 60×/s, para
+       sempre, mesmo com o mouse parado há minutos. E .cur-ember tem mix-blend-mode:screen +
+       filter:blur(.4px): cada reescrita obriga o compositor a refazer blend e filtro da
+       camada. Agora ele dorme ao assentar e o pointermove acorda.
+       O movimento é idêntico: no frame em que assenta o transform ainda é escrito, e já com
+       o valor cravado no alvo — o corte a 0,05px é menor que o arredondamento de toFixed(1)
+       que sempre esteve ali, então nenhum frame que antes mudava algo deixa de ser pintado. */
+    function cstep(){
+      cxs+=(cxr-cxs)*0.18; cys+=(cyr-cys)*0.18;
+      var done=Math.abs(cxr-cxs)<0.05 && Math.abs(cyr-cys)<0.05;
+      if(done){ cxs=cxr; cys=cyr; }
+      cur.style.transform="translate("+cxs.toFixed(1)+"px,"+cys.toFixed(1)+"px) translate(-50%,-50%)";
+      curRaf=done?0:requestAnimationFrame(cstep);
+    }
+    function cwake(){ if(!curRaf) curRaf=requestAnimationFrame(cstep); }
+    window.addEventListener("pointermove",function(e){ if(e.pointerType==="touch")return;
+      cxr=e.clientX; cyr=e.clientY;
+      /* opacity e a classe só quando MUDAM. closest() percorre a árvore testando 7 seletores
+         e rodava em todo evento de mouse — num mouse de alta taxa, centenas de vezes por
+         segundo, sempre para chegar ao mesmo resultado. */
+      if(!curShown){ curShown=true; cur.style.opacity="1"; }
+      var big=!!(e.target && e.target.closest && e.target.closest(curSel));
+      if(big!==curBig){ curBig=big; cur.classList.toggle("big",big); }
+      cwake(); },{passive:true});
     window.addEventListener("pointerdown",function(){ cur.classList.add("pulse"); setTimeout(function(){ cur.classList.remove("pulse"); },450); });
-    (function cstep(){ cxs+=(cxr-cxs)*0.18; cys+=(cyr-cys)*0.18; cur.style.transform="translate("+cxs.toFixed(1)+"px,"+cys.toFixed(1)+"px) translate(-50%,-50%)"; requestAnimationFrame(cstep); })();
+    cwake();
   }
 
   /* ---------------- numeros: contadores scrubbados pelo scroll (sobem e voltam com voce) ---------------- */
@@ -2934,11 +2980,12 @@
   var grid=document.getElementById("methodGrid");
   if(grid && !isTouch){
     grid.querySelectorAll(".pillar").forEach(function(card){
-      card.addEventListener("pointermove",function(e){ var r=card.getBoundingClientRect();
+      var pmP=rafPointer(function(e){ var r=card.getBoundingClientRect();
         var px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
         card.style.transform="rotateY("+((px-0.5)*13)+"deg) rotateX("+((0.5-py)*13)+"deg) translateY(-4px)";
         card.style.setProperty("--mx",(px*100)+"%"); card.style.setProperty("--my",(py*100)+"%"); });
-      card.addEventListener("pointerleave",function(){ card.style.transform=""; });
+      card.addEventListener("pointermove",pmP);
+      card.addEventListener("pointerleave",function(){ pmP.cancel(); card.style.transform=""; });
     });
   }
 
@@ -2993,10 +3040,13 @@
       function stop(){ active=false; }
 
       if(!isTouch){
-        stage.addEventListener("pointermove",function(e){ var r=card.getBoundingClientRect();
+        var pmO=rafPointer(function(e){ var r=card.getBoundingClientRect();
           var px=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)), py=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
           hover=true; tgX=(px-0.5)*12; tgY=(0.5-py)*12; tmx=px*100; tmy=py*100; });
-        stage.addEventListener("pointerleave",function(){ hover=false; tgX=0; tgY=0; tmx=50; tmy=50; });
+        stage.addEventListener("pointermove",pmO);
+        /* cancel antes de zerar: um frame pendente reativaria hover=true depois da saída e a
+           carta ficaria presa no último tilt em vez de voltar ao repouso */
+        stage.addEventListener("pointerleave",function(){ pmO.cancel(); hover=false; tgX=0; tgY=0; tmx=50; tmy=50; });
       } else if(window.DeviceOrientationEvent){
         window.addEventListener("deviceorientation",function(e){ if(e.gamma==null||e.beta==null)return;
           hover=true; tgX=Math.max(-10,Math.min(10,e.gamma*0.35)); tgY=Math.max(-8,Math.min(8,(e.beta-40)*0.2)); },true);
@@ -3029,9 +3079,10 @@
   /* ---------------- magnetic buttons ---------------- */
   if(!isTouch && !reduce){
     document.querySelectorAll("[data-magnetic]").forEach(function(b){
-      b.addEventListener("pointermove",function(e){ var r=b.getBoundingClientRect();
+      var pmB=rafPointer(function(e){ var r=b.getBoundingClientRect();
         b.style.transform="translate("+((e.clientX-r.left-r.width/2)*0.18)+"px,"+((e.clientY-r.top-r.height/2)*0.28)+"px)"; });
-      b.addEventListener("pointerleave",function(){ b.style.transform=""; });
+      b.addEventListener("pointermove",pmB);
+      b.addEventListener("pointerleave",function(){ pmB.cancel(); b.style.transform=""; });
     });
   }
 
@@ -3103,8 +3154,12 @@
       handle.addEventListener("pointerdown",function(e){ hDrag=true; handle.classList.add("grab");
         try{handle.setPointerCapture(e.pointerId);}catch(_){}
         cur=1-fracFromX(e.clientX); manual=cur; apply(); syncBtns(); e.preventDefault(); });
-      handle.addEventListener("pointermove",function(e){ if(!hDrag)return; cur=1-fracFromX(e.clientX); manual=cur; apply(); syncBtns(); });
-      function hEnd(){ if(hDrag){ hDrag=false; handle.classList.remove("grab"); } }
+      var pmH=rafPointer(function(e){ if(!hDrag)return; cur=1-fracFromX(e.clientX); manual=cur; apply(); syncBtns(); });
+      handle.addEventListener("pointermove",pmH);
+      /* flush ANTES de baixar hDrag: se houvesse um frame pendente ao soltar, cancelá-lo
+         perderia os últimos pixels do arrasto, e deixá-lo correr depois cairia no early
+         return. Aqui ele roda com hDrag ainda verdadeiro e aplica a posição final. */
+      function hEnd(){ pmH.flush(); if(hDrag){ hDrag=false; handle.classList.remove("grab"); } }
       handle.addEventListener("pointerup",hEnd); handle.addEventListener("pointercancel",hEnd);
     }
 
@@ -3467,6 +3522,13 @@
      da barra e só então se lia o retângulo do rodapé e os dos CTAs — cada leitura depois de
      escrita obriga o navegador a refazer o layout na hora. Agora decide-se tudo primeiro
      (aritmética sobre scrollY, sem tocar em layout) e só no fim se escreve. */
+  /* Onde o CSS já anima a barra, o JS sai do caminho. A regra .progress dentro do @supports
+     (animation-timeline) declara width:100%!important e anima por scroll-driven animation —
+     ou seja, no Chrome esta escrita era INTEGRALMENTE sobrescrita e ainda assim invalidava
+     estilo a cada frame de rolagem. As duas condições testadas aqui são exatamente as do
+     bloco CSS (@supports + prefers-reduced-motion), então Safari e Firefox, que não têm
+     animation-timeline, seguem recebendo o caminho JS e a barra continua funcionando. */
+  var cssProg=!reduce && !!(window.CSS && CSS.supports && CSS.supports("animation-timeline","view()"));
   var chromeTick=false;
   window.addEventListener("scroll",function(){
     if(chromeTick) return; chromeTick=true;
@@ -3474,11 +3536,11 @@
       chromeTick=false;
       if(!chromeGeom) measureChrome();
       var sy=window.scrollY||window.pageYOffset||0, vh=window.innerHeight;
-      var solid=sy>40, prog=scrollProg()*100;
+      var solid=sy>40, prog=cssProg?0:scrollProg()*100;
       var showDock=(sy>vh*0.85) && !!chromeGeom.foot && (chromeGeom.foot.top-sy)>vh
                    && !ctaInView(chromeGeom.offer) && !ctaInView(chromeGeom.final);
       topbar.classList.toggle("solid",solid);
-      progressBar.style.width=prog+"%";
+      if(!cssProg) progressBar.style.width=prog+"%";
       dock.classList.toggle("show",showDock);
       updateRail();
     });
