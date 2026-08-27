@@ -1606,7 +1606,18 @@
        iguais e, ainda assim, o viewport do contexto novo precisa ser reposto. */
     gl.viewport(0,0,w,h);
   }
-  resize(); onResize(resize);
+  /* Realocação ADIADA para o começo do frame que vai desenhar. Redimensionar um canvas zera
+     o buffer. A ordem dos callbacks de rAF é a de registro: o loop se registrou no fim do
+     frame anterior, o handler de resize se registra quando o evento chega — ou seja, o
+     resize roda DEPOIS do desenho, zera o buffer, e o compositor apresenta a tela vazia.
+     Um frame em branco por resize.
+     No iOS o vaivém leve de scroll esconde e mostra a barra do Safari, o que muda a altura
+     do viewport de verdade e dispara resize sem parar: daí o piscar em sequência. A WebView
+     do TikTok não tem barra que se esconde, e é exatamente por isso que lá nunca aconteceu.
+     Marcando aqui e realocando imediatamente antes de desenhar, o buffer nunca chega vazio
+     à tela — e o tamanho continua sempre correto, sem esticar nada. */
+  var needAura=false, needEmb=false;
+  resize(); onResize(function(){ needAura=true; needEmb=true; });
 
   /* ---------------- embers (2D) ---------------- */
   var ec=document.getElementById("embers"), ex=ec.getContext("2d");
@@ -1631,7 +1642,7 @@
     r:Math.random()*2.2+0.6, vy:Math.random()*0.6+0.25,
     drift:(Math.random()-0.5)*0.4, a:Math.random()*0.5+0.2,
     depth:Math.random()*0.7+0.3, tw:Math.random()*6.28, violet:Math.random()<0.16 }; }
-  eresize(); onResize(eresize);
+  eresize();
 
   /* ---------------- pointer / tilt ---------------- */
   var progCur=0,progTarget=0, mx=0,my=0, mtx=0,mty=0, vmx=0,vmy=0, metTarget=0, metCur=0;
@@ -1675,6 +1686,9 @@
 
   var start=performance.now(), last=start;
   function frame(now){
+    /* consome as realocações pendentes ANTES de desenhar — ver o comentário em needAura */
+    if(needAura){ needAura=false; resize(); }
+    if(needEmb){ needEmb=false; eresize(); }
     var dt=Math.min((now-last)/16.67,3); last=now;
     progCur+=(progTarget-progCur)*0.06;
     /* mola crítica-amortecida: resposta orgânica (acelera e assenta) no lugar do lerp linear */
@@ -2465,7 +2479,11 @@
       if(fx){ var fw=Math.max(1,Math.round(w*FSC)), fh=Math.max(1,Math.round(h*FSC));
         fc.width=fw; fc.height=fh; sCan.width=fw; sCan.height=fh; }
     }
-    gres(); onResize(gres);
+    /* mesma adiada da aura, e aqui vale para as duas origens: o resize do navegador E os
+       ajustes do próprio adaptativo, que rodam no FIM do gframe — ou seja, depois do desenho
+       daquele frame. Cada passo de escala zerava o buffer que já ia ser apresentado. */
+    var needGres=false;
+    gres(); onResize(function(){ needGres=true; });
 
     /* perf-lite (ver o bloco no <style>): cortar o CSS caro é a PRIMEIRA alavanca, não a
        última. A ordem antiga presumia que um frame ruim era culpa do 3D e começava
@@ -2562,6 +2580,7 @@
       /* zera gRaf ao sair: sem isso a flag ficaria travada num ID de frame morto e
          gwake() nunca mais religaria o loop após uma perda de contexto */
       if(!glok){ gRaf=0; return; }
+      if(needGres){ needGres=false; gres(); }
       var tt=reduce?0.6:(now-t0s)/1000;
       var tg=timelineT();
       var fdt=prev?Math.min(Math.max(now-prev,4),100):16.7;
@@ -2665,7 +2684,7 @@
           if(!liteOn && !isTouch){ autoLite(1); }
           else if(!liteBg && !isTouch){ autoLite(2); }
           else if(sparkN>SPARKMIN){ sparkN=Math.max(SPARKMIN,Math.round(sparkN*(ema>40?0.6:0.8))); }
-          else if(gscale>NICE){ gscale=Math.max(NICE,gscale*0.88); gres(); }
+          else if(gscale>NICE){ gscale=Math.max(NICE,gscale*0.88); needGres=true; }
           else if(bounceN>BOUNCEMIN){ bounceN--; }
           /* Descer ABAIXO do nativo é o último recurso e exige estar realmente ruim (>34ms
              ≈ 29fps), não só fora do alvo. Antes bastava passar de 28ms, e aí a queda se
@@ -2673,13 +2692,13 @@
              onde nada subia nem descia — a gema ficava borrada com folga de GPU sobrando e
              sem nada capaz de trazê-la de volta. Era esse o borrão do desktop. Para um
              fundo decorativo, nítido a 34fps é melhor que borrado a 45fps. */
-          else if(ema>34 && gscale>MINS){ gscale=Math.max(MINS,gscale*(ema>48?0.80:0.90)); gres(); }
+          else if(ema>34 && gscale>MINS){ gscale=Math.max(MINS,gscale*(ema>48?0.80:0.90)); needGres=true; }
         } else if(gscale<NICE){
           /* Estando abaixo do nativo, TODA folga vai para nitidez antes de qualquer outra
              coisa — e o passo é curto (6%) de propósito: cair a 34 e subir a 28 deixa uma
              faixa morta de 6ms que absorve o custo do próprio passo, então ele converge na
              maior escala que a máquina sustenta em vez de oscilar em volta dela. */
-          gscale=Math.min(NICE,gscale*1.06); gres();
+          gscale=Math.min(NICE,gscale*1.06); needGres=true;
         } else if(ema<(isTouch?17:22)){
           /* Já no alvo e com folga: devolve reflexão, depois faísca, supersampling por último.
              Limiar mais exigente no celular (17ms ≈ 59fps, como era antes de tudo isto): ali
@@ -2689,7 +2708,7 @@
              no celular não custa só desempenho, custa um piscar visível a cada passo. */
           if(bounceN<BOUNCEMAX){ bounceN++; }
           else if(sparkN<SPARKMAX){ sparkN=Math.min(SPARKMAX,sparkN+3); }
-          else if(gscale<MAXS){ gscale=Math.min(MAXS,gscale*1.05); gres(); }
+          else if(gscale<MAXS){ gscale=Math.min(MAXS,gscale*1.05); needGres=true; }
         } }
       gRaf=awake?requestAnimationFrame(gframe):0;
     }
@@ -2955,7 +2974,11 @@
       var tgX=0,tgY=0,cX=0,cY=0,mx=50,my=50,tmx=50,tmy=50,hover=false,idle=0,active=false,inView=false,raf=false;
       function apply(){ card.style.transform="rotateX("+cY.toFixed(2)+"deg) rotateY("+cX.toFixed(2)+"deg)";
         card.style.setProperty("--mx",mx.toFixed(1)+"%"); card.style.setProperty("--my",my.toFixed(1)+"%"); }
+      var needESize=false;
       function loop(){ if(!active){ raf=false; return; }
+        /* mesma adiada da aura e da gema: esize() zera o canvas das fagulhas, então ele só
+           pode rodar imediatamente antes do edraw() que vai repintá-lo */
+        if(needESize){ needESize=false; esize(); }
         idle+=1/60;
         var ix=hover?0:Math.sin(idle*0.85)*2.2, iy=hover?0:Math.cos(idle*0.62)*1.5;
         var gx=tgX+ix, gy=tgY+iy;
@@ -2981,9 +3004,9 @@
       var did=false;
       function reveal(){ if(did)return; did=true; if(onReveal) onReveal(card); }
 
-      esize(); onResize(esize);
+      esize(); onResize(function(){ needESize=true; });
       new IntersectionObserver(function(es){ es.forEach(function(en){ inView=en.isIntersecting;
-        if(inView){ reveal(); esize(); start(); } else { stop(); } }); },{threshold:0.32}).observe(stage);
+        if(inView){ reveal(); needESize=true; start(); } else { stop(); } }); },{threshold:0.32}).observe(stage);
       document.addEventListener("visibilitychange",function(){ if(document.hidden){ stop(); } else if(inView){ start(); } });
     }
 
