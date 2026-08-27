@@ -670,6 +670,20 @@
   .socials a.holo::before{transition:background-position .55s ease}
   .socials a:hover::before{background-position:130% 50%}
   .socials svg{width:17px;height:17px}
+  /* No celular os três quebravam para duas linhas: a soma das larguras naturais (~398px com
+     os gaps) não cabe em 92vw de uma tela de 393px. Em vez de apertar padding e fonte até
+     caber num aparelho — que quebra de novo no primeiro mais estreito, ou quando o usuário
+     aumenta o corpo do texto por acessibilidade — os três passam a dividir a linha em partes
+     iguais (flex:1 1 0). Aí cabem por construção, em qualquer largura.
+     A fonte acompanha a viewport e o ícone acompanha a fonte (em em, não px), então o
+     conteúdo encolhe junto com o espaço disponível e nunca estoura o próprio botão.
+     min-height:44px vem da regra base e fica de pé — o alvo de toque não muda. */
+  @media(max-width:560px){
+    .socials{flex-wrap:nowrap;width:100%;gap:8px}
+    .socials a{flex:1 1 0;min-width:0;justify-content:center;padding:11px 6px;gap:7px;
+      white-space:nowrap;font-size:clamp(.7rem,3.1vw,.85rem)}
+    .socials svg{width:1.15em;height:1.15em;flex:none}
+  }
   .foot .fine{color:var(--ink-faint);font-size:.78rem;font-family:var(--font-mono)}
   /* links legais: exigidos por scanners de reputação (TikTok/Safe Browsing) e pelo CDC */
   .foot .legal{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center}
