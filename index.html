@@ -1467,13 +1467,6 @@
      animando ao rolar, o arrasto de janela no desktop — vira no máximo uma execução por
      frame. Sozinho isso já corta a maior parte do estrago; junto com as guardas de "não
      mudou" em cada handler, a barra do iOS deixa de recriar buffers por completo. */
-  /* Forense do piscar. Duas causas possíveis, indistinguíveis a olho nu:
-       · realocação de canvas (gres) — zera o drawing buffer por um frame;
-       · perda de contexto WebGL — o iOS derruba contextos sob pressão de memória; aí o
-         fundo cai para o gradiente CSS e a gema some até restaurar.
-     Estes contadores dizem qual das duas, sem adivinhação. Aparecem no HUD do #debug. */
-  var glLost={aura:0,gem:0,resize:0};
-
   function onResize(fn){
     var raf=0;
     window.addEventListener("resize",function(){ if(raf) return;
@@ -1578,7 +1571,7 @@
   ok=buildAura();
   if(!ok){ auraFallback(true); }
   if(gl){
-    canvas.addEventListener("webglcontextlost",function(e){ e.preventDefault(); glLost.aura++; ok=false; auraFallback(true); },false);
+    canvas.addEventListener("webglcontextlost",function(e){ e.preventDefault(); ok=false; auraFallback(true); },false);
     canvas.addEventListener("webglcontextrestored",function(){ ok=buildAura(); if(ok){ auraFallback(false); resize(); } },false);
   }
 
@@ -2467,7 +2460,6 @@
       /* o handler mais caro dos cinco: realoca QUATRO buffers, e o da gema é WebGL. Mesma
          guarda da aura — sem ela, cada transição da barra do Safari recriava todos. */
       if(c.width===w && c.height===h) return;
-      glLost.resize++;
       c.width=w; c.height=h;
       if(bx){ bc.width=Math.max(1,Math.round(w*BSC)); bc.height=Math.max(1,Math.round(h*BSC)); }
       if(fx){ var fw=Math.max(1,Math.round(w*FSC)), fh=Math.max(1,Math.round(h*FSC));
@@ -2475,119 +2467,12 @@
     }
     gres(); onResize(gres);
 
-    /* ---------------- profiler (#debug) ----------------
-       Duas perguntas que a média de FPS não responde:
-       1) o travamento é FPS baixo e constante, ou são frames longos isolados? Uma EMA de
-          48ms tanto pode ser 20fps parelho quanto 60fps com um engasgo de 300ms por segundo
-          — e são problemas completamente diferentes. Daí "pior" e "longos".
-       2) o custo é CPU ou GPU? drawArrays é assíncrono, então cronometrá-lo não diz nada;
-          quem paga a conta da GPU é a primeira operação que precisa do resultado — no caso,
-          o drawImage do bloom. Por isso o modo debug insere um g.finish() explícito depois
-          dos draws: ele bloqueia até a GPU terminar, e o tempo dele É o tempo de GPU. O que
-          vier depois é custo real de cópia.
-       g.finish() é uma barreira: o próprio debug fica mais lento que o site normal. Vale a
-       troca pela atribuição exata — e [4] desliga para comparar. */
-    var DBG=location.hash.indexOf("debug")>-1;
-    var dbg={math:0,draw:0,gpu:0,bloom:0,flare:0,
-             max:0,long:0,win:0,maxS:0,longS:0,
-             offGem:false,offDust:false,fin:true};
-    function dnow(){ return DBG?performance.now():0; }
-
     /* perf-lite (ver o bloco no <style>): cortar o CSS caro é a PRIMEIRA alavanca, não a
        última. A ordem antiga presumia que um frame ruim era culpa do 3D e começava
-       degradando a gema — nesta máquina isso nunca ia resolver, porque a gema custava 3% do
-       frame. Cortar blur animado e backdrop-filter é, além de mais eficaz, mais barato
-       visualmente: ninguém repara que o vidro virou fosco; todo mundo repara em 19fps.
-       Guarda !isTouch explícita: no mobile isto não liga em hipótese nenhuma. */
-    /* liteLock: o [7] do debug tem que VENCER o auto-detect. Sem isso o adaptativo religa o
-       perf-lite na janela seguinte (o frame continua ruim, que é justamente o que estamos
-       tentando medir) e o A/B fica impossível — desliga e volta sozinho em ~1,5s. */
-    var liteLock=false;
-
-    if(DBG){
-      var hud=document.createElement("div");
-      hud.style.cssText="position:fixed;left:8px;bottom:8px;z-index:99999;font:11px/1.5 ui-monospace,Consolas,monospace;color:#6f6;background:rgba(0,0,0,.88);padding:7px 10px;border:1px solid rgba(110,255,110,.3);border-radius:6px;white-space:pre;user-select:text";
-      document.body.appendChild(hud);
-
-      /* longtask: tarefas de main thread acima de 50ms, reportadas pelo próprio navegador.
-         Se houver longtask mas o js do gframe for pequeno, quem bloqueia não é a gema — é
-         layout, GC ou outro handler. Isso separa "a gema está pesada" de "a página está
-         travando a gema". */
-      /* QUAL GPU está de fato desenhando. Se vier "SwiftShader" ou "Software", o Chrome
-         desistiu do driver e está rasterizando na CPU — e aí nenhum ajuste de shader salva:
-         a resposta seria outra (checar chrome://gpu / atualizar driver). Vale checar antes
-         de continuar otimizando contra um moinho de vento. */
-      var rend="?"; try{ var dbi=g.getExtension("WEBGL_debug_renderer_info");
-        if(dbi) rend=String(g.getParameter(dbi.UNMASKED_RENDERER_WEBGL)); }catch(e){}
-      if(rend.length>52) rend=rend.slice(0,52)+"…";
-
-      var ltN=0, ltMax=0;
-      if(window.PerformanceObserver){ try{
-        new PerformanceObserver(function(l){ l.getEntries().forEach(function(en){
-          ltN++; if(en.duration>ltMax) ltMax=Math.round(en.duration); }); })
-        .observe({entryTypes:["longtask"]});
-      }catch(e){} }
-
-      /* Isolamento por passe. A pergunta que cada tecla responde, sozinha:
-         [1] sem a gema, a rolagem fica lisa? -> o custo é o shader da pedra.
-         [2] sem a poeira? -> é o passe de tela cheia.
-         [3] sem aura/brasas? -> é o outro loop de rAF, não a gema.
-         [b][f] sem bloom/risco? -> são as cópias do canvas WebGL para canvas 2D.
-         Se NADA disso resolver, o travamento não está no 3D e sim na página. */
-      /* [8] testa a hipótese que sobra: excesso de CAMADAS de tela cheia. Esta página compõe
-         cinco canvas sobrepostos — aura, gema, bloom, risco, brasas — mais o .grain em
-         mix-blend-mode. Cada canvas que muda precisa ser enviado ao compositor todo frame:
-         só aura + gema + brasas são 3 × 1351×641×4 ≈ 10 MB por frame. Numa HD 5500, que
-         divide a banda de memória com a CPU, isso satura o barramento sem aparecer em lugar
-         nenhum do nosso perfil — combina com gpu 0 e js 1.7ms num frame de 52ms. */
-      var lyB=true, lyF=true, lyA=true, lyL=true;
-      var grainEl=document.querySelector(".grain");
-      function paint(){ if(bc) bc.style.display=lyB?"block":"none";
-                        if(fc) fc.style.display=lyF?"block":"none";
-                        if(canvas) canvas.style.display=lyL?"block":"none";
-                        if(ec) ec.style.display=lyL?"block":"none";
-                        if(grainEl) grainEl.style.display=lyL?"":"none"; }
-      window.addEventListener("keydown",function(e){
-        if(e.ctrlKey||e.altKey||e.metaKey) return;
-        var k=(e.key||"").toLowerCase();
-        if(k==="b"&&bc){ lyB=!lyB; paint(); }
-        else if(k==="f"&&fc){ lyF=!lyF; paint(); }
-        else if(k==="g"){ lyB=lyF=!(lyB||lyF); paint(); }
-        else if(k==="1"){ dbg.offGem=!dbg.offGem; }
-        else if(k==="2"){ dbg.offDust=!dbg.offDust; }
-        else if(k==="3"){ lyA=!lyA; if(lyA){ heroAwake=true; heroWake(); } else { heroAwake=false; } }
-        else if(k==="4"){ dbg.fin=!dbg.fin; }
-        /* cicla 0 -> 1 -> 2 -> 0, para dar para achar o degrau MÍNIMO que resolve */
-        else if(k==="7"){ liteLock=true; applyLite(liteBg?0:(liteOn?2:1)); }
-        else if(k==="8"){ lyL=!lyL; paint(); }
-        else if(k==="0"){ lyB=lyF=lyA=lyL=true; dbg.offGem=dbg.offDust=false; dbg.fin=true;
-                          liteLock=false; applyLite(0);
-                          paint(); heroAwake=true; heroWake(); ltN=0; ltMax=0;
-                          dbg.maxS=dbg.longS=dbg.max=dbg.long=dbg.win=0; }
-      });
-
-      function n1(v){ return (Math.round(v*10)/10); }
-      setInterval(function(){ var d=window.__txGem||{};
-        hud.textContent=
-          "fps "+d.fps+"    frame "+d.ms+"ms    pior "+dbg.maxS+"ms    longos "+dbg.longS+"/60\n"+
-          "js "+d.js+"ms = math "+n1(dbg.math)+" + draw "+n1(dbg.draw)+" + gpu "+n1(dbg.gpu)+
-            " + bloom "+n1(dbg.bloom)+" + risco "+n1(dbg.flare)+"\n"+
-          "longtask "+ltN+"   pior "+ltMax+"ms\n"+
-          "piscar: realoc "+glLost.resize+"   ctx perdido aura "+glLost.aura+" gema "+glLost.gem+"\n"+
-          "gpu "+rend+"\n"+
-          "escala "+d.scale+"  piso "+d.floor+"   faisca "+d.spark+"/"+SPARKMAX+
-            "   reflexao "+d.bounce+"/"+BOUNCEMAX+"\n"+
-          "gema "+d.px+" (css "+d.css+")   aura "+canvas.width+"x"+canvas.height+"\n"+
-          "dpr "+(window.devicePixelRatio||1)+"  gdpr "+gdpr+"  lowGpu "+(lowGpu?"sim":"nao")+
-            "  hc "+navigator.hardwareConcurrency+"  mem "+navigator.deviceMemory+"\n"+
-          "[1]gema "+(dbg.offGem?"OFF":"on ")+" [2]poeira "+(dbg.offDust?"OFF":"on ")+
-            " [3]aura "+(lyA?"on ":"OFF")+" [4]finish "+(dbg.fin?"on ":"OFF")+
-            "  [7]lite "+(liteBg?"2 pagina+hero":(liteOn?"1 pagina":"0 nada"))+
-            (liteLock?" fixo":" auto")+"\n"+
-          "[b]bloom "+(lyB?"on ":"OFF")+" [f]risco "+(lyF?"on ":"OFF")+" [g]ambos"+
-            "  [8]camadas "+(lyL?"on ":"OFF")+"  [0]tudo on";
-      },500);
-    }
+       degradando a gema — numa GPU integrada isso nunca ia resolver, porque a gema custava
+       3% do frame e a GPU estava ociosa. Cortar blur animado e backdrop-filter é, além de
+       mais eficaz, mais barato visualmente: ninguém repara que o vidro virou fosco; todo
+       mundo repara em 19fps. Guarda !isTouch: no mobile isto não liga em hipótese nenhuma. */
 
     /* ---- timeline: indice da secao + progresso local (robusto a alturas e viewports diferentes) ---- */
     var SECS=["hero","manifesto","autoridade","videos","antesdepois","numeros","gema","capa","oferta","faq","final"];
@@ -2670,17 +2555,13 @@
       if(isTouch){ S[2]*=0.45; S[3]*=0.55; S[4]=S[4]*1.18+0.08; S[6]*=0.85; }
     }
 
-    /* jsEma = tempo gasto DENTRO do gframe. Comparado com ema (intervalo real entre frames)
-       separa as duas causas possíveis de travamento: se js for uma fração pequena de ema, o
-       gargalo é GPU (o shader); se for grande, é CPU — layout forçado ou as cópias do canvas
-       WebGL para os canvas 2D, que bloqueiam esperando a GPU. */
-    var t0s=performance.now(), tCur=null, awake=true, ema=16, jsEma=0, fcount=0, prev=0;
-    window.__txGem={cut:0,t:0,fps:0,scale:gscale};
+    var t0s=performance.now(), tCur=null, awake=true, ema=16, fcount=0, prev=0;
+    /* __txGem: o capítulo da gema lê .cut para mostrar a contagem de facetas na tela */
+    window.__txGem={cut:0,t:0};
     function gframe(now){
       /* zera gRaf ao sair: sem isso a flag ficaria travada num ID de frame morto e
          gwake() nunca mais religaria o loop após uma perda de contexto */
       if(!glok){ gRaf=0; return; }
-      var jsT0=performance.now();
       var tt=reduce?0.6:(now-t0s)/1000;
       var tg=timelineT();
       var fdt=prev?Math.min(Math.max(now-prev,4),100):16.7;
@@ -2715,12 +2596,11 @@
       /* transposta = leva direcao do espaco da pedra para o espaco da camera: prega as luzes no estudio */
       var MT=new Float32Array([cb,0,-sb,sb*sa,ca,cb*sa,sb*ca,-sa,cb*ca]);
       if(!reduce){ camz*=1.0+Math.sin(tt*0.196)*0.016+Math.sin(tt*0.083+1.3)*0.010; }
-      var pMath=dnow();
       var W=c.width,H=c.height;
       g.viewport(0,0,W,H);
       g.disable(g.BLEND);
       g.clear(g.COLOR_BUFFER_BIT);
-      if(dust>0.01 && !dbg.offDust){
+      if(dust>0.01){
         bindQuad(Pd);
         g.uniform2f(Pd.U.uRes,W,H);
         g.uniform2f(Pd.U.uDrift,tt*0.10+tCur*0.35,-tCur*1.10);
@@ -2728,7 +2608,7 @@
         g.drawArrays(g.TRIANGLES,0,3);
       }
       gemBox=null;
-      if(alpha>0.004 && !dbg.offGem){
+      if(alpha>0.004){
         /* bounding box da gema em pixels: so esses fragmentos pagam o ray-trace (com folga extra p/ as faiscas) */
         var Rb=1.30+ex*0.9+spark*0.62+caus*0.55, qm=Rb/Math.sqrt(Math.max(camz*camz-Rb*Rb,0.04));
         var half=(qm/size)*H*1.06;
@@ -2762,28 +2642,14 @@
           g.disable(g.BLEND);
         }
       }
-      /* barreira explícita: só em debug, e é o que transforma "GPU assíncrona" em número */
-      var pDraw=dnow(); if(DBG&&dbg.fin){ g.finish(); } var pGpu=dnow();
       if(bx){ bx.clearRect(0,0,bc.width,bc.height);
         if(BCUT) bx.filter=BCUT;
         try{ bx.drawImage(c,0,0,bc.width,bc.height); }catch(_){}
         if(BCUT) bx.filter="none"; }
-      var pBloom=dnow();
       /* sem pedra em quadro nao ha glint pra virar estrela — pula o pass inteiro */
       if(fx && alpha>0.02){ flare(); } else if(fx){ fx.clearRect(0,0,fc.width,fc.height); }
-      if(DBG){ var pFlare=dnow();
-        dbg.math =dbg.math *0.9+(pMath -jsT0  )*0.1;
-        dbg.draw =dbg.draw *0.9+(pDraw -pMath )*0.1;
-        dbg.gpu  =dbg.gpu  *0.9+(pGpu  -pDraw )*0.1;
-        dbg.bloom=dbg.bloom*0.9+(pBloom-pGpu  )*0.1;
-        dbg.flare=dbg.flare*0.9+(pFlare-pBloom)*0.1; }
       /* auto-tuning: mede o intervalo REAL entre frames (o custo e de GPU, nao de JS) e ajusta a resolucao */
-      if(prev){ var dt=now-prev; if(dt<400) ema=ema*0.85+dt*0.15;
-        /* pior caso e contagem de frames longos numa janela de 60: é isto que distingue
-           "20fps parelho" de "60fps com engasgo", que a EMA achata e esconde */
-        if(DBG&&dt<2000){ if(dt>dbg.max) dbg.max=dt; if(dt>50) dbg.long++; dbg.win++;
-          if(dbg.win>=60){ dbg.maxS=Math.round(dbg.max); dbg.longS=dbg.long;
-                           dbg.max=0; dbg.long=0; dbg.win=0; } } }
+      if(prev){ var dt=now-prev; if(dt<400) ema=ema*0.85+dt*0.15; }
       prev=now; fcount++;
       /* Reage rápido quando está ruim, sobe devagar quando está bom. Com janela fixa de
          30 frames, sair de uma sobrecarga levava vários segundos — tempo em que o
@@ -2791,17 +2657,13 @@
          de faísca dobra (40% em vez de 20%), então a queda é quase imediata. A subida
          segue curta (5–6%) para não oscilar entre travar e recuperar. */
       var win=ema>40?12:30;
-      if(fcount>win){ fcount=0; window.__txGem.fps=Math.round(1000/Math.max(ema,1));
-        window.__txGem.scale=Math.round(gscale*100)/100; window.__txGem.spark=sparkN;
-        window.__txGem.ms=Math.round(ema*10)/10; window.__txGem.js=Math.round(jsEma*10)/10;
-        window.__txGem.bounce=bounceN; window.__txGem.px=c.width+"x"+c.height;
-        window.__txGem.css=c.clientWidth+"x"+c.clientHeight; window.__txGem.floor=MINS;
+      if(fcount>win){ fcount=0;
         if(ema>28){
           /* Ordem de sacrifício: primeiro o CSS caro (que não é nosso e custa mais), depois
-             tudo que não borra — faísca, supersampling, reflexões — e só então a nitidez. */
-          /* dois degraus, o do hero por último — ver os blocos perf-lite no <style> */
-          if(!liteOn && !liteLock && !isTouch){ autoLite(1); }
-          else if(!liteBg && !liteLock && !isTouch){ autoLite(2); }
+             tudo que não borra — faísca, supersampling, reflexões — e só então a nitidez.
+             Dois degraus de perf-lite, o do hero por último — ver os blocos no <style>. */
+          if(!liteOn && !isTouch){ autoLite(1); }
+          else if(!liteBg && !isTouch){ autoLite(2); }
           else if(sparkN>SPARKMIN){ sparkN=Math.max(SPARKMIN,Math.round(sparkN*(ema>40?0.6:0.8))); }
           else if(gscale>NICE){ gscale=Math.max(NICE,gscale*0.88); gres(); }
           else if(bounceN>BOUNCEMIN){ bounceN--; }
@@ -2829,7 +2691,6 @@
           else if(sparkN<SPARKMAX){ sparkN=Math.min(SPARKMAX,sparkN+3); }
           else if(gscale<MAXS){ gscale=Math.min(MAXS,gscale*1.05); gres(); }
         } }
-      jsEma=jsEma*0.85+(performance.now()-jsT0)*0.15;
       gRaf=awake?requestAnimationFrame(gframe):0;
     }
     /* a gema só dormia ao trocar de aba; fora da viewport seguia renderizando a full
@@ -2845,7 +2706,7 @@
        callback chegasse com a aba oculta. A economia já veio de onde importa — contagem
        de faíscas e resolução adaptativas. Resta pausar com a aba oculta. */
     document.addEventListener("visibilitychange",function(){ awake=!document.hidden&&glok; gwake(); });
-    c.addEventListener("webglcontextlost",function(e){ e.preventDefault(); glLost.gem++; glok=false; awake=false; gRaf=0; },false);
+    c.addEventListener("webglcontextlost",function(e){ e.preventDefault(); glok=false; awake=false; gRaf=0; },false);
     c.addEventListener("webglcontextrestored",function(){ glok=build(); if(glok){ gres(); awake=!document.hidden; gwake(); } },false);
     gwake();
   })();
